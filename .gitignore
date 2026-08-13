@@ -6,3 +6,4 @@
 /.superpowers
 /playwright-report
 /test-results
+.vercel
