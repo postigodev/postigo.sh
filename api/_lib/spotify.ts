@@ -1,5 +1,5 @@
-import type { NowPlayingView } from '../../src/data/presence';
-import { readJsonBounded } from './http';
+import type { NowPlayingView } from '../../src/data/presence.js';
+import { readJsonBounded } from './http.js';
 
 const TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token';
 const CURRENT_ENDPOINT = 'https://api.spotify.com/v1/me/player/currently-playing';

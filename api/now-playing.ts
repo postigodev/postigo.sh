@@ -1,5 +1,5 @@
-import { guardPublicRead, jsonForMethod, spotifyCache } from './_lib/http';
-import { getNowPlaying, loadSpotifyEnvironment } from './_lib/spotify';
+import { guardPublicRead, jsonForMethod, spotifyCache } from './_lib/http.js';
+import { getNowPlaying, loadSpotifyEnvironment } from './_lib/spotify.js';
 
 export default {
   async fetch(request: Request): Promise<Response> {

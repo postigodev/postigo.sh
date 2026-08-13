@@ -1,5 +1,5 @@
-import { githubCache, guardPublicRead, jsonForMethod } from './_lib/http';
-import { getGitHubSnapshot } from './_lib/github';
+import { githubCache, guardPublicRead, jsonForMethod } from './_lib/http.js';
+import { getGitHubSnapshot } from './_lib/github.js';
 
 export default {
   async fetch(request: Request): Promise<Response> {
