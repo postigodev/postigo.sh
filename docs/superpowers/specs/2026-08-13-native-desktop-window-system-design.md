@@ -1,7 +1,7 @@
 # Native Desktop Window System Design
 
-**Status:** Approved  
-**Date:** 2026-08-13  
+**Status:** Approved
+**Date:** 2026-08-13
 **Product:** `portfolio-v2`
 
 ## 1. Objective
