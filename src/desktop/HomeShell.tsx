@@ -1,4 +1,5 @@
 import type { ComponentChildren } from 'preact';
+import { useEffect, useState } from 'preact/hooks';
 import type { HomeProjectPreview, PublicIdentity } from '../data/portfolio';
 import type { GitHubSnapshotView } from '../data/presence';
 import GitHubSnapshotPanel from './GitHubSnapshotPanel';
@@ -16,7 +17,15 @@ interface Props {
 }
 
 export default function HomeShell({ identity, previews, github, identityWindow, playerWindow, notesWindow, taskbar, onNavigate }: Props) {
-  return <div class="home-shell" data-home-shell data-layout="columns">
+  const [layout, setLayout] = useState<'columns' | 'stacked'>('columns');
+  useEffect(() => {
+    const media = matchMedia('(max-width: 900px)');
+    const sync = () => setLayout(media.matches ? 'stacked' : 'columns');
+    sync();
+    media.addEventListener('change', sync);
+    return () => media.removeEventListener('change', sync);
+  }, []);
+  return <div class="home-shell" data-home-shell data-layout={layout}>
     <header class="system-bar">
       <a class="system-brand" href="/">POSTIGO_OS_v2.0</a><span aria-hidden="true">🐐</span>
       <nav aria-label="Primary"><a href="/">Home</a><a href="/work" onClick={(event) => onNavigate(event, '/work')}>Work</a><a href="/resume">Resume</a><a href="/about">About</a><a href="/contact">Contact</a></nav>

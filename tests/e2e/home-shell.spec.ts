@@ -27,3 +27,20 @@ test('GitHub avatar failures preserve identity and navigation', async ({ page })
   await expect(page.getByRole('link', { name: 'Explore selected work' })).toBeVisible();
   await expect(page.getByRole('link', { name: '@postigodev' })).toBeVisible();
 });
+
+for (const viewport of [
+  { width: 1440, height: 900, mode: 'columns' },
+  { width: 1024, height: 768, mode: 'columns' },
+  { width: 768, height: 1024, mode: 'stacked' },
+  { width: 390, height: 844, mode: 'stacked' },
+] as const) {
+  test(`preserves widgets without horizontal overflow at ${viewport.width}`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await page.goto('/');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    await expect(page.locator('[data-now-playing]')).toBeVisible();
+    await expect(page.locator('[data-notes]')).toBeVisible();
+    await expect(page.locator('[data-network-panel]')).toBeVisible();
+    await expect(page.locator('[data-home-shell]')).toHaveAttribute('data-layout', viewport.mode);
+  });
+}
