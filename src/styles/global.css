@@ -1,0 +1,9 @@
+* { box-sizing: border-box; }
+html { background: var(--surface); color: var(--on-surface); font-family: var(--font-body); }
+body { margin: 0; min-height: 100vh; }
+a { color: var(--primary); text-decoration: underline; }
+button, a { font: inherit; }
+:focus-visible { outline: 3px solid var(--acid); outline-offset: 2px; }
+.document-shell { max-width: 880px; margin: 0 auto; padding: 48px 24px; }
+.document-shell h1 { font-family: var(--font-display); font-size: clamp(2.25rem, 8vw, 4.5rem); line-height: .95; }
+.document-nav { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 48px; font-family: var(--font-mono); }

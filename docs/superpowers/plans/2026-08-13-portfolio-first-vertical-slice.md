@@ -104,7 +104,8 @@ tests/e2e/mobile.spec.ts            direct mobile app behavior
   "devDependencies": {
     "@astrojs/check": "0.9.10",
     "@playwright/test": "1.62.1",
-    "typescript": "7.0.2",
+    "@types/node": "26.2.0",
+    "typescript": "6.0.3",
     "vitest": "4.1.10"
   }
 }

@@ -1,0 +1,22 @@
+:root {
+  --surface: #fbf9f4;
+  --surface-dim: #dcdad5;
+  --surface-container: #f0eee9;
+  --on-surface: #1b1c19;
+  --on-surface-variant: #454558;
+  --primary: #0001bb;
+  --primary-container: #0000ff;
+  --secondary: #bc0100;
+  --tertiary: #063f00;
+  --acid: #79ff5b;
+  --legacy-gray: #c0c0c0;
+  --outline: #757589;
+  --outline-variant: #c5c4db;
+  --desktop: #171915;
+  --black: #050505;
+  --white: #ffffff;
+  --font-display: 'Epilogue', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --taskbar-height: 42px;
+}
