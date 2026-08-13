@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { projectCases } from '../data/portfolio';
 import { buildAppRegistry } from './appRegistry';
-import { isDesktopHistoryState, routeToTarget, stateForPush } from './desktopRoute';
+import { isDesktopHistoryState, rootHistoryState, routeToTarget, stateForClose, stateForPush } from './desktopRoute';
 
 const registry = buildAppRegistry(projectCases);
 
@@ -22,5 +22,17 @@ describe('desktop route contract', () => {
     const root = { portfolioDesktop: true, entryId: 0, depth: 0, route: '/', appId: 'identity' } as const;
     expect(stateForPush(root, routeToTarget('/work', registry)!)).toMatchObject({ entryId: 1, depth: 1, route: '/work' });
     expect(isDesktopHistoryState({ route: '/work' })).toBe(false);
+  });
+
+  it('replaces an owned active route with root without traversing', () => {
+    const work = stateForPush(rootHistoryState(), routeToTarget('/work', registry)!);
+    const preppie = stateForPush(work, routeToTarget('/work/preppie', registry)!);
+    expect(stateForClose(preppie, 'project:preppie')).toEqual(rootHistoryState());
+  });
+
+  it('does not mutate history when closing a non-owner or utility', () => {
+    const work = stateForPush(rootHistoryState(), routeToTarget('/work', registry)!);
+    expect(stateForClose(work, 'identity')).toBeUndefined();
+    expect(stateForClose(work, 'network')).toBeUndefined();
   });
 });

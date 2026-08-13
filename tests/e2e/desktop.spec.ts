@@ -40,6 +40,24 @@ test('project windows remain singleton and preserve evidence content', async ({ 
   await expect(preppie).toHaveCount(1);
 });
 
+test('closing a routed chain never resurrects closed parent windows', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Projects' }).click();
+  await workWindow(page).getByRole('link', { name: 'Open Preppie project' }).click();
+  await page.locator('[data-taskbar-id="identity"]').click();
+  await page.getByRole('button', { name: 'Close Piero Postigo Rocchetti' }).click();
+  await page.locator('[data-taskbar-id="work"]').click();
+  await page.getByRole('button', { name: 'Close Selected work' }).click();
+  await page.locator('[data-taskbar-id="project:preppie"]').click();
+  await page.getByRole('button', { name: 'Close Preppie' }).click();
+
+  await expect(page.getByRole('region', { name: 'Preppie' })).toHaveCount(0);
+  await expect(page.getByRole('region', { name: 'Selected work' })).toHaveCount(0);
+  await expect(page.getByRole('region', { name: 'Piero Postigo Rocchetti' })).toHaveCount(0);
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole('button', { name: /Piero OS/ })).toBeFocused();
+});
+
 test('owned Back and Forward focus route targets without closing unrelated windows', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Network' }).click();

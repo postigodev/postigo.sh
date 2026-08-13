@@ -27,6 +27,10 @@ export function stateForPush(current: DesktopHistoryState, target: RouteTarget):
   return { ...target, portfolioDesktop: true, entryId: current.entryId + 1, depth: current.depth + 1 };
 }
 
+export function stateForClose(current: DesktopHistoryState, closedId: AppId): DesktopHistoryState | undefined {
+  return current.appId === closedId ? rootHistoryState() : undefined;
+}
+
 export function rootHistoryState(): DesktopHistoryState {
   return { portfolioDesktop: true, entryId: 0, depth: 0, route: '/', appId: 'identity' };
 }

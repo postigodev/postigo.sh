@@ -12,7 +12,7 @@ import PrivacyApp from './apps/PrivacyApp';
 import ProjectApp from './apps/ProjectApp';
 import ResumeApp from './apps/ResumeApp';
 import WorkApp from './apps/WorkApp';
-import { isDesktopHistoryState, rootHistoryState, routeToTarget, stateForPush, type DesktopHistoryState, type RouteTarget } from './desktopRoute';
+import { isDesktopHistoryState, rootHistoryState, routeToTarget, stateForClose, stateForPush, type DesktopHistoryState, type RouteTarget } from './desktopRoute';
 import DesktopIcons from './DesktopIcons';
 import StartMenu from './StartMenu';
 import Taskbar from './Taskbar';
@@ -107,20 +107,19 @@ export default function DesktopShell({ identity, records, prominentRecords, proj
     const fallback = Object.values(state.windows)
       .filter((win) => win.id !== id && win.isOpen && !win.isMinimized)
       .sort((a, b) => b.zIndex - a.zIndex)[0]?.id;
+    const replacement = stateForClose(historyState.current, id);
     dispatch({ type: 'close', id });
-    if (historyState.current.appId === id && historyState.current.depth > 0) {
-      history.back();
-      return;
-    }
-    if (historyState.current.appId === id) {
-      const root = rootHistoryState();
-      history.replaceState(root, '', '/');
-      historyState.current = root;
+    if (replacement) {
+      history.replaceState(replacement, '', replacement.route);
+      historyState.current = replacement;
     }
     requestAnimationFrame(() => {
+      if (fallback) {
+        document.querySelector<HTMLElement>(`[data-window-id="${fallback}"] h2`)?.focus();
+        return;
+      }
       const opener = openers.current.get(id);
       if (opener?.isConnected) opener.focus();
-      else if (fallback) document.querySelector<HTMLElement>(`[data-window-id="${fallback}"] h2`)?.focus();
       else document.querySelector<HTMLElement>('[data-start-button]')?.focus();
     });
   };
