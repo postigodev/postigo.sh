@@ -35,3 +35,7 @@ pnpm exec vercel env add SPOTIFY_REFRESH_TOKEN production
 Never paste credentials or token values into Git, screenshots, issue bodies,
 chat messages, logs, or command arguments. The optional `GITHUB_TOKEN` is also
 server-only and should be added through `vercel env add` if used.
+
+The unmodified white Spotify full-logo asset comes from Spotify's official
+[Design & Branding Guidelines](https://developer.spotify.com/documentation/design)
+download (`2024-spotify-full-logo.zip`).

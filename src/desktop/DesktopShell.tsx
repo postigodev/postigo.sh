@@ -7,12 +7,15 @@ import Window from './Window'; import DesktopIcons from './DesktopIcons'; import
 import HomeShell from './HomeShell';
 import IdentityApp from './apps/IdentityApp'; import WorkApp from './apps/WorkApp'; import ProjectApp from './apps/ProjectApp';
 import NowPlayingApp from './apps/NowPlayingApp'; import NotesApp from './apps/NotesApp';
+import { isGitHubSnapshotView, isNowPlayingView, usePresenceEndpoint } from './usePresence';
 import '../styles/desktop.css';
 
 interface Props { identity: PublicIdentity; records: readonly WorkRecord[]; projects: readonly ProjectCase[]; previews: readonly HomeProjectPreview[] }
 export default function DesktopShell({ identity, records, projects, previews }: Props) {
   const [state, dispatch] = useReducer(windowReducer, initialDesktopState);
   const [menuOpen, setMenuOpen] = useState(false);
+  const nowPlaying = usePresenceEndpoint('/api/now-playing', unavailableNowPlaying, isNowPlayingView);
+  const github = usePresenceEndpoint('/api/github-snapshot', staticGitHubFallback, isGitHubSnapshotView);
   const historyState = useRef<DesktopHistoryState>(rootHistoryState());
   const openers = useRef(new Map<string, HTMLElement>());
   const projectMap = useMemo(() => new Map(projects.map((project) => [project.slug, project])), [projects]);
@@ -42,12 +45,12 @@ export default function DesktopShell({ identity, records, projects, previews }: 
   const minimize = (id: string) => { dispatch({ type: 'minimize', id }); requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-taskbar-id="${id}"]`)?.focus()); };
   const windows = Object.values(state.windows);
   const renderWindow = (win: (typeof windows)[number]) => <Window key={win.id} window={win} active={state.activeId === win.id} onFocus={() => dispatch({ type: 'focus', id: win.id })} onClose={() => close(win.id)} onMinimize={() => minimize(win.id)} onMaximize={() => dispatch({ type: 'toggleMaximize', id: win.id })} onMove={(x, y) => dispatch({ type: 'move', id: win.id, x, y })}>
-    {win.id === 'identity' ? <IdentityApp identity={identity} onNavigate={navigate} /> : win.id === 'now-playing' ? <NowPlayingApp view={unavailableNowPlaying} /> : win.id === 'notes' ? <NotesApp /> : win.id === 'work' ? <WorkApp records={records} onNavigate={navigate} /> : win.projectSlug && projectMap.get(win.projectSlug) ? <ProjectApp project={projectMap.get(win.projectSlug)!} /> : null}
+    {win.id === 'identity' ? <IdentityApp identity={identity} onNavigate={navigate} /> : win.id === 'now-playing' ? <NowPlayingApp view={nowPlaying} /> : win.id === 'notes' ? <NotesApp /> : win.id === 'work' ? <WorkApp records={records} onNavigate={navigate} /> : win.projectSlug && projectMap.get(win.projectSlug) ? <ProjectApp project={projectMap.get(win.projectSlug)!} /> : null}
   </Window>;
   const authoredWindow = (id: string) => { const win = state.windows[id]; return win?.placement === 'authored' ? renderWindow(win) : null; };
   const taskbar = <Taskbar windows={windows} activeId={state.activeId} menuOpen={menuOpen} onToggleMenu={() => setMenuOpen((value) => !value)} onActivate={activate} />;
   return <div class="desktop-shell">
-    <HomeShell identity={identity} previews={previews} github={staticGitHubFallback} identityWindow={authoredWindow('identity')} playerWindow={authoredWindow('now-playing')} notesWindow={authoredWindow('notes')} taskbar={taskbar} onNavigate={navigate} />
+    <HomeShell identity={identity} previews={previews} github={github} identityWindow={authoredWindow('identity')} playerWindow={authoredWindow('now-playing')} notesWindow={authoredWindow('notes')} taskbar={taskbar} onNavigate={navigate} />
     <DesktopIcons onNavigate={navigate} />
     <div class="desktop-surface" aria-label="Floating desktop windows">
       {windows.filter((win) => win.placement === 'floating').map(renderWindow)}

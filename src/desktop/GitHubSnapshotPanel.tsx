@@ -14,9 +14,9 @@ export default function GitHubSnapshotPanel({ view }: { view: GitHubSnapshotView
       </div>
     </div>
     {view.state === 'ready' ? <dl class="github-stats">
-      <div><dt>repos</dt><dd>{view.publicRepos}</dd></div>
-      <div><dt>followers</dt><dd>{view.followers}</dd></div>
-      <div><dt>stars</dt><dd>{view.stars}</dd></div>
+      <div><dt>repositories</dt><dd>{view.publicRepos} repos</dd></div>
+      <div><dt>audience</dt><dd>{view.followers} followers</dd></div>
+      <div><dt>recognition</dt><dd>{view.stars} stars</dd></div>
       <div><dt>languages</dt><dd>{view.languages.join(' · ')}</dd></div>
     </dl> : <p class="network-fallback">PROFILE_LINK_AVAILABLE</p>}
   </section>;
