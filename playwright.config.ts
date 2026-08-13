@@ -12,7 +12,7 @@ export default defineConfig({
   webServer: externalBaseUrl
     ? undefined
     : {
-        command: 'pnpm dev --host 127.0.0.1 --port 4321',
+        command: 'pnpm build && pnpm exec serve dist -l tcp://127.0.0.1:4321 --no-clipboard',
         url: 'http://127.0.0.1:4321',
         reuseExistingServer: !process.env.CI,
       },

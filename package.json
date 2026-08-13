@@ -10,7 +10,7 @@
     "dev": "astro dev",
     "check": "astro check",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "serve dist --no-clipboard",
     "test:unit": "vitest run",
     "test:e2e": "playwright test"
   },
@@ -23,6 +23,7 @@
     "@astrojs/check": "0.9.10",
     "@playwright/test": "1.62.1",
     "@types/node": "26.2.0",
+    "serve": "14.2.6",
     "typescript": "6.0.3",
     "vitest": "4.1.10"
   }

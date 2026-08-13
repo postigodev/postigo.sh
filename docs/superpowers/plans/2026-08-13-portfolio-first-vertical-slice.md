@@ -105,6 +105,7 @@ tests/e2e/mobile.spec.ts            direct mobile app behavior
     "@astrojs/check": "0.9.10",
     "@playwright/test": "1.62.1",
     "@types/node": "26.2.0",
+    "serve": "14.2.6",
     "typescript": "6.0.3",
     "vitest": "4.1.10"
   }

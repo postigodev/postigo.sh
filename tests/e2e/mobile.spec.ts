@@ -1,0 +1,9 @@
+import { expect, test } from '@playwright/test';
+test.use({ viewport: { width: 390, height: 844 }, hasTouch: true });
+test('mobile uses direct full-screen app views', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Explore selected work' }).click();
+  const work = page.getByRole('region', { name: 'Work' });
+  await expect(work).toBeVisible(); await expect(work).toHaveCSS('position', 'fixed');
+  await expect(page.getByRole('navigation', { name: 'Primary' })).toBeAttached();
+});

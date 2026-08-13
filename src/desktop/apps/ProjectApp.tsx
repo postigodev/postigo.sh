@@ -1,0 +1,4 @@
+import type { ProjectCase } from '../../data/portfolio';
+export default function ProjectApp({ project }: { project: ProjectCase }) {
+  return <article class="project-app"><header><p>[{project.status.toUpperCase()}]</p><h1>{project.name}</h1><p>{project.summary}</p><p><strong>Ownership:</strong> {project.ownership}</p></header><img src="/images/sendo/sendo-home.png" alt="Sendo Windows desktop application home screen" /><section><h3>Selected contributions</h3><ul>{project.contributions.map((item) => <li>{item}</li>)}</ul></section><section><h3>Public artifacts</h3><div class="artifact-list">{project.artifacts.map((artifact) => <a href={artifact.href} target={artifact.external ? '_blank' : undefined} rel={artifact.external ? 'noreferrer' : undefined}><strong>{artifact.label}</strong><span>{artifact.caption}</span><code>{artifact.evidenceRef}</code></a>)}</div></section><p><a href={project.links.repository}>Source repository</a></p></article>;
+}

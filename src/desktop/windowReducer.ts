@@ -1,6 +1,6 @@
 import type { Bounds, DesktopAction, DesktopState, WindowState } from './types';
 
-const identityBounds: Bounds = { x: 250, y: 72, width: 700, height: 420 };
+const identityBounds: Bounds = { x: 250, y: 72, width: 700, height: 470 };
 const workBounds: Bounds = { x: 190, y: 62, width: 820, height: 560 };
 
 export const initialDesktopState: DesktopState = {
