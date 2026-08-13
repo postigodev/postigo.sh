@@ -166,30 +166,13 @@ Suggested state:
 
 ```ts
 type WindowState = {
-  id: string;
-  appId: string;
-  title: string;
-
+  id: AppId;
   isOpen: boolean;
   isMinimized: boolean;
   isMaximized: boolean;
-
   zIndex: number;
-
-  position: {
-    x: number;
-    y: number;
-  };
-
-  size: {
-    width: number;
-    height: number;
-  };
-
-  restoreBounds?: {
-    position: { x: number; y: number };
-    size: { width: number; height: number };
-  };
+  bounds: Bounds;
+  restoreBounds: Bounds | null;
 };
 ```
 
@@ -214,10 +197,11 @@ Centralize:
 - restore
 - maximize
 - move
-- constrain to desktop bounds
-- optional resize
+- preserve a recoverable titlebar while allowing partial viewport overflow
+- eight-direction resize with per-app minimum sizes
+- adapt geometry when the measured workspace changes
 - optional persistence
-- reset desktop layout
+- reducer-level reset support
 
 Do not duplicate these mechanics inside individual app components.
 
@@ -261,22 +245,24 @@ Important:
 
 If stock Win98 CSS conflicts with Stitch, replace the stock style.
 
-### Home-shell visual authority
+### Desktop visual authority
 
-The approved home shell is a scoped, reference-first exception: its black
-three-column composition and overlay chrome follow `references/stitch/code.html`
-more literally than the broader paper-based system. The exception applies only
-to `/` and its desktop overlays. Static content routes continue to use the
-shared production design system, and the exported reference remains read-only
-inspiration rather than a runtime dependency.
+The approved desktop is a scoped, reference-first exception: its background,
+high-contrast composition, goat signature, window proportions, and surface
+relationships follow `references/stitch/code.html` more literally than the
+broader paper-based system. The exception applies only to `/` and its desktop
+overlays. Static content routes continue to use the shared production design
+system, and the exported reference remains read-only inspiration rather than a
+runtime dependency.
 
-### Authored window placement
+### Unified native desktop placement
 
-Identity, Now Playing, and Notes begin in authored grid slots. Their first drag
-transitions the window from `authored` to `floating`; subsequent position,
-focus, minimize, maximize, and restore behavior belongs to the window manager.
-Closing a desktop-only utility changes desktop state only and never writes
-browser history.
+Every app uses the same floating `Window` primitive and starts from numeric
+bounds supplied by the typed app registry. There is no authored-versus-floating
+state and no persistent navbar, sidebar, Selected Work panel, Network panel, or
+utility slot. Drag, eight-direction resize, focus, minimize, maximize, and
+restore belong to the window manager. Desktop-only utilities change desktop
+state only and never write browser history.
 
 ---
 
@@ -284,17 +270,17 @@ browser history.
 
 The homepage itself is the hero.
 
-Recommended initial desktop state:
+The approved near-cold initial desktop state is:
 
 - Identity window open and dominant
-- desktop icons for Work, Resume, About, Notes/Writing, Contact
+- desktop icons for About Piero, Projects, Resume, Contact, and Network
 - taskbar visible
-- optional small Now Playing/status surface
 - enough visible desktop background to communicate spatial freedom
 
 Do not open every app at boot.
 
-The first state is authored and calm.
+The first state is sparse and calm. Now Playing, Notes, Network, Selected Work,
+and project cases open independently through their launchers.
 
 Exploration may become denser as the user opens and overlaps windows.
 
@@ -302,28 +288,28 @@ Exploration may become denser as the user opens and overlaps windows.
 
 ## 10. App registry
 
-Prefer a centralized app registry.
+Use one centralized typed app registry as the source of truth for desktop apps.
 
 Conceptually:
 
 ```ts
 type AppDefinition = {
-  id: string;
+  id: AppId;
   title: string;
-  icon: string;
+  icon: DesktopIcon;
+  kind: AppKind;
   route?: string;
-  singleton?: boolean;
-  defaultBounds: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
-  mobileMode?: "fullscreen" | "sheet";
+  defaultBounds: Bounds;
+  minSize: Size;
+  mobileMode: "fullscreen";
+  showOnDesktop: boolean;
+  showInStart: boolean;
 };
 ```
 
-The registry may also map app IDs to components.
+All registered windows are singletons. The registry defines routable and
+desktop-only apps, labels, launch surfaces, initial geometry, minimum geometry,
+and renderer kind. The near-cold boot preset contains only `identity`.
 
 Avoid scattered hardcoded title/path/default-size maps.
 
@@ -343,7 +329,10 @@ Core portfolio content must exist as normal routes:
 /notes
 ```
 
-Desktop actions may call `history.pushState` where useful.
+Routable launchers are semantic links. With JavaScript, the desktop intercepts
+eligible same-origin navigation, opens or focuses exactly the target app, and
+uses browser history. Without JavaScript, the same links resolve to useful
+Astro documents. Desktop-only utilities are buttons and never mutate the URL.
 
 Potential behavior:
 
@@ -351,6 +340,7 @@ Potential behavior:
 Desktop: open Koba
 → project window opens
 → URL becomes /work/koba
+→ Identity and Selected Work are unchanged
 
 Direct visit: /work/koba
 → full project page renders
@@ -520,7 +510,7 @@ At narrow breakpoints:
 
 - desktop icons may become app launcher rows/grid
 - windows become fullscreen/near-fullscreen
-- freeform drag/resize can be disabled
+- freeform drag/resize is disabled
 - taskbar may simplify
 - Close/Back remains obvious
 - same content components should be reused
