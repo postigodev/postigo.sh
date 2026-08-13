@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { identity, projectCases, selectedWork } from './portfolio';
+import { homeProjectPreviews, identity, projectCases, selectedWork } from './portfolio';
 
 describe('public portfolio projection', () => {
   it('keeps the approved identity and flagship order', () => {
@@ -43,5 +43,32 @@ describe('public portfolio projection', () => {
     expect(sendo?.artifacts.map((artifact) => artifact.kind)).toEqual([
       'release', 'screenshot', 'external-contribution',
     ]);
+  });
+
+  it('makes the three home previews routable evidence-backed cases', () => {
+    expect(homeProjectPreviews.map((preview) => preview.slug)).toEqual([
+      'preppie', 'cimax-modernization', 'koba',
+    ]);
+    expect(selectedWork.slice(0, 3).every((record) => record.slug)).toBe(true);
+    expect(projectCases.find((project) => project.slug === 'cimax-modernization')).toMatchObject({
+      contextLabel: 'Sanitized modernization',
+      ownership: expect.stringMatching(/separate from the 2023 contract/i),
+    });
+    expect(projectCases.find((project) => project.slug === 'koba')).toMatchObject({
+      contextLabel: 'Shipped developer tool',
+      ownership: 'Solo project',
+    });
+  });
+
+  it('keeps blocked Cimax and Koba claims out of public data', () => {
+    const serialized = JSON.stringify(projectCases.filter(({ slug }) =>
+      ['cimax-modernization', 'koba'].includes(slug),
+    ));
+    expect(serialized).not.toMatch(/exactly-once|latency improvement|rollback|JWT|autonomous Git|commits for users/i);
+  });
+
+  it('pins identity media to Piero public GitHub profile', () => {
+    expect(identity.avatarUrl).toMatch(/^https:\/\/avatars\.githubusercontent\.com\//);
+    expect(identity.links.github).toBe('https://github.com/postigodev');
   });
 });
