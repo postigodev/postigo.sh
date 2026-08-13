@@ -11,14 +11,14 @@ The current production rules reinterpret the reference instead of reproducing it
 ## Design
 
 - Replace the current `.window-body::-webkit-scrollbar*` rules with the reference's global `::-webkit-scrollbar*` block verbatim.
-- Expose `--window-bg` as the classic control-gray surface and `--button-hover` as its hover surface so the copied rules resolve to the intended Win98 colors.
+- Expose `--window-bg: #c0c0c0` and `--button-hover: #e0e0e0`, either directly or through aliases guaranteed to resolve to those exact values.
 - Remove the custom thumb/button active state and custom scrollbar corner artwork.
 - Keep Firefox's standards-based `scrollbar-color` fallback aligned with the same face and track colors; Firefox cannot reproduce WebKit scrollbar buttons.
-- Preserve the existing 16px scrollbar size.
+- Let literal reference parity win: retain the reference's `width: 16px` and button `height: 16px`, but do not preserve the current extra scrollbar `height` declaration.
 
 ## Verification
 
 - Open a desktop window whose content overflows vertically and compare its track, thumb, and buttons with the reference.
 - Confirm the scrollbar rules are global rather than limited to window bodies.
+- Assert at source level that the global block matches reference lines 535–557 and that no scoped `.window-body` scrollbar rules, scrollbar `:active` rules, or `::-webkit-scrollbar-corner` artwork remain.
 - Run the production build and the relevant desktop interaction tests.
-
