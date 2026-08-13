@@ -2,7 +2,21 @@ import { describe, expect, it } from 'vitest';
 import { initialDesktopState, windowReducer } from './windowReducer';
 
 describe('windowReducer', () => {
-  it('boots with identity only', () => { expect(initialDesktopState.activeId).toBe('identity'); expect(initialDesktopState.windows.identity?.isOpen).toBe(true); });
+  it('boots with identity active', () => { expect(initialDesktopState.activeId).toBe('identity'); expect(initialDesktopState.windows.identity?.isOpen).toBe(true); });
+  it('boots the authored Identity, Now Playing, and Notes windows', () => {
+    expect(Object.values(initialDesktopState.windows)
+      .filter((win) => win.isOpen)
+      .map((win) => [win.id, win.placement]))
+      .toEqual([
+        ['identity', 'authored'],
+        ['now-playing', 'authored'],
+        ['notes', 'authored'],
+      ]);
+  });
+  it('moves an authored window into floating placement without changing routes', () => {
+    const moved = windowReducer(initialDesktopState, { type: 'move', id: 'notes', x: 900, y: 220 });
+    expect(moved.windows.notes).toMatchObject({ placement: 'floating', bounds: { x: 900, y: 220 } });
+  });
   it('opens Work and singleton project windows with shared titles', () => {
     const work = windowReducer(initialDesktopState, { type: 'open', id: 'work' });
     const once = windowReducer(work, { type: 'openProject', slug: 'preppie', title: 'Preppie' });
@@ -20,7 +34,7 @@ describe('windowReducer', () => {
     expect(windowReducer(max, { type: 'toggleMaximize', id: 'identity' }).windows.identity?.bounds).toEqual(initialDesktopState.windows.identity?.bounds);
   });
   it('reset returns the authored state', () => {
-    const changed = windowReducer(initialDesktopState, { type: 'open', id: 'work' });
+    const changed = windowReducer(initialDesktopState, { type: 'close', id: 'notes' });
     expect(windowReducer(changed, { type: 'reset' })).toEqual(initialDesktopState);
   });
 });
