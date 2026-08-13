@@ -1,4 +1,30 @@
 export interface Bounds { x: number; y: number; width: number; height: number }
+export interface Size { width: number; height: number }
+export type CoreAppId = 'identity' | 'about' | 'work' | 'resume' | 'contact' | 'privacy' | 'network' | 'now-playing' | 'notes';
+export type ProjectAppId = `project:${string}`;
+export type AppId = CoreAppId | ProjectAppId;
+export type AppKind = CoreAppId | 'project';
+export type ResizeEdge = 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw';
+export type MobileMode = 'fullscreen' | 'near-fullscreen';
+
+export interface AppDefinition {
+  id: AppId;
+  title: string;
+  icon: 'user' | 'folder' | 'document' | 'mail' | 'network' | 'music' | 'notes' | 'lock' | 'project';
+  kind: AppKind;
+  route?: string;
+  projectSlug?: string;
+  defaultBounds: Bounds;
+  minSize: Size;
+  mobileMode: MobileMode;
+  showOnDesktop: boolean;
+  showInStart: boolean;
+  desktopLabel?: string;
+  startLabel?: string;
+}
+
+export type AppRegistry = ReadonlyMap<AppId, AppDefinition>;
+
 export type WindowPlacement = 'authored' | 'floating';
 export interface WindowState {
   id: string; title: string; isOpen: boolean; isMinimized: boolean; isMaximized: boolean;
