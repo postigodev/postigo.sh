@@ -1,4 +1,4 @@
-import type { ComponentChildren, JSX } from 'preact';
+import type { ComponentChildren } from 'preact';
 import type { WindowState } from './types';
 
 interface Props {
@@ -10,9 +10,9 @@ export default function Window({ window: win, active, children, onFocus, onClose
   if (!win.isOpen || win.isMinimized) return null;
   const titleId = `window-title-${win.id.replace(':', '-')}`;
   const stateId = `${titleId}-state`;
-  const startDrag = (event: JSX.TargetedPointerEvent<HTMLDivElement>) => {
+  const startDrag = (event: PointerEvent) => {
     if (win.isMaximized || matchMedia('(max-width: 768px)').matches || (event.target as HTMLElement).closest('button')) return;
-    event.currentTarget.setPointerCapture(event.pointerId);
+    (event.currentTarget as HTMLDivElement).setPointerCapture(event.pointerId);
     const offsetX = event.clientX - win.bounds.x; const offsetY = event.clientY - win.bounds.y;
     const move = (moveEvent: PointerEvent) => {
       const maxX = Math.max(0, innerWidth - win.bounds.width);
