@@ -51,8 +51,13 @@ date.
 
 ### Header
 
-The document and desktop window identify Preppie as a completed professional
-experience with the role label:
+The document and desktop window open as professional experience, not as another
+shipped side project. The first scan reads in this order:
+
+> Professional Experience · 2026 → Preppie → Startup Software Engineer —
+> Backend & Integration → collaboration boundary
+
+The role label is:
 
 > Startup Software Engineer — Backend & Integration
 
@@ -63,7 +68,9 @@ The ownership statement is concise and visible near the opening:
 
 The opening summary describes movement across a real product lifecycle: product
 flows and shared contracts, PostgreSQL application-schema hardening, deployment
-isolation and readiness, database release gates, and guarded recovery work.
+isolation and readiness, database release gates, and guarded recovery work. A
+recruiter should understand that progression and the shared-ownership boundary
+within roughly 20 seconds; an engineer can then inspect the underlying PRs.
 
 ### Narrative sequence
 
@@ -79,9 +86,9 @@ Problem/System/Impact schema:
 4. **Recovery as product work** — guarded logical recovery, twice-daily restore
    configuration, rehearsal tooling, and runbooks.
 
-Each chapter connects concise editorial copy to one or more public artifacts.
-Claims stay within the authorship and collaboration boundaries in the career
-model.
+Each chapter is the primary visual and editorial unit. It connects concise copy
+to compact PR rows embedded directly below the relevant chapter. Claims stay
+within the authorship and collaboration boundaries in the career model.
 
 ## 4. Evidence and artifacts
 
@@ -97,14 +104,22 @@ The public artifact trail consists of stable public GitHub pull requests:
 | Safe promotion | [PR #129](https://github.com/AxiomaSystems/Chef/pull/129) | `EV_PREPPIE_PR_129_DB_RELEASES` |
 | Recovery | [PR #131](https://github.com/AxiomaSystems/Chef/pull/131) | `EV_PREPPIE_PR_131_DB_RECOVERY` |
 
-The case may include a product screenshot if a public, truthful asset is
-available. It is secondary context, not authorship evidence, and the slice must
-remain complete without it. No private screenshots or unpublished operational
-details may be added merely for visual richness.
+The seven PRs must not render as seven large Sendo-style artifact cards. Each
+chapter owns a compact list of PR rows containing the PR number, descriptive
+title, restrained status/category metadata, and one clear external-link action.
+The row may be one large semantic anchor, but only the title or action receives
+link styling; captions and metadata are not underlined.
 
-Artifacts show descriptive labels and captions for public readers. Raw evidence
-IDs may remain available as metadata or restrained system labels, but they must
-not dominate the recruiter reading path.
+The case may include at most one or two additional visual artifacts when a
+public, truthful asset is available: for example a product screenshot, a small
+before/after database or configuration excerpt, recovery-tooling output, or a
+release/readiness check. These are secondary context, not authorship evidence,
+and the slice must remain complete without them. No private screenshots or
+unpublished operational details may be added merely for visual richness.
+
+Artifacts show descriptive labels and captions for public readers. Raw `EV_*`
+evidence IDs remain in typed provenance metadata and tests only; they are not
+rendered anywhere in the normal public reading path.
 
 ## 5. Content architecture
 
@@ -176,9 +191,10 @@ The visual hierarchy is:
 4. technology and repository metadata.
 
 Actual interactive window chrome remains limited to the outer desktop window.
-Artifacts and chapters use archive rows, rules, selection blue, bone/technical
-surfaces, and restrained system labels—not fake nested titlebars or generic
-rounded cards. Existing canonical fonts and design tokens remain unchanged.
+Chapters use numbered markers, strong horizontal rules, short editorial copy,
+compact PR rows, selection blue, bone/technical surfaces, and restrained system
+labels—not fake nested titlebars, seven large bordered cards, or generic rounded
+cards. Existing canonical fonts and design tokens remain unchanged.
 
 ## 8. Accessibility and link behavior
 
@@ -200,6 +216,8 @@ Unit and content tests verify:
 - every chapter artifact reference resolves;
 - the ownership statement is present;
 - blocked sole-ownership/platform/SRE language is absent;
+- raw `EV_*` identifiers remain in typed data but are absent from rendered
+  Preppie and Sendo HTML;
 - route mapping accepts any known project slug rather than hard-coding Sendo;
 - project windows derive their title from shared project content.
 
@@ -222,8 +240,13 @@ production-output Playwright suite already configured by the repository.
 
 ## 10. Delivery boundary
 
-This slice includes only the Preppie case and the minimum shared-model and
-route/window generalization required to support it cleanly. Cimax, Koba, and
-DM2Text remain in their approved order but do not receive case content in this
-slice. Resume/About/Contact desktop windows, persistence, Reset Desktop UI, and
-optional experiments remain deferred.
+This slice includes the Preppie case, the minimum shared-model and route/window
+generalization required to support it cleanly, and one small consistency fix to
+the existing Sendo renderers: remove visible raw evidence IDs and replace its
+browser-default repository link with the established archive-action treatment.
+Sendo retains its compact intro → screenshot → contributions → artifacts
+structure; it is not redesigned into the Preppie trail.
+
+Cimax, Koba, and DM2Text remain in their approved order but do not receive case
+content in this slice. Resume/About/Contact desktop windows, persistence, Reset
+Desktop UI, and optional experiments remain deferred.
