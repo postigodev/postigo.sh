@@ -8,6 +8,7 @@ import HomeShell from './HomeShell';
 import IdentityApp from './apps/IdentityApp'; import WorkApp from './apps/WorkApp'; import ProjectApp from './apps/ProjectApp';
 import NowPlayingApp from './apps/NowPlayingApp'; import NotesApp from './apps/NotesApp';
 import { isGitHubSnapshotView, isNowPlayingView, usePresenceEndpoint } from './usePresence';
+import type { AppId } from './types';
 import '../styles/desktop.css';
 
 interface Props { identity: PublicIdentity; records: readonly WorkRecord[]; projects: readonly ProjectCase[]; previews: readonly HomeProjectPreview[] }
@@ -38,13 +39,13 @@ export default function DesktopShell({ identity, records, projects, previews }: 
     if (historyState.current.route !== route) { const next = stateForPush(historyState.current, target); history.pushState(next, '', route); historyState.current = next; }
     focusWindowHeading(id);
   };
-  const activate = (id: string) => { const win = state.windows[id]; if (!win) return; dispatch({ type: win.isMinimized ? 'restore' : 'focus', id }); };
-  const close = (id: string) => {
+  const activate = (id: AppId) => { const win = state.windows[id]; if (!win) return; dispatch({ type: win.isMinimized ? 'restore' : 'focus', id }); };
+  const close = (id: AppId) => {
     dispatch({ type: 'close', id });
     if (historyState.current.appId === id) { if (historyState.current.depth > 0) history.back(); else { const root = rootHistoryState(); history.replaceState(root, '', '/'); historyState.current = root; } }
     requestAnimationFrame(() => openers.current.get(id)?.focus());
   };
-  const minimize = (id: string) => { dispatch({ type: 'minimize', id }); requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-taskbar-id="${id}"]`)?.focus()); };
+  const minimize = (id: AppId) => { dispatch({ type: 'minimize', id }); requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-taskbar-id="${id}"]`)?.focus()); };
   const windows = Object.values(state.windows);
   const renderWindow = (win: (typeof windows)[number]) => <Window key={win.id} window={win} active={state.activeId === win.id} onFocus={() => dispatch({ type: 'focus', id: win.id })} onClose={() => close(win.id)} onMinimize={() => minimize(win.id)} onMaximize={() => dispatch({ type: 'toggleMaximize', id: win.id })} onMove={(x, y) => dispatch({ type: 'move', id: win.id, x, y })}>
     {win.id === 'identity' ? <IdentityApp identity={identity} onNavigate={navigate} /> : win.id === 'now-playing' ? <NowPlayingApp view={nowPlaying} /> : win.id === 'notes' ? <NotesApp /> : win.id === 'work' ? <WorkApp records={records} onNavigate={navigate} /> : win.projectSlug && projectMap.get(win.projectSlug) ? <ProjectApp project={projectMap.get(win.projectSlug)!} /> : null}

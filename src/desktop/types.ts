@@ -27,13 +27,17 @@ export type AppRegistry = ReadonlyMap<AppId, AppDefinition>;
 
 export type WindowPlacement = 'authored' | 'floating';
 export interface WindowState {
-  id: string; title: string; isOpen: boolean; isMinimized: boolean; isMaximized: boolean;
-  placement: WindowPlacement; zIndex: number; bounds: Bounds; restoreBounds?: Bounds; projectSlug?: string;
+  id: AppId; title: string; isOpen: boolean; isMinimized: boolean; isMaximized: boolean;
+  zIndex: number; bounds: Bounds; restoreBounds?: Bounds; projectSlug?: string;
+  /** Compatibility-only until the authored shell is removed in Task 5. */
+  placement?: WindowPlacement;
 }
-export interface DesktopState { windows: Record<string, WindowState>; activeId: string | null; nextZ: number }
+export interface DesktopState { windows: Record<string, WindowState>; activeId: AppId | null; nextZ: number }
 export type DesktopAction =
-  | { type: 'open'; id: 'identity' | 'now-playing' | 'notes' | 'work' }
+  | { type: 'open' | 'focus' | 'close' | 'minimize' | 'restore'; id: AppId }
   | { type: 'openProject'; slug: string; title: string }
-  | { type: 'close' | 'focus' | 'minimize' | 'restore' | 'toggleMaximize'; id: string }
+  | { type: 'toggleMaximize'; id: AppId; workspace?: Bounds }
+  | { type: 'setBounds'; id: AppId; bounds: Bounds }
+  | { type: 'workspaceChanged'; workspace: Bounds }
   | { type: 'move'; id: string; x: number; y: number }
-  | { type: 'reset' };
+  | { type: 'reset'; state?: DesktopState };
