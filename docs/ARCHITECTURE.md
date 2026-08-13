@@ -261,6 +261,23 @@ Important:
 
 If stock Win98 CSS conflicts with Stitch, replace the stock style.
 
+### Home-shell visual authority
+
+The approved home shell is a scoped, reference-first exception: its black
+three-column composition and overlay chrome follow `references/stitch/code.html`
+more literally than the broader paper-based system. The exception applies only
+to `/` and its desktop overlays. Static content routes continue to use the
+shared production design system, and the exported reference remains read-only
+inspiration rather than a runtime dependency.
+
+### Authored window placement
+
+Identity, Now Playing, and Notes begin in authored grid slots. Their first drag
+transitions the window from `authored` to `floating`; subsequent position,
+focus, minimize, maximize, and restore behavior belongs to the window manager.
+Closing a desktop-only utility changes desktop state only and never writes
+browser history.
+
 ---
 
 ## 9. First-load desktop

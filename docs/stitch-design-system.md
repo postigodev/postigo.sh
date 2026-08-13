@@ -248,3 +248,15 @@ The final system should feel like:
 Behavior comes from the desktop architecture.
 
 Appearance comes from this file.
+
+### Scoped home-shell composition
+
+For the approved `/` composition, `references/stitch/code.html` is the direct
+authority for the black archive layout, column proportions, and surface
+relationships. This is a narrow home-shell exception, not a replacement for
+the canonical tokens or the visual language of static routes. Production must
+not import or depend on the reference export.
+
+The Identity, Now Playing, and Notes windows may start inside authored layout
+slots. On first drag they become normal floating desktop windows while keeping
+the same truthful window chrome and interaction semantics.

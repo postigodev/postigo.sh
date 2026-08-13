@@ -418,6 +418,9 @@ Before release, verify against the built production output:
 
 ## 13. Delivery boundary
 
+Implementation status: the home-shell boundary is complete. The live presence
+endpoints and privacy surface remain the next delivery boundary.
+
 This slice includes the literal Stitch home shell, the revised first-load
 composition, real Selected Work previews, the GitHub portrait and snapshot,
 the secure display-only Spotify widget, responsive reflow, and preservation of

@@ -19,6 +19,13 @@ test('status panels never expose fake window controls', async ({ page }) => {
   await expect(page.locator('.window-controls')).toHaveCount(3);
 });
 
+test('closing a desktop-only utility leaves URL and history unchanged', async ({ page }) => {
+  await page.goto('/');
+  const before = await page.evaluate(() => ({ href: location.href, length: history.length }));
+  await page.getByRole('button', { name: 'Close notes.txt' }).click();
+  expect(await page.evaluate(() => ({ href: location.href, length: history.length }))).toEqual(before);
+});
+
 test('GitHub avatar failures preserve identity and navigation', async ({ page }) => {
   await page.route('https://avatars.githubusercontent.com/**', (route) => route.abort());
   await page.goto('/');
