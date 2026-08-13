@@ -24,7 +24,7 @@ button, a { font: inherit; }
   border-color: var(--os-bevel-dark) var(--os-bevel-light) var(--os-bevel-light) var(--os-bevel-dark);
   transform: translate(1px, 1px);
 }
-* { scrollbar-color: var(--os-scrollbar-face) var(--os-scrollbar-track); scrollbar-width: auto; }
+* { scrollbar-color: var(--window-bg) var(--window-bg); scrollbar-width: auto; }
 .document-shell { max-width: 880px; margin: 0 auto; padding: 48px 24px; }
 .document-shell h1 { font-family: var(--font-display); font-size: clamp(2.25rem, 8vw, 4.5rem); line-height: .95; }
 .document-nav { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 48px; font-family: var(--font-mono); }

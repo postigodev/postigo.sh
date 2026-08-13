@@ -156,13 +156,28 @@ test('Start exposes Privacy and returns focus on Escape', async ({ page }) => {
   await expect(page.locator('#window-title-identity')).toBeFocused();
 });
 
-test('window clients expose the tokenized legacy scrollbar skin', async ({ page }) => {
+test('window clients expose the literal Win98 scrollbar skin', async ({ page }) => {
   await page.goto('/');
   const body = page.getByRole('region', { name: 'Piero Postigo Rocchetti' }).locator('.window-body');
   await expect(body).toHaveCSS('overflow', 'auto');
-  expect(await body.evaluate((element) => getComputedStyle(element, '::-webkit-scrollbar').width)).toBe('16px');
-  const cornerBackground = await body.evaluate((element) => getComputedStyle(element, '::-webkit-scrollbar-corner').backgroundImage);
-  expect(cornerBackground).toContain('linear-gradient');
+  const scrollbar = await body.evaluate((element) => ({
+    width: getComputedStyle(element, '::-webkit-scrollbar').width,
+    trackBackground: getComputedStyle(element, '::-webkit-scrollbar-track').backgroundColor,
+    trackBorderStyle: getComputedStyle(element, '::-webkit-scrollbar-track').borderTopStyle,
+    thumbBackground: getComputedStyle(element, '::-webkit-scrollbar-thumb').backgroundColor,
+    thumbBorderStyle: getComputedStyle(element, '::-webkit-scrollbar-thumb').borderTopStyle,
+    buttonHeight: getComputedStyle(element, '::-webkit-scrollbar-button').height,
+    cornerBackground: getComputedStyle(element, '::-webkit-scrollbar-corner').backgroundImage,
+  }));
+  expect(scrollbar).toEqual({
+    width: '16px',
+    trackBackground: 'rgb(192, 192, 192)',
+    trackBorderStyle: 'inset',
+    thumbBackground: 'rgb(192, 192, 192)',
+    thumbBorderStyle: 'outset',
+    buttonHeight: '16px',
+    cornerBackground: 'none',
+  });
 });
 
 test('About Piero restores Identity and Player is available from desktop and Start', async ({ page }) => {

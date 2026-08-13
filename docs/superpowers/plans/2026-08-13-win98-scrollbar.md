@@ -25,6 +25,7 @@
 - Modify: `src/styles/tokens.css:1-49`
 - Modify: `src/styles/desktop.css:47-60`
 - Modify: `src/styles/global.css:27`
+- Modify: `tests/e2e/desktop.spec.ts:159-166`
 
 **Interfaces:**
 - Consumes: the canonical scrollbar block in `references/WIN98-template/style.css` and the production CSS token layer.
@@ -127,14 +128,21 @@ Run: `pnpm check && pnpm build`
 
 Expected: Astro check reports zero errors and the production build completes successfully.
 
-- [ ] **Step 6: Verify the overflowing window visually**
+- [ ] **Step 6: Align and run the production scrollbar E2E**
+
+Replace the obsolete custom-corner assertion in `tests/e2e/desktop.spec.ts` with computed-style assertions for the literal contract: 16px width, `rgb(192, 192, 192)` track and thumb, `inset` track, `outset` thumb, 16px button height, and `none` corner background.
+
+Run the focused desktop E2E against a static server over `dist/`.
+
+Expected: all desktop interaction tests pass against production output.
+
+- [ ] **Step 7: Verify the overflowing window visually**
 
 Open `http://localhost:4321`, launch Selected work, open a project with vertical overflow, and confirm the scrollbar has a 16px gray track, gray outset thumb, 16px buttons, and light-gray hover with no custom diagonal corner artwork.
 
-- [ ] **Step 7: Commit the implementation**
+- [ ] **Step 8: Commit the implementation**
 
 ```powershell
-git add -- src/styles/scrollbarParity.test.ts src/styles/tokens.css src/styles/desktop.css src/styles/global.css
+git add -- src/styles/scrollbarParity.test.ts src/styles/tokens.css src/styles/desktop.css src/styles/global.css tests/e2e/desktop.spec.ts docs/superpowers/plans/2026-08-13-win98-scrollbar.md
 git commit -m "style: match Win98 scrollbar exactly"
 ```
-

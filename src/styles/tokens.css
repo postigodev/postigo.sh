@@ -37,11 +37,8 @@
   --os-titlebar-height: 31px;
   --os-content-editorial-max: 900px;
   --os-content-case-max: 1100px;
-  --os-scrollbar-size: 16px;
-  --os-scrollbar-track: var(--os-control-bg);
-  --os-scrollbar-face: var(--os-control-bg);
-  --os-scrollbar-hover: var(--surface-dim);
-  --os-scrollbar-grip: var(--os-bevel-mid);
+  --window-bg: #c0c0c0;
+  --button-hover: #e0e0e0;
   --os-layer-icons: 10;
   --os-layer-window: 100;
   --os-layer-taskbar: 10000;
