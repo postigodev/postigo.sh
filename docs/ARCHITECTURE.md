@@ -85,10 +85,10 @@ DesktopShell
     ├── Identity
     ├── Work
     ├── Project
-    ├── About
     ├── Resume
     ├── Notes/Writing
-    ├── Contact/Network
+    ├── Contact
+    ├── Network
     ├── NowPlaying
     └── optional Terminal
 ```
@@ -264,6 +264,11 @@ utility slot. Drag, eight-direction resize, focus, minimize, maximize, and
 restore belong to the window manager. Desktop-only utilities change desktop
 state only and never write browser history.
 
+Closing a desktop window changes window state, not browser traversal. If the
+closed singleton owns the current route, the current owned entry is replaced
+with the root URL without applying the root app. Explicit Back/Forward remains
+the only route-history action that opens a historical target.
+
 ---
 
 ## 9. First-load desktop
@@ -273,7 +278,7 @@ The homepage itself is the hero.
 The approved near-cold initial desktop state is:
 
 - Identity window open and dominant
-- desktop icons for About Piero, Projects, Resume, Contact, and Network
+- desktop icons for About Piero, Projects, Resume, Contact, Network, and Player
 - taskbar visible
 - enough visible desktop background to communicate spatial freedom
 
@@ -304,12 +309,20 @@ type AppDefinition = {
   mobileMode: "fullscreen";
   showOnDesktop: boolean;
   showInStart: boolean;
+  startGroup?: "portfolio" | "utilities" | "policy";
+  contentWidth: "editorial" | "case" | "utility";
 };
 ```
 
 All registered windows are singletons. The registry defines routable and
 desktop-only apps, labels, launch surfaces, initial geometry, minimum geometry,
-and renderer kind. The near-cold boot preset contains only `identity`.
+renderer kind, Start grouping, and inner content-width policy. Launcher labels
+may alias an existing singleton: About Piero targets Identity rather than a
+duplicate About window. The near-cold boot preset contains only `identity`.
+
+Window size is independent from inner content width. Editorial and case
+content use centered tokenized maximum widths, while utilities use their full
+client area. No maximum width belongs on the resizable window itself.
 
 Avoid scattered hardcoded title/path/default-size maps.
 
@@ -333,6 +346,11 @@ Routable launchers are semantic links. With JavaScript, the desktop intercepts
 eligible same-origin navigation, opens or focuses exactly the target app, and
 uses browser history. Without JavaScript, the same links resolve to useful
 Astro documents. Desktop-only utilities are buttons and never mutate the URL.
+
+Start uses a classic vertical Piero OS rail with grouped icon rows. Desktop and
+Start share one authored icon primitive. Each window client owns a tokenized
+16px legacy scrollbar with inset track, beveled thumb/buttons, and diagonal
+corner grip; scrollbar visuals never replace window resize handles.
 
 Potential behavior:
 
@@ -612,7 +630,7 @@ The interactive desktop is an enhancement to a real site, not the only path to c
 
 ### Phase 4 — core content
 - Resume
-- About
+- About Piero launcher alias to Identity plus standalone `/about` document
 - Contact
 - Notes/Writing
 - Now Playing
