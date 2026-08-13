@@ -50,6 +50,7 @@ export interface ProjectCase extends WorkRecord {
   contextLabel: string;
   dateLabel?: string;
   roleLabel?: string;
+  ownershipLabel: string;
   ownership: string;
   summary: string;
   technologies: readonly string[];
@@ -92,6 +93,7 @@ export const projectCases = [
     contextLabel: 'Professional Experience',
     dateLabel: '2026',
     roleLabel: 'Startup Software Engineer — Backend & Integration',
+    ownershipLabel: 'Collaborative product team',
     ownership: 'Piero authored substantial backend, integration, database, and reliability work. Product ownership was shared.',
     summary: 'Worked across backend product flows, PostgreSQL contracts, deployment isolation, release safety, and database recovery as the product matured.',
     technologies: ['TypeScript', 'NestJS', 'Prisma', 'PostgreSQL', 'SQL', 'Railway', 'Vercel', 'GitHub Actions'],
@@ -161,6 +163,7 @@ export const projectCases = [
     slug: 'sendo',
     layout: 'artifact-led',
     contextLabel: 'Shipped software',
+    ownershipLabel: 'Ownership',
     ownership: 'Solo-maintained with external contributors',
     summary: 'A Rust/Tauri Windows utility coordinating Fire TV ADB/TCP control with Spotify Connect.',
     technologies: ['Rust', 'Tauri', 'Spotify Web API/Connect', 'ADB/TCP', 'OAuth'],

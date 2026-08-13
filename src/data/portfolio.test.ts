@@ -17,6 +17,7 @@ describe('public portfolio projection', () => {
       contextLabel: 'Professional Experience',
       dateLabel: '2026',
       roleLabel: 'Startup Software Engineer — Backend & Integration',
+      ownershipLabel: 'Collaborative product team',
       layout: 'evidence-trail',
     });
     expect(preppie?.sections.map((section) => section.id)).toEqual([
