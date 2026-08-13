@@ -13,19 +13,22 @@ export default function DesktopShell({ identity, records, projects }: Props) {
   const historyState = useRef<DesktopHistoryState>(rootHistoryState());
   const openers = useRef(new Map<string, HTMLElement>());
   const projectMap = useMemo(() => new Map(projects.map((project) => [project.slug, project])), [projects]);
+  const projectSlugs = useMemo(() => projects.map((project) => project.slug), [projects]);
 
-  const applyTarget = (route: string) => { const target = routeToTarget(route); if (!target) return; if (target.projectSlug) { dispatch({ type: 'open', id: 'work' }); dispatch({ type: 'openProject', slug: target.projectSlug }); } else if (target.appId === 'work') dispatch({ type: 'open', id: 'work' }); else dispatch({ type: 'focus', id: 'identity' }); };
+  const focusWindowHeading = (appId: string) => { requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-window-id="${appId}"] h2`)?.focus()); };
+  const applyTarget = (route: string) => { const target = routeToTarget(route, projectSlugs); if (!target) return; if (target.projectSlug) { const project = projectMap.get(target.projectSlug); if (!project) return; dispatch({ type: 'open', id: 'work' }); dispatch({ type: 'openProject', slug: target.projectSlug, title: project.name }); } else if (target.appId === 'work') dispatch({ type: 'open', id: 'work' }); else dispatch({ type: 'focus', id: 'identity' }); };
   useEffect(() => {
     const root = rootHistoryState(); history.replaceState(root, '', '/'); historyState.current = root;
-    const onPop = (event: PopStateEvent) => { if (!isDesktopHistoryState(event.state)) return; historyState.current = event.state; applyTarget(event.state.route); requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-window-id="${event.state.appId}"] h2`)?.focus()); };
+    const onPop = (event: PopStateEvent) => { if (!isDesktopHistoryState(event.state)) return; historyState.current = event.state; applyTarget(event.state.route); focusWindowHeading(event.state.appId); };
     addEventListener('popstate', onPop); return () => removeEventListener('popstate', onPop);
   }, []);
 
   const navigate = (event: MouseEvent, route: string) => {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-    const target = routeToTarget(route); if (!target) return; event.preventDefault();
+    const target = routeToTarget(route, projectSlugs); if (!target) return; event.preventDefault();
     const id = target.appId; openers.current.set(id, event.currentTarget as HTMLElement); applyTarget(route); setMenuOpen(false);
     if (historyState.current.route !== route) { const next = stateForPush(historyState.current, target); history.pushState(next, '', route); historyState.current = next; }
+    focusWindowHeading(id);
   };
   const activate = (id: string) => { const win = state.windows[id]; if (!win) return; dispatch({ type: win.isMinimized ? 'restore' : 'focus', id }); };
   const close = (id: string) => {
