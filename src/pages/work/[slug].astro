@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DocumentNav from '../../components/DocumentNav.astro';
+import { projectCases, type ProjectCase } from '../../data/portfolio';
+export function getStaticPaths() { return projectCases.map((project) => ({ params: { slug: project.slug }, props: { project } })); }
+interface Props { project: ProjectCase }
+const { project } = Astro.props;
+---
+<BaseLayout title={`${project.name} | Piero Postigo Rocchetti`} description={project.summary}>
+  <main class="document-shell"><DocumentNav /><a href="/work">← Work</a><p>[{project.status.toUpperCase()}]</p><h1>{project.name}</h1><p>{project.summary}</p>
+    <p><strong>Ownership:</strong> {project.ownership}</p><h2>Selected contributions</h2><ul>{project.contributions.map((item) => <li>{item}</li>)}</ul>
+    <h2>Artifacts</h2><ul>{project.artifacts.map((artifact) => <li><a href={artifact.href}>{artifact.label}</a><p>{artifact.caption}</p></li>)}</ul>
+    <p><a href={project.links.repository}>Source repository</a></p>
+  </main>
+</BaseLayout>

@@ -1,0 +1,4 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'; import DocumentNav from '../components/DocumentNav.astro'; import { identity } from '../data/portfolio';
+---
+<BaseLayout title="Piero Postigo Rocchetti | Software Engineer" description="Backend and product software engineering portfolio."><main class="document-shell"><DocumentNav /><p>[IDENTITY]</p><h1>{identity.primaryIdentity}</h1><h2>{identity.descriptor}</h2><p>{identity.name}</p><p>{identity.thesis}</p><a href="/work">Explore selected work</a></main></BaseLayout>

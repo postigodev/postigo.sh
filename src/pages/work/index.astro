@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DocumentNav from '../../components/DocumentNav.astro';
+import { selectedWork } from '../../data/portfolio';
+---
+<BaseLayout title="Work | Piero Postigo Rocchetti" description="Selected software engineering work.">
+  <main class="document-shell"><DocumentNav /><p>[SELECTED_WORK]</p><h1>Work</h1>
+    <ol>{selectedWork.map((record) => <li><h2>{record.name}</h2><p>{record.signal} · {record.status}</p>{record.slug && <a href={`/work/${record.slug}`}>Open case study</a>}</li>)}</ol>
+  </main>
+</BaseLayout>
