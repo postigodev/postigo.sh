@@ -70,8 +70,8 @@ isolation and readiness, database release gates, and guarded recovery work.
 The case uses four project-specific chapters rather than a universal
 Problem/System/Impact schema:
 
-1. **Product flows** — cart lifecycle, capture/import, recipe discovery,
-   meal-plan validation, and shared backend contracts.
+1. **Product flows** — cart lifecycle, its backend contract, and the associated
+   database migration design evidenced by PR #44.
 2. **Database contracts** — PostgreSQL/Supabase application-owned schema,
    RLS/grants, constraints, and foreign-key/index hygiene.
 3. **Safe promotion** — repository verification, trunk safeguards, preview and
@@ -91,6 +91,7 @@ The public artifact trail consists of stable public GitHub pull requests:
 | --- | --- | --- |
 | Product flows | [PR #44](https://github.com/AxiomaSystems/Chef/pull/44) | `EV_PREPPIE_PR_44_CART_LIFECYCLE` |
 | Database contracts | [PR #61](https://github.com/AxiomaSystems/Chef/pull/61) | `EV_PREPPIE_PR_61_POSTGRES_HARDENING` |
+| Safe promotion | [PR #125](https://github.com/AxiomaSystems/Chef/pull/125) | `EV_PREPPIE_PR_125_TRUNK_SAFEGUARDS` |
 | Safe promotion | [PR #127](https://github.com/AxiomaSystems/Chef/pull/127) | `EV_PREPPIE_PR_127_ENV_ISOLATION` |
 | Safe promotion | [PR #128](https://github.com/AxiomaSystems/Chef/pull/128) | `EV_PREPPIE_PR_128_READINESS` |
 | Safe promotion | [PR #129](https://github.com/AxiomaSystems/Chef/pull/129) | `EV_PREPPIE_PR_129_DB_RELEASES` |
@@ -148,8 +149,11 @@ In the desktop enhancement:
 - opening Preppie does not replace or reuse an existing Sendo project window;
 - repeated opens focus the existing Preppie window rather than duplicating it;
 - opening updates browser history to `/work/preppie`;
-- direct visits and browser back/forward reconstruct the corresponding window
-  state according to the existing route↔window contract;
+- direct visits and refreshes render the standalone Astro document and do not
+  reconstruct an in-memory desktop window;
+- browser Back/Forward restores or focuses project windows only for
+  same-document history entries previously created and marked as owned by the
+  desktop;
 - the taskbar title is derived from project content, not a slug-specific
   reducer conditional;
 - mobile uses the existing fullscreen/near-fullscreen app treatment with no
@@ -192,7 +196,7 @@ rounded cards. Existing canonical fonts and design tokens remain unchanged.
 Unit and content tests verify:
 
 - Selected Work order is unchanged and Preppie is routable;
-- the Preppie case has four ordered chapters and the six public PR artifacts;
+- the Preppie case has four ordered chapters and the seven public PR artifacts;
 - every chapter artifact reference resolves;
 - the ownership statement is present;
 - blocked sole-ownership/platform/SRE language is absent;
@@ -206,8 +210,12 @@ Playwright against built production output verifies:
 3. selecting Preppie in the desktop opens a distinct window and updates the
    route;
 4. repeated selection focuses rather than duplicates the window;
-5. browser back/forward synchronizes route and window state;
-6. the route and core content remain usable on mobile.
+5. keyboard activation of the Preppie anchor opens the project window and
+   transfers focus to its heading;
+6. browser Back/Forward across owned desktop entries synchronizes route and
+   window state, restores focus to the active window heading, and does not
+   convert a direct or refreshed deep route into a desktop session;
+7. the route and core content remain usable on mobile.
 
 The release gate remains `pnpm test`, `pnpm astro check`, `pnpm build`, and the
 production-output Playwright suite already configured by the repository.
