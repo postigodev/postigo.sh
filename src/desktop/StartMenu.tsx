@@ -1,5 +1,6 @@
 import type { AppDefinition, AppId } from './types';
 import { useEffect, useRef } from 'preact/hooks';
+import AppIcon from './AppIcon';
 
 interface Props {
   open: boolean;
@@ -15,15 +16,27 @@ export default function StartMenu({ open, definitions, onNavigate, onLaunch, onD
     if (open) requestAnimationFrame(() => menuRef.current?.querySelector<HTMLElement>('a, button')?.focus());
   }, [open]);
   if (!open) return null;
+  const groups = [
+    ['portfolio', 'Portfolio'],
+    ['utilities', 'Utilities'],
+    ['policy', 'Policy'],
+  ] as const;
   return <nav ref={menuRef} class="start-menu" aria-label="Start menu" onKeyDown={(event) => {
     if (event.key === 'Escape') {
       event.preventDefault();
       onDismiss();
     }
   }}>
-    <strong><span aria-hidden="true">🐐</span> Piero OS</strong>
-    {definitions.map((definition) => definition.route
-      ? <a key={definition.id} href={definition.route} onClick={(event) => onNavigate(event, definition.route!)}>{definition.startLabel ?? definition.title}</a>
-      : <button key={definition.id} type="button" onClick={(event) => onLaunch(event, definition.id)}>{definition.startLabel ?? definition.title}</button>)}
+    <div class="start-menu-rail" aria-hidden="true">Piero OS</div>
+    <div class="start-menu-items">{groups.map(([group, label]) => {
+      const items = definitions.filter((definition) => definition.startGroup === group);
+      if (!items.length) return null;
+      return <section class="start-menu-group" aria-label={label} key={group}>{items.map((definition) => {
+        const content = <><AppIcon name={definition.icon} /><span>{definition.startLabel ?? definition.title}</span></>;
+        return definition.route
+          ? <a key={definition.id} href={definition.route} onClick={(event) => onNavigate(event, definition.route!)}>{content}</a>
+          : <button key={definition.id} type="button" onClick={(event) => onLaunch(event, definition.id)}>{content}</button>;
+      })}</section>;
+    })}</div>
   </nav>;
 }

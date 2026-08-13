@@ -1,16 +1,19 @@
 export interface Bounds { x: number; y: number; width: number; height: number }
 export interface Size { width: number; height: number }
-export type CoreAppId = 'identity' | 'about' | 'work' | 'resume' | 'contact' | 'privacy' | 'network' | 'now-playing' | 'notes';
+export type CoreAppId = 'identity' | 'work' | 'resume' | 'contact' | 'privacy' | 'network' | 'now-playing' | 'notes';
 export type ProjectAppId = `project:${string}`;
 export type AppId = CoreAppId | ProjectAppId;
 export type AppKind = CoreAppId | 'project';
+export type AppIconName = 'user' | 'folder' | 'document' | 'mail' | 'network' | 'music' | 'notes' | 'lock' | 'project';
+export type StartGroup = 'portfolio' | 'utilities' | 'policy';
+export type ContentWidth = 'editorial' | 'case' | 'utility';
 export type ResizeEdge = 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw';
 export type MobileMode = 'fullscreen' | 'near-fullscreen';
 
 export interface AppDefinition {
   id: AppId;
   title: string;
-  icon: 'user' | 'folder' | 'document' | 'mail' | 'network' | 'music' | 'notes' | 'lock' | 'project';
+  icon: AppIconName;
   kind: AppKind;
   route?: string;
   projectSlug?: string;
@@ -21,6 +24,8 @@ export interface AppDefinition {
   showInStart: boolean;
   desktopLabel?: string;
   startLabel?: string;
+  startGroup?: StartGroup;
+  contentWidth: ContentWidth;
 }
 
 export type AppRegistry = ReadonlyMap<AppId, AppDefinition>;

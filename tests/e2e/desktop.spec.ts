@@ -137,6 +137,21 @@ test('Start exposes Privacy and returns focus on Escape', async ({ page }) => {
   await expect(page.locator('#window-title-identity')).toBeFocused();
 });
 
+test('About Piero restores Identity and Player is available from desktop and Start', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Close Piero Postigo Rocchetti' }).click();
+  await page.getByRole('link', { name: 'About Piero' }).click();
+  await expect(page.getByRole('region', { name: 'Piero Postigo Rocchetti' })).toBeVisible();
+  await expect(page).toHaveURL(/\/$/);
+
+  await page.getByRole('button', { name: 'Player' }).click();
+  await expect(page.getByRole('region', { name: 'Now playing' })).toBeVisible();
+  await page.getByRole('button', { name: 'Close Now playing' }).click();
+  await page.getByRole('button', { name: /Piero OS/ }).click();
+  await page.getByRole('button', { name: 'Now playing' }).click();
+  await expect(page.getByRole('region', { name: 'Now playing' })).toBeVisible();
+});
+
 test('desktop-only utilities open independently and keep the root URL', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Network' }).click();

@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'p
 import type { ProjectCase, PublicIdentity, WorkRecord } from '../data/portfolio';
 import { staticGitHubFallback, unavailableNowPlaying } from '../data/presence';
 import { buildAppRegistry, nearColdBoot } from './appRegistry';
-import AboutApp from './apps/AboutApp';
 import ContactApp from './apps/ContactApp';
 import IdentityApp from './apps/IdentityApp';
 import NetworkApp from './apps/NetworkApp';
@@ -132,7 +131,6 @@ export default function DesktopShell({ identity, records, prominentRecords, proj
   const renderApp = (definition: AppDefinition) => {
     switch (definition.kind) {
       case 'identity': return <IdentityApp identity={identity} onNavigate={navigate} />;
-      case 'about': return <AboutApp identity={identity} />;
       case 'work': return <WorkApp records={records} prominentRecords={prominentRecords} projectSlugs={projectSlugs} onNavigate={navigate} />;
       case 'resume': return <ResumeApp />;
       case 'contact': return <ContactApp identity={identity} />;

@@ -9,7 +9,7 @@ describe('desktop route contract', () => {
   it('maps every routable desktop app from the registry', () => {
     expect(routeToTarget('/', registry)).toEqual({ appId: 'identity', route: '/' });
     expect(routeToTarget('/work', registry)).toEqual({ appId: 'work', route: '/work' });
-    expect(routeToTarget('/about', registry)).toEqual({ appId: 'about', route: '/about' });
+    expect(routeToTarget('/about', registry)).toBeUndefined();
     expect(routeToTarget('/resume/', registry)).toEqual({ appId: 'resume', route: '/resume' });
     expect(routeToTarget('/contact', registry)).toEqual({ appId: 'contact', route: '/contact' });
     expect(routeToTarget('/privacy', registry)).toEqual({ appId: 'privacy', route: '/privacy' });

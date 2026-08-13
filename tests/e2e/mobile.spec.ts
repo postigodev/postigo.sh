@@ -33,3 +33,10 @@ test('compact mode does not overwrite restored desktop bounds', async ({ page })
   await page.setViewportSize({ width: 1024, height: 768 });
   expect(await identity.boundingBox()).toEqual(desktopBounds);
 });
+
+test('mobile launches Player from Start', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Piero OS/ }).click();
+  await page.getByRole('button', { name: 'Now playing' }).click();
+  await expect(page.getByRole('region', { name: 'Now playing' })).toBeVisible();
+});

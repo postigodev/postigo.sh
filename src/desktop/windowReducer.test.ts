@@ -40,10 +40,10 @@ describe('windowReducer', () => {
 
   it('falls back to the highest visible window after close and minimize', () => {
     let state = createInitialDesktopState(registry, []);
-    state = windowReducer(state, { type: 'open', id: 'about' });
+    state = windowReducer(state, { type: 'open', id: 'contact' });
     state = windowReducer(state, { type: 'open', id: 'work' });
-    expect(windowReducer(state, { type: 'minimize', id: 'work' }).activeId).toBe('about');
-    expect(windowReducer(state, { type: 'close', id: 'work' }).activeId).toBe('about');
+    expect(windowReducer(state, { type: 'minimize', id: 'work' }).activeId).toBe('contact');
+    expect(windowReducer(state, { type: 'close', id: 'work' }).activeId).toBe('contact');
   });
 
   it('tracks maximized workspace changes and revalidates restored windows', () => {

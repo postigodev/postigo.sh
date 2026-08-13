@@ -31,4 +31,24 @@ describe('desktop app registry', () => {
     expect(registry.has('project:sendo')).toBe(true);
     expect(registry.has('project:dm2text')).toBe(false);
   });
+
+  it('maps About Piero to Identity and exposes Player twice without duplicate apps', () => {
+    const identity = registry.get('identity');
+    expect(identity).toMatchObject({
+      route: '/', showOnDesktop: true, showInStart: true,
+      desktopLabel: 'About Piero', startLabel: 'About Piero', startGroup: 'portfolio',
+    });
+    expect([...registry.keys()]).not.toContain('about');
+    expect(registry.get('now-playing')).toMatchObject({
+      showOnDesktop: true, showInStart: true,
+      desktopLabel: 'Player', startLabel: 'Now playing', startGroup: 'utilities',
+    });
+  });
+
+  it('assigns content width and a Start group to every exposed app', () => {
+    for (const app of registry.values()) {
+      expect(['editorial', 'case', 'utility']).toContain(app.contentWidth);
+      if (app.showInStart) expect(['portfolio', 'utilities', 'policy']).toContain(app.startGroup);
+    }
+  });
 });

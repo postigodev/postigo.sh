@@ -10,6 +10,7 @@ test('boots near-cold with only Identity and native desktop launchers', async ({
   await expect(page.getByRole('link', { name: 'Resume.pdf' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Contact' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Network' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Player' })).toBeVisible();
 });
 
 test('uses the Stitch desktop without navbar or sidebar chrome', async ({ page }) => {
