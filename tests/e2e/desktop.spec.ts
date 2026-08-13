@@ -205,10 +205,10 @@ test('taskbar clock and minimize/restore focus behave natively', async ({ page }
   await expect(page.locator('#window-title-identity')).toBeFocused();
 });
 
-test('closing returns focus to the launcher', async ({ page }) => {
+test('closing focuses the highest visible window before the launcher', async ({ page }) => {
   await page.goto('/');
   const networkLauncher = page.getByRole('button', { name: 'Network' });
   await networkLauncher.click();
   await page.getByRole('button', { name: 'Close Network online' }).click();
-  await expect(networkLauncher).toBeFocused();
+  await expect(page.locator('#window-title-identity')).toBeFocused();
 });
