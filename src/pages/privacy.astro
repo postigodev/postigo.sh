@@ -1,14 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import DocumentNav from '../components/DocumentNav.astro';
+import { privacyContent } from '../data/siteContent';
 ---
 <BaseLayout title="Privacy | Piero Postigo Rocchetti" description="Privacy details for public portfolio presence data.">
-  <main class="document-shell">
-    <DocumentNav />
-    <p>[PUBLIC_DATA_DISCLOSURE]</p>
-    <h1>Privacy</h1>
-    <p>This portfolio displays the owner's current or recently played Spotify content: track or episode title, artist or publisher, album or show, cover art, playback status, progress, and a Spotify link. The server caches this display data for about 30 seconds.</p>
-    <p>Visitors do not connect a Spotify account, and this site does not use Spotify to identify or track visitors. Spotify credentials remain server-side.</p>
-    <p>GitHub profile statistics are public data cached for up to six hours. Questions can be sent through the <a href="/contact">Contact page</a>.</p>
-  </main>
+  <main class="document-shell"><DocumentNav /><p>{privacyContent.eyebrow}</p><h1>{privacyContent.title}</h1>{privacyContent.paragraphs.map((paragraph, index) => <p>{paragraph}{index === 2 && <> Questions can be sent through the <a href="/contact">Contact page</a>.</>}</p>)}</main>
 </BaseLayout>

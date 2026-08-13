@@ -24,12 +24,11 @@ export default function DesktopShell({ identity, records, projects, previews }: 
   const historyState = useRef<DesktopHistoryState>(rootHistoryState());
   const openers = useRef(new Map<string, HTMLElement>());
   const projectMap = useMemo(() => new Map(projects.map((project) => [project.slug, project])), [projects]);
-  const projectSlugs = useMemo(() => projects.map((project) => project.slug), [projects]);
   const syncWorkspace = useCallback((workspace: { x: number; y: number; width: number; height: number }) => dispatch({ type: 'workspaceChanged', workspace }), []);
   const { ref: desktopSurfaceRef, workspace, compact } = useDesktopWorkspace(syncWorkspace);
 
   const focusWindowHeading = (appId: string) => { requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-window-id="${appId}"] h2`)?.focus()); };
-  const applyTarget = (route: string) => { const target = routeToTarget(route, projectSlugs); if (!target) return; if (target.projectSlug) { const project = projectMap.get(target.projectSlug); if (!project) return; dispatch({ type: 'open', id: 'work' }); dispatch({ type: 'openProject', slug: target.projectSlug, title: project.name }); } else if (target.appId === 'work') dispatch({ type: 'open', id: 'work' }); else dispatch({ type: 'focus', id: 'identity' }); };
+  const applyTarget = (route: string) => { const target = routeToTarget(route, registry); if (!target) return; if (target.projectSlug) { const project = projectMap.get(target.projectSlug); if (!project) return; dispatch({ type: 'open', id: 'work' }); dispatch({ type: 'openProject', slug: target.projectSlug, title: project.name }); } else if (target.appId === 'work') dispatch({ type: 'open', id: 'work' }); else dispatch({ type: 'focus', id: 'identity' }); };
   useEffect(() => {
     setDesktopReady(true);
     const root = rootHistoryState(); history.replaceState(root, '', '/'); historyState.current = root;
@@ -39,7 +38,7 @@ export default function DesktopShell({ identity, records, projects, previews }: 
 
   const navigate = (event: MouseEvent, route: string) => {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-    const target = routeToTarget(route, projectSlugs); if (!target) return; event.preventDefault();
+    const target = routeToTarget(route, registry); if (!target) return; event.preventDefault();
     const id = target.appId; openers.current.set(id, event.currentTarget as HTMLElement); applyTarget(route); setMenuOpen(false);
     if (historyState.current.route !== route) { const next = stateForPush(historyState.current, target); history.pushState(next, '', route); historyState.current = next; }
     focusWindowHeading(id);

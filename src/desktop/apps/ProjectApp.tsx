@@ -55,7 +55,7 @@ export default function ProjectApp({ project }: { project: ProjectCase }) {
       </a>)}</div>
     </section>}
 
-    <a class="archive-action" href={project.links.repository} target="_blank" rel="noreferrer">
+    <a class="archive-action os-button" href={project.links.repository} target="_blank" rel="noreferrer">
       <span>[ GitHub ]</span>
       <strong>Source repository</strong>
       <span aria-hidden="true">↗</span>

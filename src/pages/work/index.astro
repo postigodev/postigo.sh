@@ -1,10 +1,13 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import DocumentNav from '../../components/DocumentNav.astro';
-import { selectedWork } from '../../data/portfolio';
+import { projectCases, prominentWork, selectedWork } from '../../data/portfolio';
+const caseSlugs = new Set<string>(projectCases.map((project) => project.slug));
+const workGroups = [
+  { title: 'Selected work', records: selectedWork },
+  { title: 'Additional featured work', records: prominentWork },
+] as const;
 ---
 <BaseLayout title="Work | Piero Postigo Rocchetti" description="Selected software engineering work.">
-  <main class="document-shell"><DocumentNav /><p>[SELECTED_WORK]</p><h1>Work</h1>
-    <ol>{selectedWork.map((record) => <li><h2>{record.name}</h2><p>{record.signal} · {record.status}</p>{record.slug && <a href={`/work/${record.slug}`}>Open case study</a>}</li>)}</ol>
-  </main>
+  <main class="document-shell"><DocumentNav /><p>[SELECTED_WORK]</p><h1>Work</h1>{workGroups.map((group) => <section><h2>{group.title}</h2><ol>{group.records.map((record) => <li><h3>{record.name}</h3><p>{record.signal} · {record.status}</p>{record.slug && caseSlugs.has(record.slug) && <a href={`/work/${record.slug}`}>Open case study</a>}</li>)}</ol></section>)}</main>
 </BaseLayout>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { homeProjectPreviews, identity, projectCases, selectedWork } from './portfolio';
+import { homeProjectPreviews, identity, projectCases, prominentWork, selectedWork } from './portfolio';
 
 describe('public portfolio projection', () => {
   it('keeps the approved identity and flagship order', () => {
@@ -8,6 +8,12 @@ describe('public portfolio projection', () => {
       'preppie', 'cimax-modernization', 'koba', 'dm2text', 'sendo',
     ]);
     expect(selectedWork.find((record) => record.id === 'preppie')?.slug).toBe('preppie');
+  });
+
+  it('keeps the approved additional featured Work records prominent and truthfully labeled', () => {
+    expect(prominentWork.map((record) => record.id)).toEqual(['trama', 'aeris', 'urbanlens', 'brumaire']);
+    expect(prominentWork.map((record) => record.status)).toEqual(['Unreleased', 'Hackathon project', 'Hackathon prototype', 'Prototype-stage']);
+    expect(prominentWork.every((record) => record.slug === undefined)).toBe(true);
   });
 
   it('publishes the four-chapter Preppie evidence trail', () => {

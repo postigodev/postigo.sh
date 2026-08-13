@@ -95,6 +95,13 @@ export const selectedWork: readonly WorkRecord[] = [
   { id: 'sendo', name: 'Sendo', kind: 'project', signal: 'Rust desktop + integrations', status: 'Shipped', slug: 'sendo' },
 ];
 
+export const prominentWork: readonly WorkRecord[] = [
+  { id: 'trama', name: 'Trama', kind: 'project', signal: 'Backend + state modeling', status: 'Unreleased' },
+  { id: 'aeris', name: 'Aeris', kind: 'project', signal: 'Applied AI + backend', status: 'Hackathon project' },
+  { id: 'urbanlens', name: 'UrbanLens', kind: 'project', signal: 'Applied AI + geospatial', status: 'Hackathon prototype' },
+  { id: 'brumaire', name: 'Brumaire', kind: 'project', signal: 'Browser/media engineering', status: 'Prototype-stage' },
+];
+
 export const homeProjectPreviews = [
   { slug: 'preppie', sequence: '01', name: 'Preppie', signal: 'Product + reliability', status: 'Completed', visualLabel: 'RELEASE / RECOVERY TRAIL', imageSrc: '/images/projects/preppie-preview.svg', imageAlt: 'Release verification and recovery trail', evidenceRef: 'EV_PREPPIE_PR_131_DB_RECOVERY' },
   { slug: 'cimax-modernization', sequence: '02', name: 'Cimax Modernization', signal: 'Backend modernization', status: 'Shipped public repository', visualLabel: 'MONGO / CACHE / JOBS', imageSrc: '/images/projects/cimax-preview.svg', imageAlt: 'MongoDB, Redis cache, and background job boundaries', evidenceRef: 'EV_CIMAX_2026_MONGO_IDEMPOTENCY' },

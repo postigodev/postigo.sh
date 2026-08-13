@@ -1,4 +1,6 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro'; import DocumentNav from '../components/DocumentNav.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DocumentNav from '../components/DocumentNav.astro';
+import { resumeContent } from '../data/siteContent';
 ---
-<BaseLayout title="Resume | Piero Postigo Rocchetti" description="Resume for Piero Postigo Rocchetti."><main class="document-shell"><DocumentNav /><p>[RESUME]</p><h1>Resume</h1><p>Software Engineer focused on backend and product engineering.</p><p>This route is ready for the reviewed resume artifact.</p></main></BaseLayout>
+<BaseLayout title="Resume | Piero Postigo Rocchetti" description="Resume for Piero Postigo Rocchetti."><main class="document-shell"><DocumentNav /><p>{resumeContent.eyebrow}</p><h1>{resumeContent.title}</h1>{resumeContent.paragraphs.map((paragraph) => <p>{paragraph}</p>)}</main></BaseLayout>
