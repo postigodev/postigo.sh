@@ -52,7 +52,7 @@ export function windowReducer(state: DesktopState, action: DesktopAction): Deskt
     return state.activeId === action.id ? { ...next, activeId: highestVisible(next, action.id) } : next;
   }
   if (action.type === 'setBounds') {
-    return update(state, action.id, (win) => win.isMaximized ? win : { ...win, bounds: action.bounds });
+    return update(state, action.id, (win) => win.isMaximized ? win : { ...win, placement: 'floating', bounds: action.bounds });
   }
   if (action.type === 'move') {
     return update(state, action.id as AppId, (win) => win.isMaximized ? win : {

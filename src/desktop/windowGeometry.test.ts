@@ -20,4 +20,12 @@ describe('window geometry', () => {
     expect(resizeBounds(start, 'se', 80, 60, minimum, workspace))
       .toEqual({ x: 200, y: 100, width: 680, height: 460 });
   });
+
+  it.each(['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const)('keeps %s resize recoverable', (edge) => {
+    const result = resizeBounds(start, edge, -900, -900, minimum, workspace);
+    expect(result.width).toBeGreaterThanOrEqual(minimum.width);
+    expect(result.height).toBeGreaterThanOrEqual(minimum.height);
+    expect(result.y).toBeGreaterThanOrEqual(workspace.y);
+    expect(result.x + result.width).toBeGreaterThanOrEqual(128);
+  });
 });
