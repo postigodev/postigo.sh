@@ -25,19 +25,14 @@ export interface AppDefinition {
 
 export type AppRegistry = ReadonlyMap<AppId, AppDefinition>;
 
-export type WindowPlacement = 'authored' | 'floating';
 export interface WindowState {
   id: AppId; title: string; isOpen: boolean; isMinimized: boolean; isMaximized: boolean;
   zIndex: number; bounds: Bounds; restoreBounds?: Bounds; projectSlug?: string;
-  /** Compatibility-only until the authored shell is removed in Task 5. */
-  placement?: WindowPlacement;
 }
 export interface DesktopState { windows: Record<string, WindowState>; activeId: AppId | null; nextZ: number }
 export type DesktopAction =
   | { type: 'open' | 'focus' | 'close' | 'minimize' | 'restore'; id: AppId }
-  | { type: 'openProject'; slug: string; title: string }
   | { type: 'toggleMaximize'; id: AppId; workspace?: Bounds }
   | { type: 'setBounds'; id: AppId; bounds: Bounds }
   | { type: 'workspaceChanged'; workspace: Bounds }
-  | { type: 'move'; id: string; x: number; y: number }
   | { type: 'reset'; state?: DesktopState };

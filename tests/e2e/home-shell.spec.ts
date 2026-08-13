@@ -1,15 +1,15 @@
 import { expect, test } from '@playwright/test';
 
-test('boots the Stitch identity shell with three project links and three widgets', async ({ page }) => {
+test('boots near-cold with only Identity and native desktop launchers', async ({ page }) => {
   await page.goto('/');
-  const headings = page.locator('main h1');
-  await expect(headings.first()).toHaveText('Software Engineer');
-  await expect(page.getByRole('link', { name: /Open Preppie/i })).toBeVisible();
-  await expect(page.getByRole('link', { name: /Open Cimax Modernization/i })).toBeVisible();
-  await expect(page.getByRole('link', { name: /Open Koba/i })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'now.playing' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'notes.txt' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'network.online' })).toBeVisible();
+  await expect(page.locator('[data-desktop-ready="true"]')).toBeVisible();
+  await expect(page.getByRole('region')).toHaveCount(1);
+  await expect(page.getByRole('region', { name: 'Piero Postigo Rocchetti' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'About Piero' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Projects' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Resume.pdf' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Contact' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Network' })).toBeVisible();
 });
 
 test('status panels never expose fake window controls', async ({ page }) => {

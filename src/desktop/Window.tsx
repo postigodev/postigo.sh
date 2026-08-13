@@ -56,14 +56,11 @@ export default function Window({ window: win, definition, workspace, compact, ac
     }, onFocus);
   };
 
-  const style = win.placement === 'authored'
-    ? { zIndex: win.zIndex }
-    : { zIndex: win.zIndex, left: win.bounds.x, top: win.bounds.y, width: win.bounds.width, height: win.bounds.height };
+  const style = { zIndex: win.zIndex, left: win.bounds.x, top: win.bounds.y, width: win.bounds.width, height: win.bounds.height };
 
   return <section
     class="os-window"
     data-window-id={win.id}
-    data-placement={win.placement}
     data-active={active}
     data-maximized={win.isMaximized}
     data-mobile-mode={definition.mobileMode}
@@ -83,6 +80,6 @@ export default function Window({ window: win, definition, workspace, compact, ac
       </div>
     </div>
     <div class="window-body">{children}</div>
-    {!compact && !win.isMaximized && win.placement !== 'authored' && resizeEdges.map((edge) => <span key={edge} class={`resize-handle resize-handle--${edge}`} data-resize-handle={edge} onPointerDown={startResize(edge)} />)}
+    {!compact && !win.isMaximized && resizeEdges.map((edge) => <span key={edge} class={`resize-handle resize-handle--${edge}`} data-resize-handle={edge} onPointerDown={startResize(edge)} />)}
   </section>;
 }

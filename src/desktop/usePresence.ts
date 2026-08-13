@@ -47,9 +47,13 @@ export function isGitHubSnapshotView(value: unknown): value is GitHubSnapshotVie
     && view.languages.every(nonEmpty);
 }
 
-export function usePresenceEndpoint<T>(url: string, fallback: T, validate: Validator<T>): T {
+export function usePresenceEndpoint<T>(url: string, fallback: T, validate: Validator<T>, enabled = true): T {
   const [value, setValue] = useState(fallback);
   useEffect(() => {
+    if (!enabled) {
+      setValue(fallback);
+      return;
+    }
     const controller = new AbortController();
     setValue(fallback);
     fetch(url, { headers: { accept: 'application/json' }, signal: controller.signal })
@@ -57,7 +61,7 @@ export function usePresenceEndpoint<T>(url: string, fallback: T, validate: Valid
       .then((next) => { if (validate(next)) setValue(next); })
       .catch(() => undefined);
     return () => controller.abort();
-  }, [url, fallback, validate]);
+  }, [url, fallback, validate, enabled]);
   return value;
 }
 

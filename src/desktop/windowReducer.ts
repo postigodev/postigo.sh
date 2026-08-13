@@ -1,5 +1,3 @@
-import { projectCases } from '../data/portfolio';
-import { buildAppRegistry, nearColdBoot } from './appRegistry';
 import type { AppId, AppRegistry, DesktopAction, DesktopState, WindowState } from './types';
 import { revalidateBounds } from './windowGeometry';
 
@@ -40,9 +38,8 @@ function update(state: DesktopState, id: AppId, change: (win: WindowState) => Wi
 }
 
 export function windowReducer(state: DesktopState, action: DesktopAction): DesktopState {
-  if (action.type === 'reset') return action.state ?? initialDesktopState;
+  if (action.type === 'reset') return action.state ?? state;
   if (action.type === 'open' || action.type === 'focus' || action.type === 'restore') return focus(state, action.id);
-  if (action.type === 'openProject') return focus(state, `project:${action.slug}`);
   if (action.type === 'close' || action.type === 'minimize') {
     const next = update(state, action.id, (win) => ({
       ...win,
@@ -52,14 +49,7 @@ export function windowReducer(state: DesktopState, action: DesktopAction): Deskt
     return state.activeId === action.id ? { ...next, activeId: highestVisible(next, action.id) } : next;
   }
   if (action.type === 'setBounds') {
-    return update(state, action.id, (win) => win.isMaximized ? win : { ...win, placement: 'floating', bounds: action.bounds });
-  }
-  if (action.type === 'move') {
-    return update(state, action.id as AppId, (win) => win.isMaximized ? win : {
-      ...win,
-      placement: 'floating',
-      bounds: { ...win.bounds, x: action.x, y: action.y },
-    });
+    return update(state, action.id, (win) => win.isMaximized ? win : { ...win, bounds: action.bounds });
   }
   if (action.type === 'workspaceChanged') {
     return {
@@ -91,8 +81,3 @@ export function windowReducer(state: DesktopState, action: DesktopAction): Deskt
   }
   return state;
 }
-
-const legacyRegistry = buildAppRegistry(projectCases);
-const legacyState = createInitialDesktopState(legacyRegistry, nearColdBoot);
-for (const win of Object.values(legacyState.windows)) win.placement = win.id === 'identity' ? 'authored' : 'floating';
-export const initialDesktopState = legacyState;
