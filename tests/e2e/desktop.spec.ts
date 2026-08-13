@@ -1,9 +1,11 @@
 import { expect, test, type Page } from '@playwright/test';
 
 const workWindow = (page: Page) => page.getByRole('region', { name: 'Work', exact: true });
+const waitForDesktop = (page: Page) => expect(page.locator('[data-desktop-ready="true"]')).toBeVisible();
 
 test('identity-first desktop opens Work and singleton Sendo', async ({ page }) => {
   await page.goto('/');
+  await waitForDesktop(page);
   await expect(page.getByRole('heading', { name: 'Software Engineer' })).toBeVisible();
   await page.getByRole('link', { name: 'Explore selected work' }).click();
   await expect(page).toHaveURL(/\/work$/);
@@ -17,6 +19,7 @@ test('identity-first desktop opens Work and singleton Sendo', async ({ page }) =
 
 test('owned back and forward synchronize windows without duplicate writes', async ({ page }) => {
   await page.goto('/');
+  await waitForDesktop(page);
   await page.getByRole('link', { name: 'Explore selected work' }).click();
   await workWindow(page).getByRole('link', { name: 'Open Sendo project' }).click();
   await page.goBack();
@@ -29,6 +32,7 @@ test('owned back and forward synchronize windows without duplicate writes', asyn
 
 test('keyboard opens a singleton Preppie professional case and focuses its window', async ({ page }) => {
   await page.goto('/');
+  await waitForDesktop(page);
   await page.getByRole('link', { name: 'Explore selected work' }).press('Enter');
   const preppieLink = workWindow(page).getByRole('link', { name: 'Open Preppie project' });
   await preppieLink.press('Enter');
@@ -45,6 +49,7 @@ test('keyboard opens a singleton Preppie professional case and focuses its windo
 
 test('owned Back and Forward restore window focus', async ({ page }) => {
   await page.goto('/');
+  await waitForDesktop(page);
   await page.getByRole('link', { name: 'Explore selected work' }).click();
   await workWindow(page).getByRole('link', { name: 'Open Preppie project' }).click();
   await page.goBack();
@@ -55,6 +60,7 @@ test('owned Back and Forward restore window focus', async ({ page }) => {
 
 test('Sendo desktop hides provenance and styles its source action', async ({ page }) => {
   await page.goto('/');
+  await waitForDesktop(page);
   await page.getByRole('link', { name: 'Explore selected work' }).click();
   await workWindow(page).getByRole('link', { name: 'Open Sendo project' }).click();
   const sendo = page.getByRole('region', { name: 'Sendo' });
@@ -64,6 +70,7 @@ test('Sendo desktop hides provenance and styles its source action', async ({ pag
 
 test('minimize and restore Sendo through the taskbar', async ({ page }) => {
   await page.goto('/');
+  await waitForDesktop(page);
   await page.getByRole('link', { name: 'Explore selected work' }).click();
   await workWindow(page).getByRole('link', { name: 'Open Sendo project' }).click();
   await page.getByRole('button', { name: 'Minimize Sendo' }).click();
@@ -75,6 +82,7 @@ test('minimize and restore Sendo through the taskbar', async ({ page }) => {
 
 test('maximize restores bounds and close returns to Work', async ({ page }) => {
   await page.goto('/');
+  await waitForDesktop(page);
   await page.getByRole('link', { name: 'Explore selected work' }).press('Enter');
   await workWindow(page).getByRole('link', { name: 'Open Sendo project' }).press('Enter');
   const sendo = page.getByRole('region', { name: 'Sendo' });
@@ -90,6 +98,7 @@ test('maximize restores bounds and close returns to Work', async ({ page }) => {
 
 test('drag keeps Identity inside the desktop viewport', async ({ page }) => {
   await page.goto('/');
+  await waitForDesktop(page);
   const identity = page.getByRole('region', { name: 'Piero Postigo Rocchetti' });
   const title = identity.getByRole('heading', { name: 'Piero Postigo Rocchetti' });
   const box = await title.boundingBox();

@@ -14,6 +14,7 @@ interface Props { identity: PublicIdentity; records: readonly WorkRecord[]; proj
 export default function DesktopShell({ identity, records, projects, previews }: Props) {
   const [state, dispatch] = useReducer(windowReducer, initialDesktopState);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [desktopReady, setDesktopReady] = useState(false);
   const nowPlaying = usePresenceEndpoint('/api/now-playing', unavailableNowPlaying, isNowPlayingView);
   const github = usePresenceEndpoint('/api/github-snapshot', staticGitHubFallback, isGitHubSnapshotView);
   const historyState = useRef<DesktopHistoryState>(rootHistoryState());
@@ -24,6 +25,7 @@ export default function DesktopShell({ identity, records, projects, previews }: 
   const focusWindowHeading = (appId: string) => { requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-window-id="${appId}"] h2`)?.focus()); };
   const applyTarget = (route: string) => { const target = routeToTarget(route, projectSlugs); if (!target) return; if (target.projectSlug) { const project = projectMap.get(target.projectSlug); if (!project) return; dispatch({ type: 'open', id: 'work' }); dispatch({ type: 'openProject', slug: target.projectSlug, title: project.name }); } else if (target.appId === 'work') dispatch({ type: 'open', id: 'work' }); else dispatch({ type: 'focus', id: 'identity' }); };
   useEffect(() => {
+    setDesktopReady(true);
     const root = rootHistoryState(); history.replaceState(root, '', '/'); historyState.current = root;
     const onPop = (event: PopStateEvent) => { if (!isDesktopHistoryState(event.state)) return; historyState.current = event.state; applyTarget(event.state.route); focusWindowHeading(event.state.appId); };
     addEventListener('popstate', onPop); return () => removeEventListener('popstate', onPop);
@@ -49,7 +51,7 @@ export default function DesktopShell({ identity, records, projects, previews }: 
   </Window>;
   const authoredWindow = (id: string) => { const win = state.windows[id]; return win?.placement === 'authored' ? renderWindow(win) : null; };
   const taskbar = <Taskbar windows={windows} activeId={state.activeId} menuOpen={menuOpen} onToggleMenu={() => setMenuOpen((value) => !value)} onActivate={activate} />;
-  return <div class="desktop-shell">
+  return <div class="desktop-shell" data-desktop-ready={desktopReady}>
     <HomeShell identity={identity} previews={previews} github={github} identityWindow={authoredWindow('identity')} playerWindow={authoredWindow('now-playing')} notesWindow={authoredWindow('notes')} taskbar={taskbar} onNavigate={navigate} />
     <DesktopIcons onNavigate={navigate} />
     <div class="desktop-surface" aria-label="Floating desktop windows">

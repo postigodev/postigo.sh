@@ -14,7 +14,8 @@
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
     "test:functions": "vitest run tests/functions",
-    "dev:vercel": "vercel dev --port 3001",
+    "test:e2e:functions": "playwright test tests/e2e/presence-api.spec.ts --config=playwright.vercel.config.ts",
+    "dev:vercel": "node scripts/vercel-local-dev.mjs",
     "spotify:bootstrap": "node scripts/spotify-bootstrap.mjs"
   },
   "dependencies": {

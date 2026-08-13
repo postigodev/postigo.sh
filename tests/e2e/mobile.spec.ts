@@ -10,6 +10,7 @@ test('mobile uses direct full-screen app views', async ({ page }) => {
 
 test('mobile opens the complete Preppie evidence trail', async ({ page }) => {
   await page.goto('/');
+  await expect(page.locator('[data-desktop-ready="true"]')).toBeVisible();
   await page.getByRole('link', { name: 'Explore selected work' }).click();
   await page.getByRole('region', { name: 'Work', exact: true }).getByRole('link', { name: 'Open Preppie project' }).click();
   const preppie = page.getByRole('region', { name: 'Preppie' });

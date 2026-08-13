@@ -39,3 +39,16 @@ server-only and should be added through `vercel env add` if used.
 The unmodified white Spotify full-logo asset comes from Spotify's official
 [Design & Branding Guidelines](https://developer.spotify.com/documentation/design)
 download (`2024-spotify-full-logo.zip`).
+
+## Verification
+
+`pnpm test:e2e` builds and serves `dist/` for static UI behavior.
+`pnpm test:e2e:functions` runs routing and request-boundary checks under
+Vercel CLI's unlinked local mode from a temporary clean staging directory, so
+local project authentication is neither read nor required. A deployed preview
+can be checked without exposing credentials:
+
+```powershell
+$env:PLAYWRIGHT_TEST_BASE_URL='https://preview.example'
+pnpm playwright test tests/e2e/presence-smoke.spec.ts
+```
