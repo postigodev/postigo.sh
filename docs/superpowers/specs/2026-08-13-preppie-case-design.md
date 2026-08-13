@@ -129,8 +129,8 @@ both Astro documents and Preact windows.
 `ProjectCase` evolves from a Sendo-specific shape to a flexible case model:
 
 - common identity fields: id, slug, name, kind, signal, status;
-- common framing fields: role label, summary, ownership statement,
-  technologies, evidence references, and project links;
+- common framing fields: context label, date label, role label, summary,
+  ownership statement, technologies, evidence references, and project links;
 - optional lead media with truthful alt text and an explicit contextual role;
 - ordered narrative sections, each with a stable id, title, body, optional
   highlights, and references to artifact ids;
@@ -140,6 +140,12 @@ both Astro documents and Preact windows.
 The model must let Sendo retain its existing story while Preppie uses the
 four-chapter contribution trail. Components render the ordered content supplied
 by each case; they do not encode Preppie-only copy or paths.
+
+For Preppie, the shared typed `contextLabel` is `Professional Experience` and
+the shared typed `dateLabel` is `2026`, derived from the canonical
+`PREPPIE_2026.dates` record. Astro and Preact render those fields; neither
+renderer hard-codes the year, the experience label, or Preppie-specific header
+logic. Other case records may use their own context/date labels.
 
 `selectedWork` gives Preppie the slug `preppie`. All selected-work ordering
 remains:
@@ -213,8 +219,13 @@ Unit and content tests verify:
 
 - Selected Work order is unchanged and Preppie is routable;
 - the Preppie case has four ordered chapters and the seven public PR artifacts;
+- the seven PR artifacts resolve into compact rows grouped beneath their four
+  referenced chapters rather than a flat artifact-card collection;
 - every chapter artifact reference resolves;
 - the ownership statement is present;
+- Preppie's shared context, year, role, and collaboration fields are populated
+  from typed content and no renderer hard-codes those values;
+- Preppie defines no more than two non-PR visual artifacts;
 - blocked sole-ownership/platform/SRE language is absent;
 - raw `EV_*` identifiers remain in typed data but are absent from rendered
   Preppie and Sendo HTML;
@@ -224,6 +235,8 @@ Unit and content tests verify:
 Playwright against built production output verifies:
 
 1. `/work/preppie` renders useful static content and public artifact links;
+   its opening hierarchy is professional-experience context, year, role, and
+   collaboration boundary—not a project-status badge;
 2. following the Preppie anchor from `/work` works with JavaScript disabled;
 3. selecting Preppie in the desktop opens a distinct window and updates the
    route;
@@ -234,6 +247,15 @@ Playwright against built production output verifies:
    window state, restores focus to the active window heading, and does not
    convert a direct or refreshed deep route into a desktop session;
 7. the route and core content remain usable on mobile.
+
+Focused static and enhanced-render assertions additionally verify that:
+
+- Preppie shows seven compact PR rows under four chapter containers;
+- Preppie renders no more than two non-PR visuals;
+- neither `/work/preppie` nor `/work/sendo`, nor their desktop windows, exposes
+  an `EV_*` identifier;
+- Sendo's repository link uses the same archive-action treatment as other
+  public source actions rather than browser-default link styling.
 
 The release gate remains `pnpm test`, `pnpm astro check`, `pnpm build`, and the
 production-output Playwright suite already configured by the repository.
