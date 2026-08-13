@@ -28,12 +28,11 @@ test('Sendo public route hides provenance and uses an archive source action', as
 
 test.describe('without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
-  test('follows the homepage Work link as a real document navigation', async ({ page }) => {
+  test('follows the Projects desktop link to the static Work document', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('heading', { name: 'Piero Postigo Rocchetti' })).toBeVisible();
-    await page.getByRole('link', { name: 'Explore selected work' }).click();
+    await page.getByRole('link', { name: 'Projects' }).click();
     await expect(page).toHaveURL(/\/work\/?$/);
-    await expect(page.getByRole('heading', { name: 'Work' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Work', exact: true })).toBeVisible();
   });
 
   test('Work link follows through to the Preppie case', async ({ page }) => {

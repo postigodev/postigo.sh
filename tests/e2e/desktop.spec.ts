@@ -1,113 +1,153 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
-const workWindow = (page: Page) => page.getByRole('region', { name: 'Work', exact: true });
 const waitForDesktop = (page: Page) => expect(page.locator('[data-desktop-ready="true"]')).toBeVisible();
+const workWindow = (page: Page) => page.getByRole('region', { name: 'Selected work' });
 
-test('identity-first desktop opens Work and singleton Sendo', async ({ page }) => {
+async function dragBy(page: Page, locator: Locator, dx: number, dy: number) {
+  const box = await locator.boundingBox();
+  if (!box) throw new Error('Pointer target is unavailable');
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2 + dx, box.y + box.height / 2 + dy);
+  await page.mouse.up();
+}
+
+test('project launch stays independent from Identity and Selected work', async ({ page }) => {
   await page.goto('/');
   await waitForDesktop(page);
-  await expect(page.getByRole('heading', { name: 'Software Engineer' })).toBeVisible();
-  await page.getByRole('link', { name: 'Explore selected work' }).click();
-  await expect(page).toHaveURL(/\/work$/);
-  await workWindow(page).getByRole('link', { name: 'Open Sendo project' }).click();
-  await expect(page).toHaveURL(/\/work\/sendo$/);
-  await expect(page.getByRole('region', { name: 'Sendo' })).toHaveCount(1);
-  await page.getByRole('button', { name: 'Work', exact: true }).click();
-  await workWindow(page).getByRole('link', { name: 'Open Sendo project' }).click();
-  await expect(page.getByRole('region', { name: 'Sendo' })).toHaveCount(1);
+  await page.getByRole('button', { name: 'Close Piero Postigo Rocchetti' }).click();
+  await page.getByRole('link', { name: 'Projects' }).click();
+  await workWindow(page).getByRole('link', { name: 'Open Koba project' }).click();
+  await page.getByRole('button', { name: 'Close Selected work' }).click();
+  await expect(page.getByRole('region', { name: 'Koba' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Piero Postigo Rocchetti' })).toHaveCount(0);
+  await expect(page.getByRole('region', { name: 'Selected work' })).toHaveCount(0);
 });
 
-test('owned back and forward synchronize windows without duplicate writes', async ({ page }) => {
+test('project windows remain singleton and preserve evidence content', async ({ page }) => {
   await page.goto('/');
-  await waitForDesktop(page);
-  await page.getByRole('link', { name: 'Explore selected work' }).click();
-  await workWindow(page).getByRole('link', { name: 'Open Sendo project' }).click();
-  await page.goBack();
-  await expect(page).toHaveURL(/\/work$/);
-  await expect(workWindow(page)).toBeVisible();
-  await page.goForward();
-  await expect(page).toHaveURL(/\/work\/sendo$/);
-  await expect(page.getByRole('region', { name: 'Sendo' })).toBeVisible();
-});
-
-test('keyboard opens a singleton Preppie professional case and focuses its window', async ({ page }) => {
-  await page.goto('/');
-  await waitForDesktop(page);
-  await page.getByRole('link', { name: 'Explore selected work' }).press('Enter');
+  await page.getByRole('link', { name: 'Projects' }).click();
   const preppieLink = workWindow(page).getByRole('link', { name: 'Open Preppie project' });
   await preppieLink.press('Enter');
   await expect(page).toHaveURL(/\/work\/preppie$/);
-  await expect(page.getByRole('region', { name: 'Preppie' })).toHaveCount(1);
+  const preppie = page.getByRole('region', { name: 'Preppie' });
+  await expect(preppie).toHaveCount(1);
   await expect(page.locator('#window-title-project-preppie')).toBeFocused();
-  await expect(page.getByRole('region', { name: 'Preppie' }).locator('[data-case-chapter]')).toHaveCount(4);
-  await expect(page.getByRole('region', { name: 'Preppie' }).locator('[data-evidence-row]')).toHaveCount(7);
-  await expect(page.getByRole('region', { name: 'Preppie' })).not.toContainText('EV_PREPPIE_');
-  await page.getByRole('button', { name: 'Work', exact: true }).click();
+  await expect(preppie.locator('[data-case-chapter]')).toHaveCount(4);
+  await expect(preppie.locator('[data-evidence-row]')).toHaveCount(7);
+  await page.locator('[data-taskbar-id="work"]').click();
   await preppieLink.press('Enter');
-  await expect(page.getByRole('region', { name: 'Preppie' })).toHaveCount(1);
+  await expect(preppie).toHaveCount(1);
 });
 
-test('owned Back and Forward restore window focus', async ({ page }) => {
+test('owned Back and Forward focus route targets without closing unrelated windows', async ({ page }) => {
   await page.goto('/');
-  await waitForDesktop(page);
-  await page.getByRole('link', { name: 'Explore selected work' }).click();
-  await workWindow(page).getByRole('link', { name: 'Open Preppie project' }).click();
+  await page.getByRole('button', { name: 'Network' }).click();
+  await page.getByRole('link', { name: 'Projects' }).click();
+  await workWindow(page).getByRole('link', { name: 'Open Sendo project' }).click();
   await page.goBack();
-  await expect(page.locator('[data-window-id="work"] h2')).toBeFocused();
-  await page.goForward();
-  await expect(page.locator('#window-title-project-preppie')).toBeFocused();
-});
-
-test('Sendo desktop hides provenance and styles its source action', async ({ page }) => {
-  await page.goto('/');
-  await waitForDesktop(page);
-  await page.getByRole('link', { name: 'Explore selected work' }).click();
-  await workWindow(page).getByRole('link', { name: 'Open Sendo project' }).click();
-  const sendo = page.getByRole('region', { name: 'Sendo' });
-  await expect(sendo).not.toContainText('EV_SENDO_');
-  await expect(sendo.getByRole('link', { name: /Source repository/ })).toHaveClass(/archive-action/);
-});
-
-test('minimize and restore Sendo through the taskbar', async ({ page }) => {
-  await page.goto('/');
-  await waitForDesktop(page);
-  await page.getByRole('link', { name: 'Explore selected work' }).click();
-  await workWindow(page).getByRole('link', { name: 'Open Sendo project' }).click();
-  await page.getByRole('button', { name: 'Minimize Sendo' }).click();
-  await expect(page.getByRole('region', { name: 'Sendo' })).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Sendo', exact: true })).toBeFocused();
-  await page.getByRole('button', { name: 'Sendo', exact: true }).click();
-  await expect(page.getByRole('region', { name: 'Sendo' })).toBeVisible();
-});
-
-test('maximize restores bounds and close returns to Work', async ({ page }) => {
-  await page.goto('/');
-  await waitForDesktop(page);
-  await page.getByRole('link', { name: 'Explore selected work' }).press('Enter');
-  await workWindow(page).getByRole('link', { name: 'Open Sendo project' }).press('Enter');
-  const sendo = page.getByRole('region', { name: 'Sendo' });
-  const before = await sendo.boundingBox();
-  await page.getByRole('button', { name: 'Maximize Sendo' }).click();
-  await expect(page.getByRole('button', { name: 'Restore Sendo' })).toBeVisible();
-  await page.getByRole('button', { name: 'Restore Sendo' }).click();
-  expect(await sendo.boundingBox()).toEqual(before);
-  await page.getByRole('button', { name: 'Close Sendo' }).click();
   await expect(page).toHaveURL(/\/work$/);
-  await expect(workWindow(page)).toBeVisible();
+  await expect(page.locator('#window-title-work')).toBeFocused();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole('region', { name: 'Network online' })).toBeVisible();
+  await expect(page.locator('#window-title-identity')).toBeFocused();
+  await page.goForward();
+  await page.goForward();
+  await expect(page.locator('#window-title-project-sendo')).toBeFocused();
 });
 
-test('drag keeps Identity inside the desktop viewport', async ({ page }) => {
+test('untouched Identity maximizes, restores, then remains draggable', async ({ page }) => {
   await page.goto('/');
-  await waitForDesktop(page);
   const identity = page.getByRole('region', { name: 'Piero Postigo Rocchetti' });
-  const title = identity.getByRole('heading', { name: 'Piero Postigo Rocchetti' });
-  const box = await title.boundingBox();
-  if (!box) throw new Error('Identity titlebar is not visible');
-  await page.mouse.move(box.x + 10, box.y + 10);
-  await page.mouse.down();
-  await page.mouse.move(-200, -200);
-  await page.mouse.up();
+  const before = await identity.boundingBox();
+  await page.getByRole('button', { name: 'Maximize Piero Postigo Rocchetti' }).click();
+  await expect(identity.locator('[data-resize-handle]')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Restore Piero Postigo Rocchetti' }).click();
+  expect(await identity.boundingBox()).toEqual(before);
+  await dragBy(page, identity.locator('.window-titlebar'), 70, 50);
+  expect((await identity.boundingBox())?.x).not.toBe(before?.x);
+});
+
+test('edge and corner resize synchronize with maximize and restore', async ({ page }) => {
+  await page.goto('/');
+  const identity = page.getByRole('region', { name: 'Piero Postigo Rocchetti' });
+  await dragBy(page, identity.locator('[data-resize-handle="e"]'), 80, 0);
+  const afterEdge = await identity.boundingBox();
+  await dragBy(page, identity.locator('[data-resize-handle="se"]'), 40, 50);
+  const resized = await identity.boundingBox();
+  expect(resized?.width).toBeGreaterThan(afterEdge?.width ?? 0);
+  expect(resized?.height).toBeGreaterThan(afterEdge?.height ?? 0);
+  await page.getByRole('button', { name: 'Maximize Piero Postigo Rocchetti' }).click();
+  await page.getByRole('button', { name: 'Restore Piero Postigo Rocchetti' }).click();
+  expect(await identity.boundingBox()).toEqual(resized);
+});
+
+test('resize enforces minimum width and releases pointer capture', async ({ page }) => {
+  await page.goto('/');
+  const identity = page.getByRole('region', { name: 'Piero Postigo Rocchetti' });
+  await dragBy(page, identity.locator('[data-resize-handle="e"]'), -900, 0);
+  const minimum = await identity.boundingBox();
+  expect(minimum?.width).toBe(420);
+  await page.mouse.move(1200, 500);
+  expect(await identity.boundingBox()).toEqual(minimum);
+});
+
+test('drag permits partial overflow but keeps titlebar controls recoverable', async ({ page }) => {
+  await page.goto('/');
+  const identity = page.getByRole('region', { name: 'Piero Postigo Rocchetti' });
+  await dragBy(page, identity.locator('.window-titlebar'), -1200, -900);
   const moved = await identity.boundingBox();
-  expect(moved?.x).toBeGreaterThanOrEqual(0);
-  expect(moved?.y).toBeGreaterThanOrEqual(42);
+  expect(moved?.x).toBeLessThan(0);
+  expect(moved?.y).toBe(0);
+  expect((moved?.x ?? 0) + (moved?.width ?? 0)).toBeGreaterThanOrEqual(128);
+});
+
+test('Start exposes Privacy and returns focus on Escape', async ({ page }) => {
+  await page.goto('/');
+  const start = page.getByRole('button', { name: /Piero OS/ });
+  await start.click();
+  await expect(page.getByRole('navigation', { name: 'Start menu' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('navigation', { name: 'Start menu' })).toHaveCount(0);
+  await expect(start).toBeFocused();
+  await start.click();
+  await page.getByRole('link', { name: 'Privacy' }).click();
+  await expect(page).toHaveURL(/\/privacy$/);
+  await expect(page.getByRole('region', { name: 'Privacy' })).toHaveCount(1);
+  await page.goBack();
+  await expect(page.locator('#window-title-identity')).toBeFocused();
+});
+
+test('desktop-only utilities open independently and keep the root URL', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Network' }).click();
+  for (const name of ['Now playing', 'Notes']) {
+    await page.getByRole('button', { name: /Piero OS/ }).click();
+    await page.getByRole('button', { name }).click();
+  }
+  for (const title of ['Network online', 'Now playing', 'Notes.txt']) {
+    const app = page.getByRole('region', { name: title });
+    await expect(app).toBeVisible();
+    await expect(app.locator('.window-controls button')).toHaveCount(3);
+  }
+  await expect(page).toHaveURL(/\/$/);
+});
+
+test('taskbar clock and minimize/restore focus behave natively', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.taskbar-clock')).toHaveText(/\d{1,2}:\d{2}/);
+  await page.getByRole('button', { name: 'Minimize Piero Postigo Rocchetti' }).click();
+  const task = page.locator('[data-taskbar-id="identity"]');
+  await expect(task).toBeFocused();
+  await task.click();
+  await expect(page.locator('#window-title-identity')).toBeFocused();
+});
+
+test('closing returns focus to the launcher', async ({ page }) => {
+  await page.goto('/');
+  const networkLauncher = page.getByRole('button', { name: 'Network' });
+  await networkLauncher.click();
+  await page.getByRole('button', { name: 'Close Network online' }).click();
+  await expect(networkLauncher).toBeFocused();
 });

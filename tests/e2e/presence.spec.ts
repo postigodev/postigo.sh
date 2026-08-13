@@ -29,9 +29,12 @@ test('renders playing and GitHub snapshot payloads without blocking identity', a
   await page.route('**/api/github-snapshot', (route) => route.fulfill({ json: githubFixture }));
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Software Engineer' })).toBeVisible();
+  await page.getByRole('button', { name: 'Network' }).click();
+  await page.getByRole('button', { name: /Piero OS/ }).click();
+  await page.getByRole('button', { name: 'Now playing' }).click();
   await expect(page.getByText('NOW PLAYING', { exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: /Test Track on Spotify/i })).toHaveAttribute('href', playingFixture.spotifyUrl);
-  await expect(page.locator('[data-network-panel]')).toContainText('7 stars');
+  await expect(page.locator('[data-network-content]')).toContainText('7 stars');
   await expect(page.getByRole('img', { name: 'Spotify' })).toBeVisible();
 });
 
@@ -39,7 +42,10 @@ test('keeps explicit fallback states for malformed responses', async ({ page }) 
   await page.route('**/api/now-playing', (route) => route.fulfill({ json: { state: 'playing', token: 'bad' } }));
   await page.route('**/api/github-snapshot', (route) => route.abort());
   await page.goto('/');
+  await page.getByRole('button', { name: 'Network' }).click();
+  await page.getByRole('button', { name: /Piero OS/ }).click();
+  await page.getByRole('button', { name: 'Now playing' }).click();
   await expect(page.getByText('PLAYBACK_UNAVAILABLE')).toBeVisible();
   await expect(page.getByRole('link', { name: '@postigodev' })).toBeVisible();
-  await expect(page.locator('[data-network-panel]')).not.toContainText(/stars|followers|repos/);
+  await expect(page.locator('[data-network-content]')).not.toContainText(/stars|followers|repos/);
 });

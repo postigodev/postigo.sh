@@ -1,4 +1,5 @@
 import type { AppDefinition, AppId } from './types';
+import { useEffect, useRef } from 'preact/hooks';
 
 interface Props {
   open: boolean;
@@ -9,8 +10,12 @@ interface Props {
 }
 
 export default function StartMenu({ open, definitions, onNavigate, onLaunch, onDismiss }: Props) {
+  const menuRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (open) requestAnimationFrame(() => menuRef.current?.querySelector<HTMLElement>('a, button')?.focus());
+  }, [open]);
   if (!open) return null;
-  return <nav class="start-menu" aria-label="Start menu" onKeyDown={(event) => {
+  return <nav ref={menuRef} class="start-menu" aria-label="Start menu" onKeyDown={(event) => {
     if (event.key === 'Escape') {
       event.preventDefault();
       onDismiss();
