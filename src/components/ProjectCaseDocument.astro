@@ -1,0 +1,80 @@
+---
+import type { CaseSection, ProjectCase, PublicArtifact } from '../data/portfolio';
+
+interface Props { project: ProjectCase }
+
+const { project } = Astro.props;
+const artifactMap = new Map<string, PublicArtifact>(project.artifacts.map((artifact) => [artifact.id, artifact]));
+const leadArtifact = project.leadMedia ? artifactMap.get(project.leadMedia.artifactId) : undefined;
+const sectionArtifactIds = new Set(project.sections.flatMap((section) => section.artifactIds));
+const ungroupedArtifacts = project.artifacts.filter((artifact) =>
+  artifact.id !== project.leadMedia?.artifactId && !sectionArtifactIds.has(artifact.id),
+);
+const artifactsFor = (section: CaseSection) => section.artifactIds
+  .map((id) => artifactMap.get(id))
+  .filter((artifact): artifact is PublicArtifact => Boolean(artifact));
+---
+<article class:list={['case-document', `case-document--${project.layout}`]}>
+  <header class="case-header">
+    <p class="case-context">{[project.contextLabel, project.dateLabel].filter(Boolean).join(' · ')}</p>
+    <h1>{project.name}</h1>
+    {project.roleLabel && <p class="case-role">{project.roleLabel}</p>}
+    <p class="case-summary">{project.summary}</p>
+    <aside class="ownership-boundary" aria-label="Collaboration boundary">
+      <strong>{project.ownershipLabel}</strong>
+      <span>{project.ownership}</span>
+    </aside>
+  </header>
+
+  {leadArtifact && project.leadMedia && (
+    <figure class="case-visual" data-case-visual>
+      <img src={leadArtifact.href} alt={project.leadMedia.alt} />
+      <figcaption>{leadArtifact.caption}</figcaption>
+    </figure>
+  )}
+
+  <div class="case-chapters">
+    {project.sections.map((section, index) => (
+      <section class="case-chapter" data-case-chapter aria-labelledby={`chapter-${section.id}`}>
+        <p class="chapter-number">{String(index + 1).padStart(2, '0')}</p>
+        <div class="chapter-copy">
+          <h2 id={`chapter-${section.id}`}>{section.title}</h2>
+          {section.body.map((paragraph) => <p>{paragraph}</p>)}
+          {section.highlights && <ul>{section.highlights.map((item) => <li>{item}</li>)}</ul>}
+          {artifactsFor(section).length > 0 && (
+            <div class="evidence-rows">
+              {artifactsFor(section).map((artifact) => (
+                <a class="evidence-row" data-evidence-row href={artifact.href} target="_blank" rel="noreferrer">
+                  <span class="evidence-title">{artifact.label}</span>
+                  <span class="evidence-meta">{[artifact.status, artifact.category].filter(Boolean).join(' · ')}</span>
+                  <span class="evidence-arrow" aria-hidden="true">↗</span>
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+    ))}
+  </div>
+
+  {project.layout === 'artifact-led' && ungroupedArtifacts.length > 0 && (
+    <section class="public-artifacts" aria-labelledby="public-artifacts-heading">
+      <h2 id="public-artifacts-heading">Public artifacts</h2>
+      <div class="artifact-list">
+        {ungroupedArtifacts.map((artifact) => (
+          <a href={artifact.href} target={artifact.external ? '_blank' : undefined} rel={artifact.external ? 'noreferrer' : undefined}>
+            <strong>{artifact.label}</strong>
+            <span>{artifact.caption}</span>
+            <span class="evidence-arrow" aria-hidden="true">↗</span>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <a class="archive-action" href={project.links.repository} target="_blank" rel="noreferrer">
+    <span>[ GitHub ]</span>
+    <strong>Source repository</strong>
+    <span aria-hidden="true">↗</span>
+  </a>
+</article>

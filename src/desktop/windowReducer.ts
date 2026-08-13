@@ -24,7 +24,7 @@ export function windowReducer(state: DesktopState, action: DesktopAction): Deskt
   if (action.type === 'open' || action.type === 'focus') return focus(state, action.id);
   if (action.type === 'openProject') {
     const id = `project:${action.slug}`;
-    const seeded = state.windows[id] ? state : { ...state, windows: { ...state.windows, [id]: { id, title: action.slug === 'sendo' ? 'Sendo' : action.slug, projectSlug: action.slug, isOpen: true, isMinimized: false, isMaximized: false, zIndex: state.nextZ, bounds: { x: 270, y: 92, width: 760, height: 520 } } } };
+    const seeded = state.windows[id] ? state : { ...state, windows: { ...state.windows, [id]: { id, title: action.title, projectSlug: action.slug, isOpen: true, isMinimized: false, isMaximized: false, zIndex: state.nextZ, bounds: { x: 270, y: 92, width: 760, height: 520 } } } };
     return focus(seeded, id);
   }
   if (action.type === 'close') {

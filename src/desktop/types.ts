@@ -6,7 +6,7 @@ export interface WindowState {
 export interface DesktopState { windows: Record<string, WindowState>; activeId: string | null; nextZ: number }
 export type DesktopAction =
   | { type: 'open'; id: 'identity' | 'work' }
-  | { type: 'openProject'; slug: string }
+  | { type: 'openProject'; slug: string; title: string }
   | { type: 'close' | 'focus' | 'minimize' | 'restore' | 'toggleMaximize'; id: string }
   | { type: 'move'; id: string; x: number; y: number }
   | { type: 'reset' };

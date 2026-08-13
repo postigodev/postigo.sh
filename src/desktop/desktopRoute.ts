@@ -1,10 +1,12 @@
 export interface RouteTarget { appId: string; route: string; projectSlug?: string }
 export interface DesktopHistoryState extends RouteTarget { portfolioDesktop: true; entryId: number; depth: number }
 const staticRoutes: Record<string, string> = { '/': 'identity', '/work': 'work' };
-export function routeToTarget(pathname: string): RouteTarget | undefined {
+export function routeToTarget(pathname: string, knownProjectSlugs: readonly string[] = []): RouteTarget | undefined {
   const clean = pathname !== '/' ? pathname.replace(/\/$/, '') : pathname;
   if (staticRoutes[clean]) return { appId: staticRoutes[clean], route: clean };
-  if (clean === '/work/sendo') return { appId: 'project:sendo', route: clean, projectSlug: 'sendo' };
+  const match = clean.match(/^\/work\/([^/]+)$/);
+  const slug = match?.[1];
+  if (slug && knownProjectSlugs.includes(slug)) return { appId: `project:${slug}`, route: clean, projectSlug: slug };
   return undefined;
 }
 export function isDesktopHistoryState(value: unknown): value is DesktopHistoryState {

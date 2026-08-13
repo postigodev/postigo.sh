@@ -25,6 +25,41 @@ test('owned back and forward synchronize windows without duplicate writes', asyn
   await expect(page.getByRole('region', { name: 'Sendo' })).toBeVisible();
 });
 
+test('keyboard opens a singleton Preppie professional case and focuses its window', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Explore selected work' }).press('Enter');
+  const preppieLink = page.getByRole('link', { name: 'Open Preppie project' });
+  await preppieLink.press('Enter');
+  await expect(page).toHaveURL(/\/work\/preppie$/);
+  await expect(page.getByRole('region', { name: 'Preppie' })).toHaveCount(1);
+  await expect(page.locator('#window-title-project-preppie')).toBeFocused();
+  await expect(page.getByRole('region', { name: 'Preppie' }).locator('[data-case-chapter]')).toHaveCount(4);
+  await expect(page.getByRole('region', { name: 'Preppie' }).locator('[data-evidence-row]')).toHaveCount(7);
+  await expect(page.getByRole('region', { name: 'Preppie' })).not.toContainText('EV_PREPPIE_');
+  await page.getByRole('button', { name: 'Work', exact: true }).click();
+  await preppieLink.press('Enter');
+  await expect(page.getByRole('region', { name: 'Preppie' })).toHaveCount(1);
+});
+
+test('owned Back and Forward restore window focus', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Explore selected work' }).click();
+  await page.getByRole('link', { name: 'Open Preppie project' }).click();
+  await page.goBack();
+  await expect(page.locator('[data-window-id="work"] h2')).toBeFocused();
+  await page.goForward();
+  await expect(page.locator('#window-title-project-preppie')).toBeFocused();
+});
+
+test('Sendo desktop hides provenance and styles its source action', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Explore selected work' }).click();
+  await page.getByRole('link', { name: 'Open Sendo project' }).click();
+  const sendo = page.getByRole('region', { name: 'Sendo' });
+  await expect(sendo).not.toContainText('EV_SENDO_');
+  await expect(sendo.getByRole('link', { name: /Source repository/ })).toHaveClass(/archive-action/);
+});
+
 test('minimize and restore Sendo through the taskbar', async ({ page }) => {
   await page.goto('/'); await page.getByRole('link', { name: 'Explore selected work' }).click(); await page.getByRole('link', { name: 'Open Sendo project' }).click();
   await page.getByRole('button', { name: 'Minimize Sendo' }).click();
