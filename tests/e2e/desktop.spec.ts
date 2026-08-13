@@ -142,6 +142,9 @@ test('Start exposes Privacy and returns focus on Escape', async ({ page }) => {
   const start = page.getByRole('button', { name: /Piero OS/ });
   await start.click();
   await expect(page.getByRole('navigation', { name: 'Start menu' })).toBeVisible();
+  await expect(page.locator('.start-menu-rail')).toHaveText('Piero OS');
+  await expect(page.locator('.start-menu-group')).toHaveCount(3);
+  await expect(page.locator('.start-menu .app-icon')).toHaveCount(8);
   await page.keyboard.press('Escape');
   await expect(page.getByRole('navigation', { name: 'Start menu' })).toHaveCount(0);
   await expect(start).toBeFocused();
@@ -151,6 +154,15 @@ test('Start exposes Privacy and returns focus on Escape', async ({ page }) => {
   await expect(page.getByRole('region', { name: 'Privacy' })).toHaveCount(1);
   await page.goBack();
   await expect(page.locator('#window-title-identity')).toBeFocused();
+});
+
+test('window clients expose the tokenized legacy scrollbar skin', async ({ page }) => {
+  await page.goto('/');
+  const body = page.getByRole('region', { name: 'Piero Postigo Rocchetti' }).locator('.window-body');
+  await expect(body).toHaveCSS('overflow', 'auto');
+  expect(await body.evaluate((element) => getComputedStyle(element, '::-webkit-scrollbar').width)).toBe('16px');
+  const cornerBackground = await body.evaluate((element) => getComputedStyle(element, '::-webkit-scrollbar-corner').backgroundImage);
+  expect(cornerBackground).toContain('linear-gradient');
 });
 
 test('About Piero restores Identity and Player is available from desktop and Start', async ({ page }) => {
