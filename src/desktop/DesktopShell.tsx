@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'preact/hooks';
-import type { PublicIdentity, ProjectCase, WorkRecord } from '../data/portfolio';
+import type { HomeProjectPreview, PublicIdentity, ProjectCase, WorkRecord } from '../data/portfolio';
+import { staticGitHubFallback, unavailableNowPlaying } from '../data/presence';
 import { isDesktopHistoryState, rootHistoryState, routeToTarget, stateForPush, type DesktopHistoryState } from './desktopRoute';
 import { initialDesktopState, windowReducer } from './windowReducer';
 import Window from './Window'; import DesktopIcons from './DesktopIcons'; import StartMenu from './StartMenu'; import Taskbar from './Taskbar';
+import HomeShell from './HomeShell';
 import IdentityApp from './apps/IdentityApp'; import WorkApp from './apps/WorkApp'; import ProjectApp from './apps/ProjectApp';
+import NowPlayingApp from './apps/NowPlayingApp'; import NotesApp from './apps/NotesApp';
 import '../styles/desktop.css';
 
-interface Props { identity: PublicIdentity; records: readonly WorkRecord[]; projects: readonly ProjectCase[] }
-export default function DesktopShell({ identity, records, projects }: Props) {
+interface Props { identity: PublicIdentity; records: readonly WorkRecord[]; projects: readonly ProjectCase[]; previews: readonly HomeProjectPreview[] }
+export default function DesktopShell({ identity, records, projects, previews }: Props) {
   const [state, dispatch] = useReducer(windowReducer, initialDesktopState);
   const [menuOpen, setMenuOpen] = useState(false);
   const historyState = useRef<DesktopHistoryState>(rootHistoryState());
@@ -38,14 +41,17 @@ export default function DesktopShell({ identity, records, projects }: Props) {
   };
   const minimize = (id: string) => { dispatch({ type: 'minimize', id }); requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-taskbar-id="${id}"]`)?.focus()); };
   const windows = Object.values(state.windows);
-  return <div class="desktop-shell"><header class="system-bar"><strong>POSTIGO_OS</strong><span>🐐</span><nav aria-label="Primary"><a href="/">Home</a><a href="/work" onClick={(e) => navigate(e, '/work')}>Work</a><a href="/resume">Resume</a><a href="/about">About</a><a href="/contact">Contact</a></nav><span>ARCHIVE</span></header>
+  const renderWindow = (win: (typeof windows)[number]) => <Window key={win.id} window={win} active={state.activeId === win.id} onFocus={() => dispatch({ type: 'focus', id: win.id })} onClose={() => close(win.id)} onMinimize={() => minimize(win.id)} onMaximize={() => dispatch({ type: 'toggleMaximize', id: win.id })} onMove={(x, y) => dispatch({ type: 'move', id: win.id, x, y })}>
+    {win.id === 'identity' ? <IdentityApp identity={identity} onNavigate={navigate} /> : win.id === 'now-playing' ? <NowPlayingApp view={unavailableNowPlaying} /> : win.id === 'notes' ? <NotesApp /> : win.id === 'work' ? <WorkApp records={records} onNavigate={navigate} /> : win.projectSlug && projectMap.get(win.projectSlug) ? <ProjectApp project={projectMap.get(win.projectSlug)!} /> : null}
+  </Window>;
+  const authoredWindow = (id: string) => { const win = state.windows[id]; return win?.placement === 'authored' ? renderWindow(win) : null; };
+  const taskbar = <Taskbar windows={windows} activeId={state.activeId} menuOpen={menuOpen} onToggleMenu={() => setMenuOpen((value) => !value)} onActivate={activate} />;
+  return <div class="desktop-shell">
+    <HomeShell identity={identity} previews={previews} github={staticGitHubFallback} identityWindow={authoredWindow('identity')} playerWindow={authoredWindow('now-playing')} notesWindow={authoredWindow('notes')} taskbar={taskbar} onNavigate={navigate} />
     <DesktopIcons onNavigate={navigate} />
-    <main class="desktop-surface">
-      {windows.map((win) => <Window window={win} active={state.activeId === win.id} onFocus={() => dispatch({ type: 'focus', id: win.id })} onClose={() => close(win.id)} onMinimize={() => minimize(win.id)} onMaximize={() => dispatch({ type: 'toggleMaximize', id: win.id })} onMove={(x, y) => dispatch({ type: 'move', id: win.id, x, y })}>
-        {win.id === 'identity' ? <IdentityApp identity={identity} onNavigate={navigate} /> : win.id === 'work' ? <WorkApp records={records} onNavigate={navigate} /> : win.projectSlug && projectMap.get(win.projectSlug) ? <ProjectApp project={projectMap.get(win.projectSlug)!} /> : null}
-      </Window>)}
-    </main>
+    <div class="desktop-surface" aria-label="Floating desktop windows">
+      {windows.filter((win) => win.placement === 'floating').map(renderWindow)}
+    </div>
     <StartMenu open={menuOpen} onNavigate={navigate} />
-    <Taskbar windows={windows} activeId={state.activeId} menuOpen={menuOpen} onToggleMenu={() => setMenuOpen((value) => !value)} onActivate={activate} />
   </div>;
 }
