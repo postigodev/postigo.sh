@@ -14,7 +14,8 @@
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
     "test:functions": "vitest run tests/functions",
-    "dev:vercel": "vercel dev --port 3001"
+    "dev:vercel": "vercel dev --port 3001",
+    "spotify:bootstrap": "node scripts/spotify-bootstrap.mjs"
   },
   "dependencies": {
     "@astrojs/preact": "6.0.2",
