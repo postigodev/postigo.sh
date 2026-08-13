@@ -79,7 +79,7 @@ export default function Window({ window: win, definition, workspace, compact, ac
         <button data-window-control aria-label={`Close ${win.title}`} onClick={onClose}>×</button>
       </div>
     </div>
-    <div class="window-body">{children}</div>
+    <div class="window-body"><div class={`window-content window-content--${definition.contentWidth}`} data-content-width={definition.contentWidth}>{children}</div></div>
     {!compact && !win.isMaximized && resizeEdges.map((edge) => <span key={edge} class={`resize-handle resize-handle--${edge}`} data-resize-handle={edge} onPointerDown={startResize(edge)} />)}
   </section>;
 }

@@ -101,6 +101,22 @@ test('edge and corner resize synchronize with maximize and restore', async ({ pa
   expect(await identity.boundingBox()).toEqual(resized);
 });
 
+test('wide windows bound editorial and case content but not utility content', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  const identity = page.getByRole('region', { name: 'Piero Postigo Rocchetti' });
+  await page.getByRole('button', { name: 'Maximize Piero Postigo Rocchetti' }).click();
+  const editorial = identity.locator('[data-content-width="editorial"]');
+  expect((await editorial.boundingBox())?.width).toBeLessThanOrEqual(900);
+  expect((await identity.boundingBox())?.width).toBeGreaterThan(900);
+
+  await page.getByRole('button', { name: 'Player' }).click();
+  const utility = page.getByRole('region', { name: 'Now playing' });
+  await page.getByRole('button', { name: 'Maximize Now playing' }).click();
+  const utilityContent = utility.locator('[data-content-width="utility"]');
+  expect((await utilityContent.boundingBox())?.width).toBe((await utility.locator('.window-body').boundingBox())?.width);
+});
+
 test('resize enforces minimum width and releases pointer capture', async ({ page }) => {
   await page.goto('/');
   const identity = page.getByRole('region', { name: 'Piero Postigo Rocchetti' });

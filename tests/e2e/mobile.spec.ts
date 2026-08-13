@@ -40,3 +40,10 @@ test('mobile launches Player from Start', async ({ page }) => {
   await page.getByRole('button', { name: 'Now playing' }).click();
   await expect(page.getByRole('region', { name: 'Now playing' })).toBeVisible();
 });
+
+test('compact content shells stay within the viewport', async ({ page }) => {
+  await page.goto('/');
+  const content = page.locator('[data-content-width="editorial"]');
+  expect((await content.boundingBox())?.width).toBeLessThanOrEqual(390);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+});
