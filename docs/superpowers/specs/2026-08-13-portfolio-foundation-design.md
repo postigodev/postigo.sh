@@ -118,17 +118,18 @@ Close controls. Nested content must not pretend to be a window.
 The approved flagship Selected Work collection is:
 
 1. Preppie;
-2. Sendo;
-3. Cimax Modernization;
-4. Koba;
-5. DM2Text.
+2. Cimax Modernization;
+3. Koba;
+4. DM2Text;
+5. Sendo.
 
 This is an explicit product/editorial decision for this portfolio and its
 recruiter-first audience. It overrides the generic flagship pool in the current
 positioning model without changing that model's broader role-selection weights.
-Sendo is selected here because its shipped Rust/Tauri desktop, device/API,
-distribution, and external-contributor evidence adds a distinct technical
-surface to the collection.
+Sendo remains in the flagship collection because its shipped Rust/Tauri
+desktop, device/API, distribution, and external-contributor evidence adds a
+distinct technical surface. Implementing its case study first is a vertical-
+slice decision and does not change the public ranking above.
 
 The homepage exposes three initial records and provides a direct path to the
 complete Work archive.
@@ -214,6 +215,8 @@ document. It does not synthesize or hydrate an artificial Work window behind
 the project. Returning to `/` starts the authored desktop composition.
 
 Desktop state is not persisted in the initial implementation.
+Reset remains a reducer-level recovery capability, but the initial UI does not
+surface a Reset Desktop control before persistence or a demonstrated UX need.
 
 ## 8. Route and window synchronization
 
@@ -223,6 +226,10 @@ The route and desktop state follow these rules:
 - Work, project detail, Resume, About, and Contact are routable apps.
 - Status, Now Playing, Terminal, and similar utilities are desktop-only and do
   not modify the URL.
+- Routable launcher actions are semantic `<a href="...">` elements. The
+  enhanced desktop intercepts eligible same-origin clicks; without JavaScript,
+  they navigate to complete Astro documents. Desktop-only utilities use
+  `<button>`.
 - Opening a routable app adds a history entry only when the route changes.
 - Opening a routable singleton that already represents the current route only
   focuses it; it does not duplicate history.
@@ -281,6 +288,12 @@ Suggested domains are:
 - projects and status;
 - public evidence references and artifacts;
 - writing when introduced.
+
+Project cases also expose first-class public artifacts. Each artifact records
+its kind, label, public URL or local asset, evidence reference, caption, and
+optional publication caveat. The first Sendo case includes release/distribution
+evidence, a real product screenshot, and external-contributor evidence. Artifact
+availability does not impose a universal narrative section schema.
 
 Attribution, ownership, publishability, artifact visibility, temporal caveats,
 and status must be explicit fields where relevant. Private evidence may support
@@ -365,11 +378,12 @@ The first vertical slice must pass:
 
 - Astro/TypeScript check;
 - production build;
+- production preview or a static server over `dist/` for the final E2E gate;
 - initial desktop boot with visible identity;
 - Work and project opening;
 - project singleton behavior;
 - Close behavior for owned and depth-zero route entries;
-- Reset Desktop behavior;
+- reducer-level reset behavior without a visible Reset Desktop control;
 - focus and z-index behavior;
 - constrained drag;
 - minimize/restore;
