@@ -12,7 +12,7 @@ interface Props {
 export default function Taskbar({ windows, activeId, menuOpen, onToggleMenu, onActivate }: Props) {
   return <footer class="taskbar" aria-label="Desktop taskbar">
     <button data-start-button class="start-button" aria-expanded={menuOpen} onClick={onToggleMenu}><span aria-hidden="true">🐐</span> Piero OS</button>
-    <div class="taskbar-items">{windows.filter((win) => win.isOpen).map((win) => <button key={win.id} data-taskbar-id={win.id} aria-pressed={activeId === win.id} onClick={() => onActivate(win.id)}>{win.title}</button>)}</div>
+    <div class="taskbar-items">{windows.filter((win) => win.isOpen).map((win) => <button key={win.id} data-taskbar-id={win.id} aria-pressed={activeId === win.id} onClick={() => onActivate(win.id)}><span class="taskbar-item-label">{win.title}</span></button>)}</div>
     <Clock />
   </footer>;
 }

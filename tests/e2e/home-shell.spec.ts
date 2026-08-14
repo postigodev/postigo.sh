@@ -28,6 +28,21 @@ test('uses sentence case OS chrome', async ({ page }) => {
   await expect(page.getByText('PIERO_OS')).toHaveCount(0);
 });
 
+test('keeps identity semantics and taskbar labels inside their controls', async ({ page }) => {
+  await page.goto('/');
+  const identity = page.getByRole('region', { name: 'Piero Postigo Rocchetti' });
+  await expect(identity.getByRole('heading', { level: 1, name: 'Software Engineer' })).toBeVisible();
+  await expect(identity.getByRole('heading', { name: 'backend + product engineering' })).toHaveCount(0);
+  await expect(identity.locator('.identity-descriptor')).toHaveText('backend + product engineering');
+  await expect(page.locator('html')).toHaveCSS('font-family', /IBM Plex Sans/);
+
+  for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
+    await page.setViewportSize(viewport);
+    const task = page.locator('[data-taskbar-id="identity"]');
+    expect(await task.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+  }
+});
+
 test('Network is a real independently controlled window', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Network' }).click();

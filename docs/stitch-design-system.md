@@ -61,7 +61,7 @@ typography:
     fontWeight: '700'
     lineHeight: '1.2'
   body-base:
-    fontFamily: Space Grotesk
+    fontFamily: IBM Plex Sans
     fontSize: 16px
     fontWeight: '400'
     lineHeight: '1.5'
@@ -118,7 +118,7 @@ Use the frontmatter color tokens as canonical implementation values. The prose v
 The type system creates a hierarchy between "Editorial" and "System Data."
 
 - **Headings:** Epilogue provides a bold, distinctive weight for section titles, feeling both modern and slightly aggressive. Use heavy weights (700+) for a printed-poster effect.
-- **Body Text:** Space Grotesk offers a geometric, technical feel that bridges readable prose and machine-like precision.
+- **Body Text:** IBM Plex Sans is the temporary body/UI face while the broader typography direction is revisited; it preserves technical clarity without changing the existing hierarchy.
 - **Metadata/Labels:** JetBrains Mono is used for technical notes, timestamps, tags, and small UI labels.
 - **Styling Note:** Links should be underlined in primary UI Blue. Metadata may be prefixed with system-style prompts such as `[INFO]:` or `> root`.
 
