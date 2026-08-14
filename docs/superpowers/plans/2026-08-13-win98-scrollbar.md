@@ -108,11 +108,7 @@ Replace the scrollbar rules in `src/styles/desktop.css` with the exact block fro
 }
 ```
 
-Replace the Firefox fallback in `src/styles/global.css` with:
-
-```css
-* { scrollbar-color: var(--window-bg) var(--window-bg); scrollbar-width: auto; }
-```
+Remove any `scrollbar-color` fallback from `src/styles/global.css`; Chromium gives that standards-based property precedence and a same-color thumb/track makes the thumb visually disappear.
 
 Remove the now-unused `--os-scrollbar-*` tokens from `src/styles/tokens.css`.
 

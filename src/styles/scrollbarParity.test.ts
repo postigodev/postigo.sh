@@ -6,6 +6,7 @@ const referenceCss = normalizeLines(
   readFileSync(new URL('../../references/WIN98-template/style.css', import.meta.url), 'utf8'),
 );
 const desktopCss = normalizeLines(readFileSync(new URL('./desktop.css', import.meta.url), 'utf8'));
+const globalCss = normalizeLines(readFileSync(new URL('./global.css', import.meta.url), 'utf8'));
 const tokensCss = normalizeLines(readFileSync(new URL('./tokens.css', import.meta.url), 'utf8'));
 
 const referenceBlock = referenceCss.match(
@@ -20,6 +21,7 @@ describe('Win98 scrollbar parity', () => {
     expect(desktopCss).not.toContain('::-webkit-scrollbar-thumb:active');
     expect(desktopCss).not.toContain('::-webkit-scrollbar-button:active');
     expect(desktopCss).not.toContain('::-webkit-scrollbar-corner');
+    expect(globalCss).not.toContain('scrollbar-color');
   });
 
   it('pins the exact Win98 face and hover colors', () => {

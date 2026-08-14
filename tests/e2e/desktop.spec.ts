@@ -161,6 +161,7 @@ test('window clients expose the literal Win98 scrollbar skin', async ({ page }) 
   const body = page.getByRole('region', { name: 'Piero Postigo Rocchetti' }).locator('.window-body');
   await expect(body).toHaveCSS('overflow', 'auto');
   const scrollbar = await body.evaluate((element) => ({
+    color: getComputedStyle(element).scrollbarColor,
     width: getComputedStyle(element, '::-webkit-scrollbar').width,
     trackBackground: getComputedStyle(element, '::-webkit-scrollbar-track').backgroundColor,
     trackBorderStyle: getComputedStyle(element, '::-webkit-scrollbar-track').borderTopStyle,
@@ -170,6 +171,7 @@ test('window clients expose the literal Win98 scrollbar skin', async ({ page }) 
     cornerBackground: getComputedStyle(element, '::-webkit-scrollbar-corner').backgroundImage,
   }));
   expect(scrollbar).toEqual({
+    color: 'auto',
     width: '16px',
     trackBackground: 'rgb(192, 192, 192)',
     trackBorderStyle: 'inset',

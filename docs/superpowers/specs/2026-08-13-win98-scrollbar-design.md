@@ -13,7 +13,7 @@ The current production rules reinterpret the reference instead of reproducing it
 - Replace the current `.window-body::-webkit-scrollbar*` rules with the reference's global `::-webkit-scrollbar*` block verbatim.
 - Expose `--window-bg: #c0c0c0` and `--button-hover: #e0e0e0`, either directly or through aliases guaranteed to resolve to those exact values.
 - Remove the custom thumb/button active state and custom scrollbar corner artwork.
-- Keep Firefox's standards-based `scrollbar-color` fallback aligned with the same face and track colors; Firefox cannot reproduce WebKit scrollbar buttons.
+- Do not add a standards-based `scrollbar-color` fallback: setting the thumb and track to the same gray overrides the WebKit appearance in Chromium and makes the thumb visually disappear.
 - Let literal reference parity win: retain the reference's `width: 16px` and button `height: 16px`, but do not preserve the current extra scrollbar `height` declaration.
 
 ## Verification
