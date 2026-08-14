@@ -1,5 +1,5 @@
 export type WorkKind = 'professional-experience' | 'project';
-export type ArtifactKind = 'release' | 'screenshot' | 'external-contribution' | 'pull-request' | 'source';
+export type ArtifactKind = 'release' | 'screenshot' | 'anonymized-example' | 'external-contribution' | 'pull-request' | 'source';
 export type CaseLayout = 'artifact-led' | 'evidence-trail';
 
 export interface PublicIdentity {
@@ -42,6 +42,7 @@ export interface PublicArtifact {
   external?: boolean;
   status?: string;
   category?: string;
+  imageAlt?: string;
 }
 
 export interface CaseSection {
@@ -55,6 +56,11 @@ export interface CaseSection {
 export interface LeadMedia {
   artifactId: string;
   alt: string;
+}
+
+export interface ArtifactSequence {
+  label: string;
+  artifactIds: readonly string[];
 }
 
 export interface ProjectCase extends WorkRecord {
@@ -71,6 +77,7 @@ export interface ProjectCase extends WorkRecord {
   evidenceRefs: readonly string[];
   artifacts: readonly PublicArtifact[];
   leadMedia?: LeadMedia;
+  artifactSequence?: ArtifactSequence;
   links: { repository: string };
 }
 
@@ -91,7 +98,7 @@ export const selectedWork: readonly WorkRecord[] = [
   { id: 'preppie', name: 'Preppie', kind: 'professional-experience', signal: 'Product + reliability', status: 'Completed', slug: 'preppie' },
   { id: 'cimax-modernization', name: 'Cimax Modernization', kind: 'project', signal: 'Backend modernization', status: 'Shipped public repository', slug: 'cimax-modernization' },
   { id: 'koba', name: 'Koba', kind: 'project', signal: 'Developer tooling', status: 'Shipped', slug: 'koba' },
-  { id: 'dm2text', name: 'DM2Text', kind: 'project', signal: 'Browser product', status: 'Shipped on GitHub' },
+  { id: 'dm2text', name: 'DM2Text', kind: 'project', signal: 'Browser product', status: 'Shipped on GitHub', slug: 'dm2text' },
   { id: 'sendo', name: 'Sendo', kind: 'project', signal: 'Rust desktop + integrations', status: 'Shipped', slug: 'sendo' },
 ];
 
@@ -290,6 +297,79 @@ export const projectCases = [
       { id: 'koba-release', kind: 'release', label: 'Koba v0.1.7 release', href: 'https://github.com/postigodev/koba/releases/tag/v0.1.7', evidenceRef: 'EV_KOBA_RELEASE_017', caption: 'Multi-platform binaries, checksums, and Scoop distribution.', external: true, status: 'Released', category: 'Distribution' },
     ],
     links: { repository: 'https://github.com/postigodev/koba' },
+  },
+  {
+    id: 'dm2text',
+    name: 'DM2Text',
+    kind: 'project',
+    signal: 'Browser product',
+    status: 'Shipped on GitHub',
+    slug: 'dm2text',
+    layout: 'artifact-led',
+    contextLabel: 'Shipped browser product',
+    dateLabel: '2026',
+    roleLabel: 'Solo product engineering — Browser state & local-first boundaries',
+    ownershipLabel: 'Ownership',
+    ownership: 'Solo project',
+    summary: 'Instagram keeps only a changing window of a long DM thread mounted in the DOM. DM2Text turns “copy N messages ending at this exact message” into a bounded, local browser workflow.',
+    technologies: ['TypeScript', 'WXT', 'Chrome Manifest V3', 'Vitest'],
+    sections: [
+      {
+        id: 'bounded-interaction',
+        title: 'A bounded interaction',
+        body: [
+          'Copy context begins from one exact message and asks for a count, turning an open-ended thread into an explicit request.',
+          'The interaction makes both boundaries visible before collection starts: how much context to copy, and the message where that context must end.',
+        ],
+        artifactIds: [],
+      },
+      {
+        id: 'changing-window',
+        title: 'State that will not sit still',
+        body: [
+          'Instagram remounts a changing slice of the thread as the user moves through older history. The collection session merges those windows instead of treating any single DOM snapshot as the conversation.',
+          'It preserves the selected message as an anchor key and returns only the requested range ending at that exact anchor, including remount and partial-history conditions.',
+        ],
+        artifactIds: ['dm2text-session-source'],
+      },
+      {
+        id: 'local-output',
+        title: 'A local output boundary',
+        body: [
+          'DM2Text formats the requested range for the clipboard without intentionally transmitting or persisting captured message content.',
+          'The release and verification trail keeps that product boundary inspectable without turning repository counts into impact claims.',
+        ],
+        highlights: [
+          '119 automated tests passed at the 2026-08-13 refresh.',
+          'Production size budgets reported 36,227 bytes of JavaScript and a 24,754-byte packaged extension ZIP.',
+        ],
+        artifactIds: ['dm2text-privacy', 'dm2text-release', 'dm2text-ci', 'dm2text-budgets'],
+      },
+    ],
+    evidenceRefs: [
+      'EV_DM2TEXT_VIRTUALIZED_DOM_SOURCE',
+      'EV_DM2TEXT_LOCAL_ONLY_BOUNDARY',
+      'EV_DM2TEXT_CI_119_TESTS',
+      'EV_DM2TEXT_BUILD_SIZE_SNAPSHOT',
+      'EV_DM2TEXT_RELEASE_011',
+      'EV_DM2TEXT_PRODUCT_SCREENSHOTS',
+      'EV_DM2TEXT_TRANSCRIPT_FORMAT_DOCS',
+    ],
+    artifacts: [
+      { id: 'dm2text-message-action', kind: 'screenshot', label: 'Copy context', href: '/images/dm2text/message-action.png', imageAlt: 'DM2Text Copy context action beside an Instagram direct message', evidenceRef: 'EV_DM2TEXT_PRODUCT_SCREENSHOTS', caption: 'The user starts from the exact message that should end the copied range.' },
+      { id: 'dm2text-copy-dialog', kind: 'screenshot', label: 'Choose the boundary', href: '/images/dm2text/copy-dialog.png', imageAlt: 'DM2Text dialog asking how many messages to copy', evidenceRef: 'EV_DM2TEXT_PRODUCT_SCREENSHOTS', caption: 'A bounded count turns a long thread into one explicit collection request.' },
+      { id: 'dm2text-transcript-example', kind: 'anonymized-example', label: 'Anonymized output example', href: '/images/dm2text/transcript-example.svg', imageAlt: 'An anonymized DM2Text clipboard transcript with fictional participants', evidenceRef: 'EV_DM2TEXT_TRANSCRIPT_FORMAT_DOCS', caption: 'A constructed example of the documented local clipboard format—not a real conversation screenshot.' },
+      { id: 'dm2text-session-source', kind: 'source', label: 'Anchor-bounded collection loop', href: 'https://github.com/postigodev/dm2text/blob/main/src/collection/session.ts', evidenceRef: 'EV_DM2TEXT_VIRTUALIZED_DOM_SOURCE', caption: 'The public implementation merges changing windows, retains anchorKey, and selects the requested range with selectEndingAt.', external: true, status: 'Public source', category: 'State / identity' },
+      { id: 'dm2text-privacy', kind: 'source', label: 'DM2Text privacy boundary', href: 'https://dm2text.postigo.sh/privacy', evidenceRef: 'EV_DM2TEXT_LOCAL_ONLY_BOUNDARY', caption: 'Public policy for DM2Text’s own handling of captured message content.', external: true, status: 'Public policy', category: 'Privacy' },
+      { id: 'dm2text-release', kind: 'release', label: 'DM2Text v0.1.1 release', href: 'https://github.com/postigodev/dm2text/releases/tag/v0.1.1', evidenceRef: 'EV_DM2TEXT_RELEASE_011', caption: 'The current audited GitHub release and manual distribution artifact.', external: true, status: 'Released', category: 'Distribution' },
+      { id: 'dm2text-ci', kind: 'source', label: 'CI verification workflow', href: 'https://github.com/postigodev/dm2text/blob/main/.github/workflows/ci.yml', evidenceRef: 'EV_DM2TEXT_CI_119_TESTS', caption: 'Automated tests and size-budget checks for the audited source snapshot.', external: true, status: 'Public source', category: 'Verification' },
+      { id: 'dm2text-budgets', kind: 'source', label: 'Production size budgets', href: 'https://github.com/postigodev/dm2text/blob/main/scripts/check-budgets.mjs', evidenceRef: 'EV_DM2TEXT_BUILD_SIZE_SNAPSHOT', caption: 'The public script enforcing JavaScript and packaged-extension limits.', external: true, status: 'Public source', category: 'Bundle discipline' },
+    ],
+    artifactSequence: {
+      label: 'Interaction trace',
+      artifactIds: ['dm2text-message-action', 'dm2text-copy-dialog', 'dm2text-transcript-example'],
+    },
+    links: { repository: 'https://github.com/postigodev/dm2text' },
   },
   {
     id: 'sendo',

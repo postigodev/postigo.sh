@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title description">
+  <title id="title">Anonymized DM2Text output example</title>
+  <desc id="description">A paper-style transcript showing fictional people and representative copied message formats.</desc>
+  <rect width="960" height="540" fill="#f5f2ea"/>
+  <path d="M0 8h960M0 532h960" stroke="#111111" stroke-width="8"/>
+  <rect x="28" y="28" width="904" height="484" fill="none" stroke="#111111" stroke-width="2"/>
+  <rect x="28" y="28" width="904" height="64" fill="#111111"/>
+  <rect x="48" y="49" width="14" height="22" fill="#1537ff"/>
+  <text x="78" y="70" fill="#f5f2ea" font-family="JetBrains Mono, Consolas, monospace" font-size="24" font-weight="700" letter-spacing="1">ANONYMIZED OUTPUT EXAMPLE</text>
+  <text x="54" y="130" fill="#1537ff" font-family="JetBrains Mono, Consolas, monospace" font-size="16" font-weight="700">[10:41 AM, Tuesday]</text>
+  <text x="54" y="171" fill="#111111" font-family="JetBrains Mono, Consolas, monospace" font-size="20"><tspan font-weight="700">Person A:</tspan> Did you see the draft?</text>
+  <text x="54" y="220" fill="#111111" font-family="JetBrains Mono, Consolas, monospace" font-size="20"><tspan font-weight="700">You</tspan> (replying to Person A: Did you see the draft?):</text>
+  <text x="86" y="251" fill="#111111" font-family="JetBrains Mono, Consolas, monospace" font-size="20">Yes, sending notes now.</text>
+  <text x="54" y="306" fill="#111111" font-family="JetBrains Mono, Consolas, monospace" font-size="20"><tspan font-weight="700">Person B:</tspan> [shared post by example.account]</text>
+  <text x="86" y="340" fill="#4d4d4d" font-family="JetBrains Mono, Consolas, monospace" font-size="19">Caption: A visible post caption</text>
+  <text x="54" y="395" fill="#111111" font-family="JetBrains Mono, Consolas, monospace" font-size="20"><tspan font-weight="700">Person A:</tspan> [image]</text>
+  <path d="M54 438h852" stroke="#111111" stroke-width="2" stroke-dasharray="8 7"/>
+  <text x="54" y="478" fill="#111111" font-family="JetBrains Mono, Consolas, monospace" font-size="16" font-weight="700" letter-spacing="1">LOCAL OUTPUT // CLIPBOARD TRANSCRIPT</text>
+  <text x="906" y="478" fill="#1537ff" text-anchor="end" font-family="JetBrains Mono, Consolas, monospace" font-size="16">03 / 03</text>
+</svg>
