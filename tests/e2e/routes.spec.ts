@@ -20,6 +20,20 @@ test('direct Preppie route is a professional evidence trail', async ({ page }) =
   await expect(page.locator('body')).not.toContainText('EV_PREPPIE_');
 });
 
+test('direct DM2Text route presents an artifact-led interaction trace', async ({ page }) => {
+  await page.goto('/work/dm2text');
+  await expect(page.getByRole('heading', { name: 'DM2Text' })).toBeVisible();
+  await expect(page.getByText('Interaction trace')).toBeVisible();
+  const trace = page.locator('[data-artifact-sequence]');
+  await expect(trace.locator('[data-sequence-artifact]')).toHaveCount(3);
+  await expect(trace.locator('figcaption strong')).toHaveText([
+    'Copy context', 'Choose the boundary', 'Anonymized output example',
+  ]);
+  await expect(page.locator('[data-case-chapter]')).toHaveCount(3);
+  await expect(page.getByRole('link', { name: 'Anchor-bounded collection loop' })).toBeVisible();
+  await expect(page.locator('body')).not.toContainText(/EV_DM2TEXT|[a-f0-9]{64}/i);
+});
+
 test('Sendo public route hides provenance and uses an archive source action', async ({ page }) => {
   await page.goto('/work/sendo');
   await expect(page.locator('body')).not.toContainText('EV_SENDO_');

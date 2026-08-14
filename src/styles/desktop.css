@@ -135,6 +135,10 @@
 .project-app .case-header { padding: 8px 0 24px; border-top: 0; border-bottom-color: var(--os-bevel-light); }
 .project-app .case-context { color: var(--acid); }
 .project-app .case-role, .project-app .case-visual figcaption { color: var(--outline-variant); }
+.project-app .artifact-sequence__label { color: var(--acid); border-bottom-color: var(--os-bevel-light); }
+.project-app .artifact-sequence__item { border-color: var(--os-bevel-light); }
+.project-app .artifact-sequence__item--anonymized-example { color: var(--on-surface); background: var(--surface); border-color: var(--acid); }
+.project-app .artifact-sequence__item--anonymized-example figcaption { border-top-color: var(--acid); }
 .project-app .ownership-boundary { grid-template-columns: minmax(180px, .7fr) 2fr; background: var(--surface); border-color: var(--os-bevel-light); }
 .project-app .case-visual img { width: min(100%, 720px); border-color: var(--os-bevel-light); filter: grayscale(1) contrast(1.15); }
 .project-app .case-chapter { grid-template-columns: 74px 1fr; gap: 16px; border-top-color: var(--os-bevel-light); }

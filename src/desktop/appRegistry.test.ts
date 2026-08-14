@@ -29,7 +29,7 @@ describe('desktop app registry', () => {
     expect(registry.has('project:cimax-modernization')).toBe(true);
     expect(registry.has('project:koba')).toBe(true);
     expect(registry.has('project:sendo')).toBe(true);
-    expect(registry.has('project:dm2text')).toBe(false);
+    expect(registry.has('project:dm2text')).toBe(true);
   });
 
   it('maps About Piero to Identity and exposes Player twice without duplicate apps', () => {

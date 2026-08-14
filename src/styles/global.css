@@ -41,6 +41,18 @@ button, a { font: inherit; }
 .case-visual { margin: 30px 0; }
 .case-visual img { display: block; width: min(100%, 780px); border: 2px solid var(--on-surface); filter: grayscale(1) contrast(1.1); }
 .case-visual figcaption { margin-top: 8px; font: .75rem/1.4 var(--font-mono); color: var(--on-surface-variant); }
+.artifact-sequence { margin: 30px 0 44px; }
+.artifact-sequence__label { margin: 0 0 10px; padding-bottom: 8px; border-bottom: 2px solid var(--on-surface); color: var(--primary); font: 700 .75rem/1 var(--font-mono); letter-spacing: .05em; text-transform: uppercase; }
+.artifact-sequence__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 14px; align-items: start; }
+.artifact-sequence__item { min-width: 0; margin: 0; overflow: hidden; border: 2px solid var(--on-surface); background: var(--black); color: var(--white); }
+.artifact-sequence__media { display: block; padding: 10px; background: var(--black); }
+.artifact-sequence__media img { display: block; width: 100%; height: auto; margin: auto; filter: none; }
+.artifact-sequence__item figcaption { display: grid; gap: 7px; padding: 12px; border-top: 2px solid currentColor; }
+.artifact-sequence__item figcaption strong { font: 700 .82rem/1.2 var(--font-mono); text-transform: uppercase; }
+.artifact-sequence__item figcaption span { font-size: .84rem; line-height: 1.4; }
+.artifact-sequence__item--anonymized-example { background: var(--surface); color: var(--on-surface); border-color: var(--primary); }
+.artifact-sequence__item--anonymized-example .artifact-sequence__media { padding: 0; background: var(--surface); }
+.artifact-sequence__item--anonymized-example figcaption { border-top-color: var(--primary); }
 .case-chapters { margin-top: 42px; }
 .case-chapter { display: grid; grid-template-columns: 100px 1fr; gap: 24px; padding: 28px 0 42px; border-top: 2px solid var(--on-surface); }
 .chapter-number { margin: 4px 0 0; color: var(--primary); font-weight: 700; }

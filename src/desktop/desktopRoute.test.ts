@@ -14,7 +14,7 @@ describe('desktop route contract', () => {
     expect(routeToTarget('/contact', registry)).toEqual({ appId: 'contact', route: '/contact' });
     expect(routeToTarget('/privacy', registry)).toEqual({ appId: 'privacy', route: '/privacy' });
     expect(routeToTarget('/work/koba', registry)).toEqual({ appId: 'project:koba', route: '/work/koba', projectSlug: 'koba' });
-    expect(routeToTarget('/work/dm2text', registry)).toBeUndefined();
+    expect(routeToTarget('/work/dm2text', registry)).toEqual({ appId: 'project:dm2text', route: '/work/dm2text', projectSlug: 'dm2text' });
     expect(routeToTarget('/status', registry)).toBeUndefined();
   });
 
