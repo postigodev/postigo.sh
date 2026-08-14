@@ -28,8 +28,8 @@ A short shipped/verification surface follows these acts through release, source,
 
 The case opens with a three-step optional artifact sequence shared by the Astro and Preact renderers:
 
-1. `message-action.png` — byte-for-byte copy of the public DM2Text asset `docs/assets/message-action.png`, showing the `Copy context` action.
-2. `copy-dialog.png` — byte-for-byte copy of the public DM2Text asset `docs/assets/copy-dialog.png`, showing the bounded count dialog.
+1. `message-action.png` — byte-for-byte copy of the public DM2Text asset `docs/assets/message-action.png`, showing the `Copy context` action. Approved SHA-256: `d5f07cf16742c119391d2a81bd2bcd483dc9bd89c737e52d5f9151b9da0a8844`.
+2. `copy-dialog.png` — byte-for-byte copy of the public DM2Text asset `docs/assets/copy-dialog.png`, showing the bounded count dialog. Approved SHA-256: `3d6db7253c47e5e9c2c4d1ca10c8482124600c274cec5b640b9d4487b900478f`.
 3. `transcript-example.svg` — a new deterministic portfolio asset based on DM2Text's documented transcript example.
 
 The third asset must be labelled **Anonymized output example**. It must not be presented as a screenshot of a real private conversation or as evidence of adoption. Its deterministic input is the public transcript example in `C:\Users\akuma\repos\dm2text\README.md`:
@@ -42,7 +42,7 @@ Person B: [shared post by example.account]
 Person A: [image]
 ```
 
-No real username, conversation text, or private content may appear. Tests compare hashes for the copied PNGs and assert the SVG's visible provenance label and anonymized text contract.
+No real username, conversation text, or private content may appear. The implementation performs a one-time local comparison against the sibling checkout. Committed tests compare the portfolio copies against the fixed approved hashes above, so clean CI and deploy checkouts do not depend on `C:\Users\akuma\repos\dm2text`. Tests also assert the SVG's visible provenance label and anonymized text contract.
 
 All three assets live under `public/images/dm2text/`. The two PNG files are copied without modifying the DM2Text source repository. The SVG follows the portfolio's sharp, archival OS skin while preserving readable transcript text.
 
@@ -101,7 +101,7 @@ Exact counts remain supporting evidence, not impact metrics. If refresh is block
 ## Testing
 
 - Extend portfolio data tests to require DM2Text's slug, three ordered sequence artifacts, distinct `anonymized-example` typing, visible provenance, evidence references, solo attribution, release, privacy/source links, and absence of blocked Chrome Web Store claims.
-- Verify byte-for-byte hashes of the two copied PNGs against `C:\Users\akuma\repos\dm2text\docs\assets\` and assert that the generated SVG contains only the approved anonymized transcript fixture.
+- During implementation, compare the two copied PNGs once against `C:\Users\akuma\repos\dm2text\docs\assets\`. In committed tests, verify the portfolio assets against the fixed SHA-256 values in this spec and assert that the generated SVG contains only the approved anonymized transcript fixture. Clean CI must not require the sibling checkout.
 - Add renderer assertions for the static route and desktop window using the shared typed source.
 - Confirm `/work/dm2text` builds as static HTML and works without JavaScript.
 - Confirm launching DM2Text opens only the DM2Text window and preserves route/history behavior.
