@@ -19,8 +19,8 @@ DM2Text is a shipped, solo browser product. Lead with a bounded user interaction
 The case uses three project-specific acts rather than a universal Problem / System / Impact dossier:
 
 1. **A bounded interaction** — `Copy context` starts one explicit session and asks for a bounded message count.
-2. **State that will not sit still** — the extension reconstructs older context across changing mounted windows while preserving the exact selected endpoint, including duplicate-message occurrences.
-3. **A local output boundary** — transient conversation state becomes one requested clipboard transcript, then cleanup runs; message content is not persisted or intentionally transmitted.
+2. **State that will not sit still** — the extension reconstructs older context across changing mounted windows while preserving the exact selected endpoint through remount and partial-history conditions.
+3. **A local output boundary** — transient conversation state becomes one requested clipboard transcript; message content is not persisted or intentionally transmitted.
 
 A short shipped/verification surface follows these acts through release, source, privacy, and refreshed CI/build evidence.
 
@@ -28,11 +28,21 @@ A short shipped/verification surface follows these acts through release, source,
 
 The case opens with a three-step optional artifact sequence shared by the Astro and Preact renderers:
 
-1. `message-action.png` — real public screenshot of the `Copy context` action.
-2. `copy-dialog.png` — real public screenshot of the bounded count dialog.
+1. `message-action.png` — byte-for-byte copy of the public DM2Text asset `docs/assets/message-action.png`, showing the `Copy context` action.
+2. `copy-dialog.png` — byte-for-byte copy of the public DM2Text asset `docs/assets/copy-dialog.png`, showing the bounded count dialog.
 3. `transcript-example.svg` — a new deterministic portfolio asset based on DM2Text's documented transcript example.
 
-The third asset must be labelled **Anonymized output example**. It must not be presented as a screenshot of a real private conversation or as evidence of adoption. Its text uses only `Person A`, `Person B`, `You`, and documented media/reply placeholders.
+The third asset must be labelled **Anonymized output example**. It must not be presented as a screenshot of a real private conversation or as evidence of adoption. Its deterministic input is the public transcript example in `C:\Users\akuma\repos\dm2text\README.md`:
+
+```text
+[10:41 AM, Tuesday] Person A: Did you see the draft?
+You (replying to Person A: Did you see the draft?): Yes, sending notes now.
+Person B: [shared post by example.account]
+  Caption: A visible post caption
+Person A: [image]
+```
+
+No real username, conversation text, or private content may appear. Tests compare hashes for the copied PNGs and assert the SVG's visible provenance label and anonymized text contract.
 
 All three assets live under `public/images/dm2text/`. The two PNG files are copied without modifying the DM2Text source repository. The SVG follows the portfolio's sharp, archival OS skin while preserving readable transcript text.
 
@@ -41,6 +51,14 @@ All three assets live under `public/images/dm2text/`. The two PNG files are copi
 Add an optional artifact-sequence field to `ProjectCase` instead of hard-coding DM2Text in either renderer:
 
 ```ts
+type ArtifactKind =
+  | 'release'
+  | 'screenshot'
+  | 'anonymized-example'
+  | 'external-contribution'
+  | 'pull-request'
+  | 'source';
+
 interface ArtifactSequence {
   label: string;
   artifactIds: readonly string[];
@@ -52,7 +70,7 @@ interface ProjectCase {
 }
 ```
 
-Every referenced sequence item must exist in the case's existing `artifacts` array and use `kind: 'screenshot'`. The sequence is a presentation option, not a mandatory dossier section. Existing project cases remain unchanged.
+Every referenced sequence item must exist in the case's existing `artifacts` array and use `kind: 'screenshot' | 'anonymized-example'`. Sequence figures render the artifact label and caption visibly, so the constructed example's provenance cannot be hidden by presentation. The sequence is a presentation option, not a mandatory dossier section. Existing project cases remain unchanged.
 
 Both `ProjectCaseDocument.astro` and `ProjectApp.tsx` render the same ordered sequence after the case header and before narrative sections. A shared class contract keeps their visual result consistent without duplicating facts.
 
@@ -75,18 +93,19 @@ Exact counts remain supporting evidence, not impact metrics. If refresh is block
 ## Rendering and responsive behavior
 
 - Desktop windows retain unrestricted resizing; the existing case-content max width remains responsible for readable prose.
-- The artifact sequence uses a three-column strip when space permits and collapses to one column on narrow/mobile views.
+- The artifact sequence uses an intrinsic grid such as `repeat(auto-fit, minmax(...))`, so it responds to the available case/window content width. It shows three columns when space permits and collapses to one column in a narrowed desktop window or mobile view.
 - Images use intrinsic dimensions, descriptive alt text, and no eager-loading requirement beyond the first visible asset.
 - Local image artifacts open as images when selected; source, release, privacy, and repository artifacts open as semantic links.
 - No carousel, animation dependency, iframe, or runtime media fetch is introduced.
 
 ## Testing
 
-- Extend portfolio data tests to require DM2Text's slug, three ordered sequence artifacts, evidence references, solo attribution, release, privacy/source links, and absence of blocked Chrome Web Store claims.
+- Extend portfolio data tests to require DM2Text's slug, three ordered sequence artifacts, distinct `anonymized-example` typing, visible provenance, evidence references, solo attribution, release, privacy/source links, and absence of blocked Chrome Web Store claims.
+- Verify byte-for-byte hashes of the two copied PNGs against `C:\Users\akuma\repos\dm2text\docs\assets\` and assert that the generated SVG contains only the approved anonymized transcript fixture.
 - Add renderer assertions for the static route and desktop window using the shared typed source.
 - Confirm `/work/dm2text` builds as static HTML and works without JavaScript.
 - Confirm launching DM2Text opens only the DM2Text window and preserves route/history behavior.
-- Confirm the artifact sequence is three columns on desktop and one column on mobile.
+- Confirm the artifact sequence is three columns in a sufficiently wide case, one column after narrowing a freely resizable desktop window, and one column on mobile.
 - Run unit tests, Astro check, production build, and relevant Playwright tests against built output.
 
 ## Non-goals
@@ -96,4 +115,3 @@ Exact counts remain supporting evidence, not impact metrics. If refresh is block
 - Adding all remaining portfolio projects in the same slice.
 - Introducing a universal architecture diagram or fixed dossier schema.
 - Reworking the approved desktop visual system.
-
