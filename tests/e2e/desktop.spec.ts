@@ -40,6 +40,34 @@ test('project windows remain singleton and preserve evidence content', async ({ 
   await expect(preppie).toHaveCount(1);
 });
 
+test('DM2Text opens independently and its interaction trace follows window width', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Projects' }).click();
+  await workWindow(page).getByRole('link', { name: 'Open DM2Text project' }).click();
+  await expect(page).toHaveURL(/\/work\/dm2text$/);
+
+  const dm2text = page.getByRole('region', { name: 'DM2Text' });
+  await expect(dm2text).toHaveCount(1);
+  await page.getByRole('button', { name: 'Close Selected work' }).click();
+  await page.locator('[data-taskbar-id="identity"]').click();
+  await page.getByRole('button', { name: 'Close Piero Postigo Rocchetti' }).click();
+  await expect(dm2text).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Selected work' })).toHaveCount(0);
+  await expect(page.getByRole('region', { name: 'Piero Postigo Rocchetti' })).toHaveCount(0);
+
+  const cards = dm2text.locator('[data-sequence-artifact]');
+  await expect(cards).toHaveCount(3);
+  const wideFirst = await cards.nth(0).boundingBox();
+  const wideSecond = await cards.nth(1).boundingBox();
+  expect(Math.abs((wideFirst?.y ?? 0) - (wideSecond?.y ?? 0))).toBeLessThan(5);
+
+  await dragBy(page, dm2text.locator('[data-resize-handle="e"]'), -700, 0);
+  const narrowFirst = await cards.nth(0).boundingBox();
+  const narrowSecond = await cards.nth(1).boundingBox();
+  expect(narrowSecond?.y).toBeGreaterThan(narrowFirst?.y ?? 0);
+});
+
 test('closing a routed chain never resurrects closed parent windows', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('link', { name: 'Projects' }).click();
