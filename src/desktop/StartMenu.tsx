@@ -32,7 +32,7 @@ export default function StartMenu({ open, definitions, onNavigate, onLaunch, onD
       const items = definitions.filter((definition) => definition.startGroup === group);
       if (!items.length) return null;
       return <section class="start-menu-group" aria-label={label} key={group}>{items.map((definition) => {
-        const content = <><AppIcon name={definition.icon} /><span>{definition.startLabel ?? definition.title}</span></>;
+        const content = <><span>{definition.startLabel ?? definition.title}</span><AppIcon name={definition.icon} /></>;
         return definition.route
           ? <a key={definition.id} href={definition.route} onClick={(event) => onNavigate(event, definition.route!)}>{content}</a>
           : <button key={definition.id} type="button" onClick={(event) => onLaunch(event, definition.id)}>{content}</button>;

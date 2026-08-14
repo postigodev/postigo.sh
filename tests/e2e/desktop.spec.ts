@@ -145,6 +145,13 @@ test('Start exposes Privacy and returns focus on Escape', async ({ page }) => {
   await expect(page.locator('.start-menu-rail')).toHaveText('Piero OS');
   await expect(page.locator('.start-menu-group')).toHaveCount(3);
   await expect(page.locator('.start-menu .app-icon')).toHaveCount(8);
+  const itemLayout = await page.locator('.start-menu a, .start-menu button').evaluateAll((items) => items.map((item) => {
+    const label = item.querySelector(':scope > span:not(.app-icon)')?.getBoundingClientRect();
+    const icon = item.querySelector(':scope > .app-icon')?.getBoundingClientRect();
+    return { iconLeft: icon?.left, labelRight: label?.right };
+  }));
+  expect(new Set(itemLayout.map(({ iconLeft }) => Math.round(iconLeft ?? 0))).size).toBe(1);
+  expect(itemLayout.every(({ iconLeft, labelRight }) => (labelRight ?? 0) < (iconLeft ?? 0))).toBe(true);
   await page.keyboard.press('Escape');
   await expect(page.getByRole('navigation', { name: 'Start menu' })).toHaveCount(0);
   await expect(start).toBeFocused();

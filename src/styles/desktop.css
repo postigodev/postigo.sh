@@ -155,9 +155,9 @@
 .start-menu-rail { display: flex; align-items: flex-start; justify-content: center; padding: 8px 4px; color: var(--white); background: linear-gradient(0deg, var(--os-title-active), var(--os-title-inactive)); font: 700 18px/1 var(--font-body); letter-spacing: .04em; writing-mode: vertical-rl; transform: rotate(180deg); }
 .start-menu-items { min-width: 0; padding: 2px 0; }
 .start-menu-group + .start-menu-group { margin-top: 2px; padding-top: 3px; border-top: 1px solid var(--os-bevel-mid); box-shadow: inset 0 1px 0 var(--os-bevel-light); }
-.start-menu a, .start-menu button { display: flex; align-items: center; gap: 9px; width: 100%; min-height: 34px; padding: 4px 8px; border: 0; border-radius: 0; background: transparent; color: var(--os-control-fg); text-align: left; text-decoration: none; }
+.start-menu a, .start-menu button { display: grid; grid-template-columns: minmax(0, 1fr) 24px; align-items: center; gap: 9px; width: 100%; min-height: 34px; padding: 4px 8px; border: 0; border-radius: 0; background: transparent; color: var(--os-control-fg); text-align: right; text-decoration: none; }
 .start-menu a:hover, .start-menu a:focus-visible, .start-menu button:hover, .start-menu button:focus-visible { background: var(--os-selection); color: var(--white); }
-.start-menu .app-icon { width: 24px; height: 24px; flex: 0 0 24px; }
+.start-menu .app-icon { width: 24px; height: 24px; margin: 0; }
 
 @media (max-width: 768px) {
   .desktop-icons, .resize-handle { display: none; }
