@@ -14,7 +14,7 @@ Complete DM2Text as the fifth routable Selected Work case with an evidence-first
 
 ## Editorial angle
 
-DM2Text is a shipped, solo browser product. Lead with a bounded user interaction, then reveal the underlying state and identity problem: Instagram exposes partial, virtualized message windows, while the user expects a chronological transcript ending at one exact selected message.
+DM2Text is a shipped, solo browser product. Open with the concrete technical hook: Instagram keeps a changing window of a long DM thread mounted in the DOM, while the user expects “copy N messages ending at this exact message.” The first chapter remains **A bounded interaction**; the hook is introductory copy, not a replacement abstraction.
 
 The case uses three project-specific acts rather than a universal Problem / System / Impact dossier:
 
@@ -22,17 +22,17 @@ The case uses three project-specific acts rather than a universal Problem / Syst
 2. **State that will not sit still** — the extension reconstructs older context across changing mounted windows while preserving the exact selected endpoint through remount and partial-history conditions.
 3. **A local output boundary** — transient conversation state becomes one requested clipboard transcript; message content is not persisted or intentionally transmitted.
 
-A short shipped/verification surface follows these acts through release, source, privacy, and refreshed CI/build evidence.
+A short shipped/verification surface follows these acts through release, source, privacy, and refreshed CI/build evidence. Exact test and bundle counts remain supporting verification near the end and never become headline impact metrics.
 
 ## Artifact sequence
 
-The case opens with a three-step optional artifact sequence shared by the Astro and Preact renderers:
+The case opens with a three-step **Interaction trace** shared by the Astro and Preact renderers, not generic onboarding:
 
 1. `message-action.png` — byte-for-byte copy of the public DM2Text asset `docs/assets/message-action.png`, showing the `Copy context` action. Approved SHA-256: `d5f07cf16742c119391d2a81bd2bcd483dc9bd89c737e52d5f9151b9da0a8844`.
 2. `copy-dialog.png` — byte-for-byte copy of the public DM2Text asset `docs/assets/copy-dialog.png`, showing the bounded count dialog. Approved SHA-256: `3d6db7253c47e5e9c2c4d1ca10c8482124600c274cec5b640b9d4487b900478f`.
 3. `transcript-example.svg` — a new deterministic portfolio asset based on DM2Text's documented transcript example.
 
-The third asset must be labelled **Anonymized output example**. It must not be presented as a screenshot of a real private conversation or as evidence of adoption. Its deterministic input is the public transcript example in `C:\Users\akuma\repos\dm2text\README.md`:
+The third asset must be labelled **Anonymized output example** and rendered with a visibly distinct paper/transcript treatment rather than the screenshot frame used by the first two artifacts. It must not be presented as a screenshot of a real private conversation or as evidence of adoption. Its deterministic input is the public transcript example in `C:\Users\akuma\repos\dm2text\README.md`:
 
 ```text
 [10:41 AM, Tuesday] Person A: Did you see the draft?
@@ -42,7 +42,7 @@ Person B: [shared post by example.account]
 Person A: [image]
 ```
 
-No real username, conversation text, or private content may appear. The implementation performs a one-time local comparison against the sibling checkout. Committed tests compare the portfolio copies against the fixed approved hashes above, so clean CI and deploy checkouts do not depend on `C:\Users\akuma\repos\dm2text`. Tests also assert the SVG's visible provenance label and anonymized text contract.
+No real username, conversation text, or private content may appear. The implementation performs a one-time local comparison against the sibling checkout. Committed tests compare the portfolio copies against the approved source-snapshot hashes above, so clean CI and deploy checkouts do not depend on `C:\Users\akuma\repos\dm2text`. These hashes may be intentionally refreshed later when the approved upstream screenshots change; they are provenance snapshots, not permanent asset identity. Tests also assert the SVG's visible provenance label and anonymized text contract.
 
 All three assets live under `public/images/dm2text/`. The two PNG files are copied without modifying the DM2Text source repository. The SVG follows the portfolio's sharp, archival OS skin while preserving readable transcript text.
 
@@ -72,6 +72,8 @@ interface ProjectCase {
 
 Every referenced sequence item must exist in the case's existing `artifacts` array and use `kind: 'screenshot' | 'anonymized-example'`. Sequence figures render the artifact label and caption visibly, so the constructed example's provenance cannot be hidden by presentation. The sequence is a presentation option, not a mandatory dossier section. Existing project cases remain unchanged.
 
+SHA-256 values and `EV_*` identifiers are internal provenance/test metadata. Neither appears in the normal reader path, captions, artifact labels, or narrative copy.
+
 Both `ProjectCaseDocument.astro` and `ProjectApp.tsx` render the same ordered sequence after the case header and before narrative sections. A shared class contract keeps their visual result consistent without duplicating facts.
 
 ## Public case content
@@ -80,15 +82,17 @@ Both `ProjectCaseDocument.astro` and `ProjectApp.tsx` render the same ordered se
 - Add one `ProjectCase` with `layout: 'artifact-led'`, solo ownership, status `Shipped on GitHub`, and repository `https://github.com/postigodev/dm2text`.
 - Use the supported browser-product, local-first, exact-anchor, virtualized-window, release, and verification claims only.
 - Link evidence to specific public source files where possible rather than repeatedly linking the repository root.
+- Act 2 includes one compact real source artifact linking to `src/collection/session.ts`, where changing mounted windows are merged while selection remains bounded by the preserved anchor key. It may show a short faithful excerpt around `mergeWindow`, `anchorKey`, and `selectEndingAt`; it must not invent a generic architecture diagram.
 - Include the public `v0.1.1` release and the public privacy policy or README privacy contract.
 - Do not claim Chrome Web Store publication. Manual/GitHub distribution remains the canonical public state unless evidence is updated first.
 - Do not describe the extension as scraping arbitrary private Instagram data.
+- Scope privacy wording to DM2Text's own behavior: it does not intentionally transmit or persist captured message content. Do not make claims about Instagram, the browser, the operating-system clipboard, or other applications retaining data.
 
 ## Mutable verification
 
 Before publishing exact test or bundle-size numbers, refresh them in the DM2Text checkout with sequential verification commands. Update `career_evidence.yaml` first if the current values differ from the canonical snapshot, then project the refreshed values into portfolio copy.
 
-Exact counts remain supporting evidence, not impact metrics. If refresh is blocked or ambiguous, omit exact numbers and state only that CI enforces tests and size budgets.
+Exact counts remain supporting verification near the end, not impact metrics or headline copy. If refresh is blocked or ambiguous, omit exact numbers and state only that CI enforces tests and size budgets.
 
 ## Rendering and responsive behavior
 
