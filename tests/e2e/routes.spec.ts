@@ -68,5 +68,6 @@ test('project content survives an unavailable screenshot', async ({ page }) => {
 
 test('reduced motion removes transitions', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' }); await page.goto('/');
-  await expect(page.getByRole('region', { name: 'Piero Postigo Rocchetti' })).toHaveCSS('transition-duration', '0s');
+  await expect(page.locator('#welcome')).toHaveCSS('transition-duration', '0s');
+  await expect(page.locator('.floating-goat')).toHaveCSS('animation-duration', /^(0\.01ms|1e-05s)$/);
 });

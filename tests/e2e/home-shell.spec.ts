@@ -1,86 +1,58 @@
 import { expect, test } from '@playwright/test';
 
-test('boots near-cold with only Identity and native desktop launchers', async ({ page }) => {
+const expectedModules = [
+  'hero',
+  'projects',
+  'writings',
+  'github activity',
+  'profile card',
+  'navigation',
+  'note',
+  'links',
+  'resume',
+  'now playing',
+  'photo album',
+  'latest activity',
+] as const;
+
+test('renders the preview-native twelve-module homepage without the desktop shell', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('[data-desktop-ready="true"]')).toBeVisible();
-  await expect(page.getByRole('region')).toHaveCount(1);
-  await expect(page.getByRole('region', { name: 'Piero Postigo Rocchetti' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'About Piero' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Projects' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Resume.pdf' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Contact' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Network' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Player' })).toBeVisible();
+
+  await expect(page.locator('[data-home-surface]')).toBeVisible();
+  await expect(page.locator('[data-site-module]')).toHaveCount(12);
+  await expect(page.locator('[data-module-title]')).toHaveText(expectedModules);
+  await expect(page.locator('.desktop-shell')).toHaveCount(0);
+  await expect(page.getByRole('heading', { level: 1, name: 'Software Engineer' })).toBeVisible();
+  await expect(page.locator('[data-home-surface] h1')).toHaveCount(1);
+  await expect(page.locator('html')).toHaveCSS('font-family', /Tahoma/);
 });
 
-test('uses the Stitch desktop without navbar or sidebar chrome', async ({ page }) => {
+test('keeps selected work in the approved order with semantic case links', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.system-bar')).toHaveCount(0);
-  await expect(page.locator('.home-rail')).toHaveCount(0);
-  await expect(page.locator('.desktop-shell')).toHaveCSS('overflow', 'hidden');
-  await expect(page.locator('.desktop-workspace')).toHaveCSS('position', 'fixed');
+
+  const projects = page.locator('[data-selected-project]');
+  await expect(projects).toHaveCount(5);
+  await expect(projects.locator('a')).toHaveText([
+    'Preppie', 'Cimax Modernization', 'Koba', 'DM2Text', 'Sendo',
+  ]);
+  expect(await projects.locator('a').evaluateAll((links) => links.map((link) => link.getAttribute('href')))).toEqual([
+    '/work/preppie',
+    '/work/cimax-modernization',
+    '/work/koba',
+    '/work/dm2text',
+    '/work/sendo',
+  ]);
 });
 
-test('uses sentence case OS chrome', async ({ page }) => {
+test('shows honest empty states for unpublished personal surfaces', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('button', { name: /Piero OS/ })).toBeVisible();
-  await expect(page.getByText('SYSTEM_READY')).toHaveCount(0);
-  await expect(page.getByText('PIERO_OS')).toHaveCount(0);
+  await expect(page.locator('#writings-box')).toContainText('No published writing yet');
+  await expect(page.locator('#album')).toContainText('Photo album under construction');
 });
 
-test('keeps identity semantics and taskbar labels inside their controls', async ({ page }) => {
-  await page.goto('/');
-  const identity = page.getByRole('region', { name: 'Piero Postigo Rocchetti' });
-  await expect(identity.getByRole('heading', { level: 1, name: 'Software Engineer' })).toBeVisible();
-  await expect(identity.getByRole('heading', { name: 'backend + product engineering' })).toHaveCount(0);
-  await expect(identity.locator('.identity-descriptor')).toHaveText('backend + product engineering');
-  await expect(page.locator('html')).toHaveCSS('font-family', /IBM Plex Sans/);
-
-  for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
-    await page.setViewportSize(viewport);
-    const task = page.locator('[data-taskbar-id="identity"]');
-    expect(await task.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
-  }
+test('keeps the direction contract in production markup', async ({ request }) => {
+  const response = await request.get('/');
+  const body = await response.text();
+  expect(body).toContain('e23380ff');
+  expect(body).toContain('unreviewed and undocumented is unfinished');
 });
-
-test('Network is a real independently controlled window', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Network' }).click();
-  const network = page.getByRole('region', { name: 'Network online' });
-  await expect(network).toBeVisible();
-  await expect(network.locator('.window-controls button')).toHaveCount(3);
-});
-
-test('closing a desktop-only utility leaves URL and history unchanged', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('button', { name: /Piero OS/ }).click();
-  await page.getByRole('button', { name: 'Notes' }).click();
-  const before = await page.evaluate(() => ({ href: location.href, length: history.length }));
-  await page.getByRole('button', { name: 'Close Notes.txt' }).click();
-  expect(await page.evaluate(() => ({ href: location.href, length: history.length }))).toEqual(before);
-});
-
-test('GitHub avatar failures preserve identity and navigation', async ({ page }) => {
-  await page.route('https://avatars.githubusercontent.com/**', (route) => route.abort());
-  await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Software Engineer' })).toBeVisible();
-  await expect(page.getByRole('region', { name: 'Piero Postigo Rocchetti' }).getByText('PP', { exact: true })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Explore selected work' })).toBeVisible();
-  await page.getByRole('button', { name: 'Network' }).click();
-  await expect(page.getByRole('link', { name: '@postigodev' })).toBeVisible();
-});
-
-for (const viewport of [
-  { width: 1440, height: 900 },
-  { width: 1024, height: 768 },
-  { width: 768, height: 1024 },
-  { width: 390, height: 844 },
-] as const) {
-  test(`preserves the near-cold desktop without document overflow at ${viewport.width}`, async ({ page }) => {
-    await page.setViewportSize(viewport);
-    await page.goto('/');
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
-    await expect(page.getByRole('region', { name: 'Piero Postigo Rocchetti' })).toBeVisible();
-    await expect(page.getByRole('region')).toHaveCount(1);
-  });
-}

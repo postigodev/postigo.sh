@@ -8,6 +8,14 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
+const directionContract = `<!--
+THESIS: A maintained personal web desktop makes professional evidence immediately legible and refuses the generic portfolio hero-card stack.
+OWN-WORLD: Dark blue, violet, cyan, and acid-green modules use compact Tahoma type, metallic gradient titlebars, hard borders, and the embedded goat signature.
+STORY: Visitors identify Piero as a software engineer, scan selected work, then follow stable routes or public presence links.
+FIRST VIEWPORT: A 952px three-column desktop opens with the identity header above navigation, a dominant engineering hero, selected work, and live presence; Work is the primary path.
+FORM: Preview-native personal homepage, chosen pinned direction, seed e23380ff.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+-->`;
 ---
 <!doctype html>
 <html lang="en">
@@ -15,10 +23,7 @@ const { title, description } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@700;800&family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
     <title>{title}</title>
   </head>
-  <body><slot /></body>
+  <body><Fragment set:html={directionContract} /><slot /></body>
 </html>

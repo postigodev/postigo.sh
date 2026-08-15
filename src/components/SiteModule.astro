@@ -1,0 +1,15 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  column: 'left' | 'main' | 'right';
+  class?: string;
+  hero?: boolean;
+}
+
+const { id, title, column, class: className, hero = false } = Astro.props;
+---
+<section class:list={['site-module', `site-module--${column}`, className]} id={id} data-site-module data-mobile-order>
+  {hero ? <div class="site-module__title" data-module-title>{title}</div> : <h2 class="site-module__title" data-module-title>{title}</h2>}
+  <div class="site-module__body"><slot /></div>
+</section>

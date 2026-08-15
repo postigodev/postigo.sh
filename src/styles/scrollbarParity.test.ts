@@ -13,19 +13,24 @@ const referenceBlock = referenceCss.match(
   /::-webkit-scrollbar \{[\s\S]*?::-webkit-scrollbar-button:hover \{[\s\S]*?\n\}/,
 )?.[0];
 
-describe('Win98 scrollbar parity', () => {
-  it('uses the literal global reference block without production embellishments', () => {
+describe('scrollbar styling boundaries', () => {
+  it('keeps the unused desktop implementation pinned to its behavior reference', () => {
     expect(referenceBlock).toBeTruthy();
     expect(desktopCss).toContain(referenceBlock);
     expect(desktopCss).not.toContain('.window-body::-webkit-scrollbar');
     expect(desktopCss).not.toContain('::-webkit-scrollbar-thumb:active');
     expect(desktopCss).not.toContain('::-webkit-scrollbar-button:active');
     expect(desktopCss).not.toContain('::-webkit-scrollbar-corner');
-    expect(globalCss).not.toContain('scrollbar-color');
   });
 
   it('pins the exact Win98 face and hover colors', () => {
     expect(tokensCss).toContain('--window-bg: #c0c0c0;');
     expect(tokensCss).toContain('--button-hover: #e0e0e0;');
+  });
+
+  it('themes the production document scrollbar for the preview-native surface', () => {
+    expect(globalCss).toContain('scrollbar-color: #5e6d8a #11151d;');
+    expect(globalCss).toContain('::-webkit-scrollbar-thumb');
+    expect(globalCss).toContain('::-webkit-scrollbar-corner');
   });
 });
