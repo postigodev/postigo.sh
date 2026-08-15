@@ -25,6 +25,4 @@ export function resizeBounds(start: Bounds, edge: ResizeEdge, dx: number, dy: nu
   return clampForRecovery({ x, y, width, height }, workspace);
 }
 
-export function revalidateBounds(bounds: Bounds, workspace: Bounds): Bounds {
-  return clampForRecovery(bounds, workspace);
-}
+export const revalidateBounds = clampForRecovery;

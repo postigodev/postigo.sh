@@ -1,5 +1,5 @@
 import { unavailableNowPlaying } from '../data/presence';
-import { isNowPlayingView, usePlayingProgress, usePresenceEndpoint } from '../desktop/usePresence';
+import { isNowPlayingView, usePlayingProgress, usePresenceEndpoint } from '../presence/usePresence';
 
 export default function NowPlayingWidget() {
   const view = usePresenceEndpoint('/api/now-playing', unavailableNowPlaying, isNowPlayingView);

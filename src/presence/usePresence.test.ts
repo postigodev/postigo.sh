@@ -3,16 +3,8 @@ import { isGitHubSnapshotView, isNowPlayingView, progressAtTick } from './usePre
 
 describe('presence payload validation', () => {
   it('accepts normalized playing and GitHub payloads', () => {
-    expect(isNowPlayingView({
-      state: 'playing', track: 'Track', artist: 'Artist', album: 'Album',
-      artworkUrl: 'https://i.scdn.co/image/test', spotifyUrl: 'https://open.spotify.com/track/test',
-      durationMs: 10_000, progressMs: 2_000, observedAt: 'now',
-    })).toBe(true);
-    expect(isGitHubSnapshotView({
-      state: 'ready', profileUrl: 'https://github.com/postigodev', login: 'postigodev',
-      avatarUrl: 'https://avatars.githubusercontent.com/u/1', publicRepos: 5,
-      followers: 3, stars: 7, languages: ['Rust'], observedAt: 'now',
-    })).toBe(true);
+    expect(isNowPlayingView({ state: 'playing', track: 'Track', artist: 'Artist', album: 'Album', artworkUrl: 'https://i.scdn.co/image/test', spotifyUrl: 'https://open.spotify.com/track/test', durationMs: 10_000, progressMs: 2_000, observedAt: 'now' })).toBe(true);
+    expect(isGitHubSnapshotView({ state: 'ready', profileUrl: 'https://github.com/postigodev', login: 'postigodev', avatarUrl: 'https://avatars.githubusercontent.com/u/1', publicRepos: 5, followers: 3, stars: 7, languages: ['Rust'], observedAt: 'now' })).toBe(true);
   });
 
   it('rejects partial or account-selecting impostor payloads', () => {

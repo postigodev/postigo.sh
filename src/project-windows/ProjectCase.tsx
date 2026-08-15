@@ -1,4 +1,4 @@
-import type { ProjectCase, PublicArtifact } from '../../data/portfolio';
+import type { ProjectCase, PublicArtifact } from '../data/portfolio';
 
 function ArtifactRow({ artifact }: { artifact: PublicArtifact }) {
   return <a class="evidence-row" data-evidence-row href={artifact.href} target="_blank" rel="noreferrer">
@@ -8,7 +8,7 @@ function ArtifactRow({ artifact }: { artifact: PublicArtifact }) {
   </a>;
 }
 
-export default function ProjectApp({ project }: { project: ProjectCase }) {
+export default function ProjectCaseContent({ project }: { project: ProjectCase }) {
   const artifactMap = new Map<string, PublicArtifact>(project.artifacts.map((artifact) => [artifact.id, artifact]));
   const leadArtifact = project.leadMedia ? artifactMap.get(project.leadMedia.artifactId) : undefined;
   const sectionArtifactIds = new Set(project.sections.flatMap((section) => section.artifactIds));
@@ -16,7 +16,8 @@ export default function ProjectApp({ project }: { project: ProjectCase }) {
   const sequenceArtifacts = (project.artifactSequence?.artifactIds ?? []).map((id) => artifactMap.get(id)).filter((artifact): artifact is PublicArtifact => Boolean(artifact));
   const ungroupedArtifacts = project.artifacts.filter((artifact) => artifact.id !== project.leadMedia?.artifactId && !sectionArtifactIds.has(artifact.id) && !sequenceArtifactIds.has(artifact.id));
 
-  return <article class={`project-app project-app--${project.layout}`}>
+  return <article class={`project-window-document case-document--${project.layout}`}>
+    <a class="project-window__back" href="/work">← Work</a>
     <header class="case-header">
       <p class="case-context">{[project.contextLabel, project.dateLabel].filter(Boolean).join(' · ')}</p>
       <h1>{project.name}</h1>
@@ -67,10 +68,8 @@ export default function ProjectApp({ project }: { project: ProjectCase }) {
       </a>)}</div>
     </section>}
 
-    <a class="archive-action os-button" href={project.links.repository} target="_blank" rel="noreferrer">
-      <span>[ GitHub ]</span>
-      <strong>Source repository</strong>
-      <span aria-hidden="true">↗</span>
+    <a class="archive-action" href={project.links.repository} target="_blank" rel="noreferrer">
+      <span>[ GitHub ]</span><strong>Source repository</strong><span aria-hidden="true">↗</span>
     </a>
   </article>;
 }

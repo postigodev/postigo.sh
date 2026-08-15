@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-test('direct Sendo route is a standalone Astro document with artifacts', async ({ page }) => {
+test('direct Sendo route opens the server-rendered case window with artifacts', async ({ page }) => {
   await page.goto('/work/sendo');
-  await expect(page.getByRole('heading', { name: 'Sendo' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Sendo', exact: true })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Work' })).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Artifacts' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Sendo v0.1.0 release' })).toBeVisible();
@@ -11,7 +11,7 @@ test('direct Sendo route is a standalone Astro document with artifacts', async (
 test('direct Preppie route is a professional evidence trail', async ({ page }) => {
   await page.goto('/work/preppie');
   await expect(page.getByText('Professional Experience · 2026')).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Preppie' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Preppie', exact: true })).toBeVisible();
   await expect(page.getByText('Startup Software Engineer — Backend & Integration')).toBeVisible();
   await expect(page.getByText(/Product ownership was shared/)).toBeVisible();
   await expect(page.locator('[data-case-chapter]')).toHaveCount(4);
@@ -22,7 +22,7 @@ test('direct Preppie route is a professional evidence trail', async ({ page }) =
 
 test('direct DM2Text route presents an artifact-led interaction trace', async ({ page }) => {
   await page.goto('/work/dm2text');
-  await expect(page.getByRole('heading', { name: 'DM2Text' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'DM2Text', exact: true })).toBeVisible();
   await expect(page.getByText('Interaction trace')).toBeVisible();
   const trace = page.locator('[data-artifact-sequence]');
   await expect(trace.locator('[data-sequence-artifact]')).toHaveCount(3);
@@ -60,7 +60,7 @@ test.describe('without JavaScript', () => {
     await page.goto('/work');
     await page.getByRole('link', { name: 'Open case study' }).first().click();
     await expect(page).toHaveURL(/\/work\/preppie$/);
-    await expect(page.getByRole('heading', { name: 'Preppie' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Preppie', exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: /PR #44/ })).toBeVisible();
   });
 });
@@ -68,7 +68,7 @@ test.describe('without JavaScript', () => {
 test('project content survives an unavailable screenshot', async ({ page }) => {
   await page.route('**/images/sendo/sendo-home.png', (route) => route.abort());
   await page.goto('/work/sendo');
-  await expect(page.getByRole('heading', { name: 'Sendo' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Sendo', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Source repository' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Sendo v0.1.0 release' })).toBeVisible();
 });

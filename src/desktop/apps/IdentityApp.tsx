@@ -1,5 +1,0 @@
-import type { PublicIdentity } from '../../data/portfolio';
-interface Props { identity: PublicIdentity; onNavigate: (event: MouseEvent, route: string) => void }
-export default function IdentityApp({ identity, onNavigate }: Props) {
-  return <div class="identity-app"><p class="system-label">[ PRIMARY_IDENTITY: SOFTWARE_ENGINEER // STATUS: ACTIVE ]</p><div class="identity-portrait"><span aria-hidden="true">PP</span><img src={identity.avatarUrl} alt={`${identity.name} GitHub profile portrait`} width="112" height="112" onError={(event) => { event.currentTarget.hidden = true; }} /></div><h1>{identity.primaryIdentity}</h1><p class="identity-descriptor">{identity.descriptor}</p><p class="identity-name">{identity.name}</p><p class="identity-thesis">{identity.thesis}</p><div class="identity-actions"><a class="os-button os-button--primary primary-action" href="/work" onClick={(event) => onNavigate(event, '/work')}>Explore selected work</a><a class="os-button" href="/resume" onClick={(event) => onNavigate(event, '/resume')}>View resume</a></div></div>;
-}

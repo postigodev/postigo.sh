@@ -253,6 +253,43 @@ button, a { font: inherit; }
 .artifact-list a { display: grid; grid-template-columns: minmax(220px, 1fr) 2fr 24px; gap: 16px; padding: 13px; color: #dce6f8; border: 1px solid #4b5870; text-decoration: none; }
 .archive-action { display: inline-grid; grid-template-columns: auto auto auto; gap: 12px; align-items: center; margin-top: 12px; padding: 10px 12px; color: #071000; border: 1px solid #708f20; background: var(--lime); font-family: "Courier New", monospace; text-decoration: none; }
 
+/* Project case studies are the only interactive windows on the static surface. */
+.project-window-layer { position: fixed; z-index: 100; inset: 0; overflow: hidden; pointer-events: none; }
+.project-window { position: absolute; display: flex; min-width: 0; min-height: 0; flex-direction: column; overflow: visible; color: #d7dced; border: 1px solid #515f79; border-radius: 10px; background: linear-gradient(180deg, var(--panel-2), var(--panel)); box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 14px 34px rgba(0,0,0,.48); pointer-events: auto; }
+.project-window__titlebar { display: flex; min-height: 31px; flex: 0 0 31px; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 5px 4px 10px; color: #d6dce9; border-bottom: 1px solid #54617b; border-radius: 9px 9px 0 0; background: linear-gradient(180deg, #30384a 0%, #1a1f2b 54%, #121722 55%, #2a3142 100%); touch-action: none; user-select: none; cursor: move; }
+.project-window[data-active="true"] .project-window__titlebar { color: #fff; border-bottom-color: #6178aa; background: linear-gradient(180deg, #40507f 0%, #25324f 54%, #181f31 55%, #39486f 100%); }
+.project-window__titlebar h2 { min-width: 0; margin: 0; overflow: hidden; font: 800 10px/1.25 Tahoma, Verdana, sans-serif; letter-spacing: .18px; text-overflow: ellipsis; text-transform: lowercase; white-space: nowrap; }
+.project-window__titlebar h2::before { content: "✦"; margin-right: 6px; color: #95b5ff; font-size: 9px; }
+.project-window__controls { display: flex; gap: 3px; }
+.project-window__controls button { display: grid; width: 22px; height: 20px; place-items: center; padding: 0; color: #edf2ff; border: 1px solid #65738d; border-radius: 3px; background: linear-gradient(180deg, #3a455b, #1b202c); font: 800 12px/1 Tahoma, sans-serif; cursor: pointer; }
+.project-window__controls button:hover { color: #fff; border-color: #96a9cf; background: #2558ff; }
+.project-window__body { min-width: 0; min-height: 0; flex: 1; overflow: auto; border-radius: 0 0 9px 9px; }
+.project-window__content { width: 100%; max-width: 1040px; min-height: 100%; margin-inline: auto; }
+.project-window__switcher { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 5px; padding: 5px 8px; color: #aebbd2; border-bottom: 1px solid #46536d; background: rgba(15,18,25,.96); font: 8px/1.2 "Courier New", monospace; }
+.project-window__switcher a { padding: 1px 4px; color: #dce6fb; border: 1px solid #53617d; background: #20283a; text-decoration: none; }
+.project-window-document { padding: 20px; }
+.project-window__back { display: inline-block; margin-bottom: 16px; padding: 3px 6px; color: #d9ff83; border: 1px solid #708a2d; background: #253017; font: 700 9px/1.2 "Courier New", monospace; }
+.project-window-document h1 { margin: 18px 0 8px; color: #f5f8ff; font: 900 clamp(2rem, 7vw, 4.5rem)/.95 Tahoma, Verdana, sans-serif; letter-spacing: -.04em; }
+.project-window-document p, .project-window-document li { max-width: 72ch; color: #c4cfe2; }
+.project-window-document .case-context { color: #8ec6ff; }
+.project-window-document .case-role { color: #eef3ff; }
+.project-window-document .chapter-copy h2, .project-window-document .public-artifacts h2 { color: #eef3ff; }
+.project-window-document .artifact-sequence__item--anonymized-example { color: var(--ink); background: #151923; border-color: var(--lime); }
+.project-window-document .artifact-sequence__item--anonymized-example figcaption { border-top-color: var(--lime); }
+
+.project-resize { position: absolute; z-index: 3; touch-action: none; }
+.project-resize--n, .project-resize--s { left: 8px; right: 8px; height: 8px; cursor: ns-resize; }
+.project-resize--n { top: -4px; }
+.project-resize--s { bottom: -4px; }
+.project-resize--e, .project-resize--w { top: 8px; bottom: 8px; width: 8px; cursor: ew-resize; }
+.project-resize--e { right: -4px; }
+.project-resize--w { left: -4px; }
+.project-resize--ne, .project-resize--nw, .project-resize--se, .project-resize--sw { width: 12px; height: 12px; z-index: 4; }
+.project-resize--ne { top: -4px; right: -4px; cursor: nesw-resize; }
+.project-resize--nw { top: -4px; left: -4px; cursor: nwse-resize; }
+.project-resize--se { right: -4px; bottom: -4px; cursor: nwse-resize; }
+.project-resize--sw { left: -4px; bottom: -4px; cursor: nesw-resize; }
+
 @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes goat-bob { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-3px) rotate(1deg); } }
 @keyframes tiny-tilt { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(1.2deg); } }
@@ -275,6 +312,13 @@ button, a { font: inherit; }
   .ownership-boundary, .case-chapter, .evidence-row, .artifact-list a { grid-template-columns: 1fr; }
   .case-chapter { gap: 8px; }
   .evidence-arrow { justify-self: start; }
+  .project-window-layer { z-index: 1000; }
+  .project-window { position: fixed !important; inset: 0 !important; width: auto !important; height: auto !important; border: 0; border-radius: 0; box-shadow: none; }
+  .project-window:not([data-active="true"]) { display: none; }
+  .project-window__titlebar { border-radius: 0; cursor: default; touch-action: auto; }
+  .project-window__controls [data-maximize-project], .project-resize { display: none; }
+  .project-window__body { border-radius: 0; }
+  .project-window-document { padding: 16px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

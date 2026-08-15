@@ -1,5 +1,5 @@
 import { staticGitHubFallback } from '../data/presence';
-import { isGitHubSnapshotView, usePresenceEndpoint } from '../desktop/usePresence';
+import { isGitHubSnapshotView, usePresenceEndpoint } from '../presence/usePresence';
 
 export default function GitHubWidget() {
   const view = usePresenceEndpoint('/api/github-snapshot', staticGitHubFallback, isGitHubSnapshotView);
