@@ -40,6 +40,13 @@ test('Sendo public route hides provenance and uses an archive source action', as
   await expect(page.getByRole('link', { name: /Source repository/ })).toHaveClass(/archive-action/);
 });
 
+test('direct writings route is a useful static empty state', async ({ page }) => {
+  await page.goto('/writings');
+  await expect(page.getByRole('heading', { level: 1, name: 'Writings' })).toBeVisible();
+  await expect(page.getByText('No published writing yet.')).toBeVisible();
+  await expect(page.getByText('This section is under construction.')).toBeVisible();
+});
+
 test.describe('without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
   test('follows the Projects desktop link to the static Work document', async ({ page }) => {

@@ -61,3 +61,15 @@ Included in the Task 1 implementation commit; the final commit hash is supplied 
 - Project-window interception and desktop window-manager behavior remain intentionally deferred to later tasks.
 - Writings and photo-album content remain empty until verified source material exists.
 - The user's pre-existing unstaged deletions under `docs/` were preserved and excluded from this task's commit.
+
+## Review fixes
+
+- Renamed the unsupported “latest activity” module to “selected work status.” It continues to show the known project statuses without asserting recency that the data model does not provide.
+- Replaced the ticker's accessible name on a generic `div` with a semantic paragraph containing one screen-reader-only copy of the message. The animated visual duplicate remains hidden from assistive technology.
+- Added direct `/writings` route coverage for its heading and honest empty state.
+
+### Review-fix verification
+
+- Red: `pnpm exec playwright test tests/e2e/home-shell.spec.ts tests/e2e/routes.spec.ts` produced the expected three homepage failures before the markup fix; the new `/writings` route test already passed against the existing route.
+- Green: `pnpm exec playwright test tests/e2e/home-shell.spec.ts tests/e2e/routes.spec.ts tests/e2e/mobile.spec.ts` passed all 17 Chromium tests.
+- `pnpm check` passed with 0 errors, 0 warnings, and 0 hints.

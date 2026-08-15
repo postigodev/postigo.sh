@@ -16,12 +16,13 @@ const writings = getPublishedWritings();
         <a class="wordmark" href="/">postigo.sh</a>
         <div class="head-links"><a href="/">home</a> · <a href="/about">profile</a></div>
       </div>
-      <div class="ticker-window" aria-label={`${identity.primaryIdentity}. ${identity.descriptor}. ${identity.thesis}`}>
-        <div class="ticker-track" aria-hidden="true">
+      <p class="ticker-window">
+        <span class="sr-only">{identity.primaryIdentity}. {identity.descriptor}. {identity.thesis}</span>
+        <span class="ticker-track" aria-hidden="true">
           {identity.primaryIdentity} · {identity.descriptor} · {identity.thesis} &nbsp; ◆ &nbsp;
           {identity.primaryIdentity} · {identity.descriptor} · {identity.thesis}
-        </div>
-      </div>
+        </span>
+      </p>
       <div class="site-head__goat">
         <img src="/images/site/goat-profile.webp" width="80" height="80" alt="Goat, the postigo.sh site mascot" />
         <span>resident</span>
@@ -92,7 +93,7 @@ const writings = getPublishedWritings();
           <div class="album-empty" aria-label="Photo album under construction"><span aria-hidden="true">NO PHOTOS</span><strong>Photo album under construction.</strong><p>No images have been published here yet.</p></div>
         </SiteModule>
 
-        <SiteModule id="updates-mini" title="latest activity" column="right">
+        <SiteModule id="updates-mini" title="selected work status" column="right">
           <ol class="activity-list">{selectedWork.slice(0, 3).map((project) => <li><a href={`/work/${project.slug}`}>{project.name}</a><span>{project.status}</span></li>)}</ol>
         </SiteModule>
       </aside>

@@ -85,7 +85,7 @@ button, a { font: inherit; }
 .wordmark { color: #f2f5fb; font: 900 24px/1 Arial, sans-serif; letter-spacing: -1.2px; text-decoration: none; text-shadow: 0 0 10px rgba(80,138,255,.18); }
 .wordmark:hover { color: #fff; background: transparent; }
 .head-links { margin-top: 5px; color: #aab5cb; font-size: 9px; }
-.ticker-window { min-width: 0; overflow: hidden; border-block: 1px solid rgba(127,145,189,.22); background: rgba(255,255,255,.04); white-space: nowrap; }
+.ticker-window { min-width: 0; margin: 0; overflow: hidden; border-block: 1px solid rgba(127,145,189,.22); background: rgba(255,255,255,.04); white-space: nowrap; }
 .ticker-track { display: inline-block; min-width: max-content; padding: 4px 0; color: #a9b9da; font: 8px/1.2 "Courier New", monospace; animation: ticker 38s linear infinite; }
 .site-head__goat { position: relative; height: 66px; }
 .site-head__goat img { position: absolute; right: 15px; bottom: -2px; width: 53px; height: 53px; object-fit: cover; border: 1px solid #586885; border-radius: 9px; background: #232938; animation: goat-bob 3.6s ease-in-out infinite; }

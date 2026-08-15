@@ -12,7 +12,7 @@ const expectedModules = [
   'resume',
   'now playing',
   'photo album',
-  'latest activity',
+  'selected work status',
 ] as const;
 
 test('renders the preview-native twelve-module homepage without the desktop shell', async ({ page }) => {
@@ -42,6 +42,24 @@ test('keeps selected work in the approved order with semantic case links', async
     '/work/dm2text',
     '/work/sendo',
   ]);
+});
+
+test('describes selected work without implying unsupported recency', async ({ page }) => {
+  await page.goto('/');
+
+  const status = page.locator('#updates-mini');
+  await expect(status.getByRole('heading', { name: 'Selected work status' })).toBeVisible();
+  await expect(status).not.toContainText('latest activity');
+  await expect(status.locator('a')).toHaveText(['Preppie', 'Cimax Modernization', 'Koba']);
+});
+
+test('exposes one semantic ticker message to assistive technology', async ({ page }) => {
+  await page.goto('/');
+
+  const accessibleTicker = page.locator('p.ticker-window .sr-only');
+  await expect(accessibleTicker).toContainText('Software Engineer');
+  await expect(accessibleTicker).toContainText('I build reliable software for real workflows');
+  await expect(page.locator('.ticker-window')).not.toHaveAttribute('aria-label');
 });
 
 test('shows honest empty states for unpublished personal surfaces', async ({ page }) => {
