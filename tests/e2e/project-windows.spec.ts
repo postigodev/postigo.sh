@@ -87,6 +87,33 @@ test('Back and Forward restore exact project snapshots and focus does not add de
   await expect(projectWindow(page, 'koba')).toHaveAttribute('data-active', 'true');
 });
 
+test('closing an active project never resurrects a project removed from the current snapshot', async ({ page }) => {
+  await page.goto('/');
+  await waitForWindowLayer(page);
+  await projectLink(page, 'Preppie').click();
+  await projectWindow(page, 'preppie').getByRole('link', { name: 'Koba' }).click();
+  await projectWindow(page, 'preppie').getByRole('button', { name: 'Close Preppie' }).click();
+  await projectWindow(page, 'koba').getByRole('button', { name: 'Close Koba' }).click();
+
+  await expect(page).toHaveURL(/\/$/);
+  await expect(projectWindow(page, 'preppie')).toHaveCount(0);
+  await expect(projectWindow(page, 'koba')).toHaveCount(0);
+});
+
+test('closing a focused earlier project keeps the other current project open', async ({ page }) => {
+  await page.goto('/');
+  await waitForWindowLayer(page);
+  await projectLink(page, 'Preppie').click();
+  await projectWindow(page, 'preppie').getByRole('link', { name: 'Koba' }).click();
+  await projectWindow(page, 'preppie').locator('[data-window-titlebar]').click();
+  await projectWindow(page, 'preppie').getByRole('button', { name: 'Close Preppie' }).click();
+
+  await expect(page).toHaveURL(/\/work\/koba$/);
+  await expect(projectWindow(page, 'preppie')).toHaveCount(0);
+  await expect(projectWindow(page, 'koba')).toBeVisible();
+  await expect(projectWindow(page, 'koba')).toHaveAttribute('data-active', 'true');
+});
+
 test('a direct project route renders the homepage and close replaces to root', async ({ page }) => {
   await page.goto('/work/koba');
   await waitForWindowLayer(page);

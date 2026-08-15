@@ -1,24 +1,55 @@
-export interface ProjectHistoryState {
-  portfolioProjectWindows: true;
-  sessionId: string;
+export interface ProjectHistorySnapshot {
   openSlugs: string[];
   activeSlug: string | null;
   depth: number;
 }
 
+export interface ProjectOwnedHistorySnapshot extends ProjectHistorySnapshot {
+  sessionId: string;
+}
+
+export interface ProjectHistoryState extends ProjectHistorySnapshot {
+  portfolioProjectWindows: true;
+  sessionId: string;
+  previous: ProjectOwnedHistorySnapshot | null;
+}
+
+function isProjectHistorySnapshot(value: unknown): value is ProjectHistorySnapshot {
+  if (!value || typeof value !== 'object') return false;
+  const snapshot = value as Partial<ProjectHistorySnapshot>;
+  return Array.isArray(snapshot.openSlugs)
+    && snapshot.openSlugs.every((slug) => typeof slug === 'string')
+    && (snapshot.activeSlug === null || typeof snapshot.activeSlug === 'string')
+    && typeof snapshot.depth === 'number';
+}
+
+function isProjectOwnedHistorySnapshot(value: unknown): value is ProjectOwnedHistorySnapshot {
+  return isProjectHistorySnapshot(value)
+    && typeof (value as Partial<ProjectOwnedHistorySnapshot>).sessionId === 'string';
+}
+
+function snapshotOf(state: ProjectHistoryState): ProjectOwnedHistorySnapshot {
+  return { sessionId: state.sessionId, openSlugs: [...state.openSlugs], activeSlug: state.activeSlug, depth: state.depth };
+}
+
+function snapshotsMatch(left: ProjectHistorySnapshot, right: ProjectHistorySnapshot): boolean {
+  return left.activeSlug === right.activeSlug
+    && left.openSlugs.length === right.openSlugs.length
+    && left.openSlugs.every((slug, index) => slug === right.openSlugs[index]);
+}
+
 export function isProjectHistoryState(value: unknown): value is ProjectHistoryState {
   if (!value || typeof value !== 'object') return false;
   const state = value as Partial<ProjectHistoryState>;
+  const previous = state.previous;
   return state.portfolioProjectWindows === true
     && typeof state.sessionId === 'string'
-    && Array.isArray(state.openSlugs)
-    && state.openSlugs.every((slug) => typeof slug === 'string')
-    && (state.activeSlug === null || typeof state.activeSlug === 'string')
-    && typeof state.depth === 'number';
+    && isProjectHistorySnapshot(state)
+    && (previous === null || isProjectOwnedHistorySnapshot(previous));
 }
 
 export function projectRootHistory(sessionId: string, openSlugs: readonly string[], activeSlug: string | null): ProjectHistoryState {
-  return { portfolioProjectWindows: true, sessionId, openSlugs: [...new Set(openSlugs)], activeSlug, depth: 0 };
+  return { portfolioProjectWindows: true, sessionId, openSlugs: [...new Set(openSlugs)], activeSlug, depth: 0, previous: null };
 }
 
 export function projectHistoryForOpen(current: ProjectHistoryState, slug: string): ProjectHistoryState {
@@ -27,6 +58,7 @@ export function projectHistoryForOpen(current: ProjectHistoryState, slug: string
     openSlugs: current.openSlugs.includes(slug) ? [...current.openSlugs] : [...current.openSlugs, slug],
     activeSlug: slug,
     depth: current.depth + 1,
+    previous: snapshotOf(current),
   };
 }
 
@@ -49,6 +81,12 @@ export function projectHistoryForClose(
   activeSlug: string | null,
   fallbackSlug: string | null,
 ): ProjectCloseHistoryAction {
-  if (activeSlug === slug && current.sessionId === sessionId && current.depth > 0) return { kind: 'back' };
-  return { kind: 'replace', state: projectHistoryWithout(current, slug, activeSlug === slug ? fallbackSlug : activeSlug) };
+  const intended = projectHistoryWithout(current, slug, activeSlug === slug ? fallbackSlug : activeSlug);
+  const mayBack = activeSlug === slug
+    && current.sessionId === sessionId
+    && current.previous !== null
+    && current.previous.sessionId === sessionId
+    && current.previous.depth === current.depth - 1
+    && snapshotsMatch(current.previous, intended);
+  return mayBack ? { kind: 'back' } : { kind: 'replace', state: intended };
 }

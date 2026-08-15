@@ -10,6 +10,7 @@ describe('project window history', () => {
       openSlugs: ['preppie'],
       activeSlug: 'preppie',
       depth: 1,
+      previous: { sessionId: 'session-a', openSlugs: [], activeSlug: null, depth: 0 },
     });
   });
 
@@ -36,6 +37,32 @@ describe('project window history', () => {
     });
     expect(projectHistoryForClose(nested, 'session-a', 'preppie', 'koba', 'koba')).toEqual({
       kind: 'replace', state: { ...nested, openSlugs: ['koba'], activeSlug: 'koba' },
+    });
+  });
+
+  it('does not back into a project removed by an inactive close', () => {
+    const root = projectRootHistory('session-a', [], null);
+    const preppie = projectHistoryForOpen(root, 'preppie');
+    const koba = projectHistoryForOpen(preppie, 'koba');
+    const withoutPreppie = projectHistoryForClose(koba, 'session-a', 'preppie', 'koba', 'koba');
+    expect(withoutPreppie.kind).toBe('replace');
+    if (withoutPreppie.kind !== 'replace') return;
+
+    expect(projectHistoryForClose(withoutPreppie.state, 'session-a', 'koba', 'koba', null)).toEqual({
+      kind: 'replace',
+      state: { ...withoutPreppie.state, openSlugs: [], activeSlug: null },
+    });
+  });
+
+  it('does not back after focus replacement when predecessor differs from post-close state', () => {
+    const root = projectRootHistory('session-a', [], null);
+    const preppie = projectHistoryForOpen(root, 'preppie');
+    const koba = projectHistoryForOpen(preppie, 'koba');
+    const focusedPreppie = projectHistoryForFocus(koba, 'preppie');
+
+    expect(projectHistoryForClose(focusedPreppie, 'session-a', 'preppie', 'preppie', 'koba')).toEqual({
+      kind: 'replace',
+      state: { ...focusedPreppie, openSlugs: ['koba'], activeSlug: 'koba' },
     });
   });
 });
