@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-15T00:00:00-05:00",
+  "title": "Design System: postigo.sh",
+  "extensions": {
+    "colorMeta": {
+      "cold-ink": { "role": "neutral", "displayName": "Cold Ink", "canonical": "#eef3ff", "tonalRamp": ["#101419", "#27313d", "#435266", "#627792", "#849bb9", "#a9bed7", "#d0def0", "#eef3ff"] },
+      "slate-muted": { "role": "neutral", "displayName": "Slate Muted", "canonical": "#b9c5da", "tonalRamp": ["#11151d", "#283141", "#46536a", "#65758f", "#8797af", "#a9b7ca", "#ced7e5", "#f0f4fa"] },
+      "midnight-panel": { "role": "neutral", "displayName": "Midnight Panel", "canonical": "rgba(19, 22, 30, .97)", "tonalRamp": ["#0b0d12", "#13161e", "#232936", "#3a4355", "#5d687d", "#8792a6", "#bdc5d2", "#eef1f6"] },
+      "raised-panel": { "role": "neutral", "displayName": "Raised Panel", "canonical": "rgba(29, 33, 44, .97)", "tonalRamp": ["#0d0f14", "#1d212c", "#303746", "#4a5365", "#6d788b", "#929daf", "#c0c8d4", "#f0f3f7"] },
+      "steel-line": { "role": "neutral", "displayName": "Steel Line", "canonical": "#5b6882", "tonalRamp": ["#11151e", "#253044", "#3f4d67", "#5b6882", "#7d8aa2", "#a2adbf", "#cbd2dd", "#f1f4f7"] },
+      "bright-steel": { "role": "neutral", "displayName": "Bright Steel", "canonical": "#8495b7", "tonalRamp": ["#101522", "#283550", "#46587b", "#6579a1", "#8495b7", "#a7b4c9", "#cdd5e2", "#f2f5f9"] },
+      "action-blue": { "role": "primary", "displayName": "Action Blue", "canonical": "#5c87ff", "tonalRamp": ["#07133c", "#102a78", "#1c43b1", "#315fdf", "#5c87ff", "#8facff", "#bfd0ff", "#edf2ff"] },
+      "signal-cyan": { "role": "secondary", "displayName": "Signal Cyan", "canonical": "#74e9ff", "tonalRamp": ["#00262d", "#004e5c", "#08798b", "#25a6ba", "#4bd1e5", "#74e9ff", "#b7f4ff", "#edfcff"] },
+      "acid-lime": { "role": "tertiary", "displayName": "Acid Lime", "canonical": "#b8ff2c", "tonalRamp": ["#1c2b00", "#385500", "#567e00", "#75a900", "#95d40f", "#b8ff2c", "#d8ff91", "#f3ffdb"] },
+      "signal-violet": { "role": "secondary", "displayName": "Signal Violet", "canonical": "#aa87ff", "tonalRamp": ["#1a0d3f", "#372078", "#5838ad", "#7a58d9", "#aa87ff", "#c4aaff", "#decfff", "#f6efff"] },
+      "near-black": { "role": "neutral", "displayName": "Near Black", "canonical": "#090b10", "tonalRamp": ["#090b10", "#1a1d24", "#30343d", "#4b505b", "#6e747f", "#969ba4", "#c7cad0", "#f2f3f5"] },
+      "white": { "role": "neutral", "displayName": "White", "canonical": "#ffffff", "tonalRamp": ["#262626", "#4a4a4a", "#707070", "#969696", "#bcbcbc", "#d8d8d8", "#eeeeee", "#ffffff"] },
+      "deep-surface": { "role": "neutral", "displayName": "Deep Surface", "canonical": "#151923", "tonalRamp": ["#0c0e13", "#151923", "#292f3e", "#434b5c", "#657084", "#8c96a7", "#bec5d0", "#eff2f6"] },
+      "raised-surface": { "role": "neutral", "displayName": "Raised Surface", "canonical": "#202633", "tonalRamp": ["#0e1117", "#202633", "#353e50", "#505b6e", "#737f92", "#98a3b4", "#c4cad4", "#f1f3f6"] },
+      "link-blue": { "role": "primary", "displayName": "Link Blue", "canonical": "#8ec6ff", "tonalRamp": ["#071c34", "#123c68", "#286098", "#4787c5", "#68a9e9", "#8ec6ff", "#c2e0ff", "#eef7ff"] }
+    },
+    "typographyMeta": {
+      "hero": { "displayName": "Hero", "purpose": "Compact identity headline inside the homepage hero module." },
+      "document-display": { "displayName": "Document Display", "purpose": "Responsive headings on stable routes and project cases." },
+      "body": { "displayName": "Body", "purpose": "Dense interface copy and controls." },
+      "module-title": { "displayName": "Module Title", "purpose": "Lowercase labels in metallic titlebars." },
+      "metadata": { "displayName": "Metadata", "purpose": "Tickers, case labels, statuses, and archival annotations." },
+      "micro-label": { "displayName": "Micro Label", "purpose": "Tiny uppercase public-presence badges." }
+    },
+    "shadows": [
+      { "name": "module-lift", "value": "inset 0 1px 0 rgba(255,255,255,.05), 0 5px 12px rgba(0,0,0,.18)", "purpose": "Default lift for site modules and document navigation." },
+      { "name": "header-lift", "value": "inset 0 1px 0 rgba(255,255,255,.08), inset 0 -1px 0 rgba(0,0,0,.34), 0 8px 18px rgba(0,0,0,.26)", "purpose": "Identity header depth." },
+      { "name": "document-lift", "value": "0 7px 18px rgba(0,0,0,.24)", "purpose": "Stable-route reading panels." },
+      { "name": "focus-edge", "value": "0 0 0 1px #060806", "purpose": "Dark counter-edge behind the acid-lime focus outline." }
+    ],
+    "motion": [
+      { "name": "ticker", "value": "38s linear infinite", "purpose": "Slow continuous identity ticker." },
+      { "name": "goat-bob", "value": "3.6s ease-in-out infinite", "purpose": "Subtle resident-goat motion in the header." },
+      { "name": "goat-tilt", "value": "5.5s ease-in-out infinite", "purpose": "Near-static authored movement in the hero." },
+      { "name": "disc-spin", "value": "10s linear infinite", "purpose": "Now-playing disc motion." },
+      { "name": "critter-walk", "value": "18s linear infinite", "purpose": "Decorative goat passage below the homepage grid." }
+    ],
+    "breakpoints": [
+      { "name": "single-column", "value": "780px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Site Module",
+      "kind": "card",
+      "refersTo": "site-module",
+      "description": "The signature framed information module with a metallic titlebar.",
+      "html": "<section class=\"ds-module\"><h2 class=\"ds-module__title\">selected work</h2><div class=\"ds-module__body\">Evidence-led content lives here.</div></section>",
+      "css": ".ds-module { overflow: hidden; color: var(--ink, #eef3ff); border: 1px solid var(--line, #5b6882); border-radius: 10px; background: linear-gradient(180deg, var(--panel-2, rgba(29,33,44,.97)), var(--panel, rgba(19,22,30,.97))); box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 5px 12px rgba(0,0,0,.18); font: 11px/1.42 Tahoma, Verdana, Arial, sans-serif; } .ds-module__title { position: relative; margin: 0; padding: 5px 28px 5px 20px; color: #eef2fb; border-bottom: 1px solid #54617b; background: linear-gradient(180deg, #30384a 0%, #1a1f2b 54%, #121722 55%, #2a3142 100%); font: 800 10px/1.25 Tahoma, Verdana, sans-serif; letter-spacing: .18px; text-transform: lowercase; } .ds-module__title::before { content: '✦'; position: absolute; left: 7px; top: 5px; color: #79b6ff; font-size: 9px; } .ds-module__title::after { content: ''; position: absolute; top: 7px; right: 8px; width: 18px; height: 5px; border: 1px solid rgba(142,159,194,.45); background: linear-gradient(90deg, rgba(117,151,255,.7) 0 45%, transparent 45% 60%, rgba(184,255,44,.68) 60%); } .ds-module__body { padding: 8px; } .ds-module:focus-within { border-color: var(--line-bright, #8495b7); }"
+    },
+    {
+      "name": "Hero Action",
+      "kind": "button",
+      "refersTo": "hero-action",
+      "description": "The dominant route action from identity to selected work.",
+      "html": "<a class=\"ds-hero-action\" href=\"#\">Explore selected work</a>",
+      "css": ".ds-hero-action { display: inline-block; padding: 4px 7px; color: #071000; border: 1px solid #779a1d; border-radius: 0; background: var(--lime, #b8ff2c); font: 700 11px/1.42 Tahoma, Verdana, Arial, sans-serif; text-decoration: none; } .ds-hero-action:hover { color: #fff; background: #2558ff; } .ds-hero-action:focus-visible { outline: 2px solid var(--lime, #b8ff2c); outline-offset: 2px; box-shadow: 0 0 0 1px #060806; } .ds-hero-action:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "Metallic Navigation Link",
+      "kind": "nav",
+      "description": "Compact primary routing control used in the directory and document navigation.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Primary\"><a href=\"#\">work</a><a href=\"#\">profile</a></nav>",
+      "css": ".ds-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; } .ds-nav a { display: block; padding: 5px 8px; color: #eef2fb; border: 1px solid #586684; border-radius: 7px; background: linear-gradient(180deg, #33405b 0%, #20273a 46%, #27365f 48%, #1c2230 100%); font: 700 9px/1.42 Tahoma, Verdana, Arial, sans-serif; text-align: center; text-decoration: none; } .ds-nav a:hover { color: #fff; background: linear-gradient(180deg, #4d76ff, #1a45ce); } .ds-nav a:focus-visible { outline: 2px solid var(--lime, #b8ff2c); outline-offset: 2px; box-shadow: 0 0 0 1px #060806; } .ds-nav a:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "Selected Work Row",
+      "kind": "custom",
+      "description": "A linear evidence row with project identity and concise status metadata.",
+      "html": "<a class=\"ds-work-row\" href=\"#\"><span class=\"ds-work-row__title\">Project name</span><span class=\"ds-work-row__meta\">signal · shipped</span></a>",
+      "css": ".ds-work-row { position: relative; display: grid; grid-template-columns: minmax(0,1fr) minmax(120px,auto); gap: 8px; align-items: baseline; padding: 6px 7px 6px 17px; color: #f0f4ff; border-bottom: 1px solid #364054; font: 11px/1.42 Tahoma, Verdana, Arial, sans-serif; text-decoration: underline; text-underline-offset: 2px; } .ds-work-row::before { content: '★'; position: absolute; left: 4px; top: 7px; color: #8aaeff; font-size: 8px; } .ds-work-row__title { font-weight: 700; } .ds-work-row__meta { color: #aebbd2; font-size: 8px; text-align: right; } .ds-work-row:hover { color: #fff; background: #2558ff; text-decoration: none; } .ds-work-row:focus-visible { outline: 2px solid var(--lime, #b8ff2c); outline-offset: 2px; box-shadow: 0 0 0 1px #060806; } .ds-work-row:active { transform: translateX(1px); }"
+    },
+    {
+      "name": "Presence Label",
+      "kind": "chip",
+      "refersTo": "presence-label",
+      "description": "A tiny categorical badge for public GitHub and Spotify states.",
+      "html": "<span class=\"ds-presence-label\">now playing</span>",
+      "css": ".ds-presence-label { display: inline-block; width: max-content; padding: 2px 4px; color: #eaf2ff; border: 1px solid #586885; border-radius: 4px; background: linear-gradient(180deg, #394768, #1b2338); font: 700 7px/1.2 Tahoma, Verdana, sans-serif; text-transform: uppercase; } .ds-presence-label:hover { border-color: var(--line-bright, #8495b7); } .ds-presence-label:focus-visible { outline: 2px solid var(--lime, #b8ff2c); outline-offset: 2px; }"
+    },
+    {
+      "name": "GitHub Metrics",
+      "kind": "card",
+      "description": "A compact two-column public-profile metric grid with hard separators.",
+      "html": "<dl class=\"ds-github-stats\"><div><dt>repositories</dt><dd>24 repos</dd></div><div><dt>followers</dt><dd>12</dd></div></dl>",
+      "css": ".ds-github-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin: 0; border: 1px solid #364054; background: #364054; font-family: Tahoma, Verdana, Arial, sans-serif; } .ds-github-stats div { min-width: 0; padding: 5px; background: #111620; } .ds-github-stats dt { color: #8fa0ba; font-size: 7px; } .ds-github-stats dd { margin: 1px 0 0; color: var(--ink, #eef3ff); font-size: 11px; font-weight: 700; } .ds-github-stats div:hover { background: #182035; } .ds-github-stats div:focus-within { outline: 2px solid var(--lime, #b8ff2c); outline-offset: -2px; }"
+    },
+    {
+      "name": "Now Playing",
+      "kind": "custom",
+      "description": "A live-presence player with a spinning disc, truncated copy, and multicolor progress.",
+      "html": "<div class=\"ds-player\"><span class=\"ds-player__disc\" aria-hidden=\"true\"></span><div class=\"ds-player__copy\"><span class=\"ds-presence-label\">now playing</span><a href=\"#\"><strong>Track name</strong></a><span>Artist</span><span class=\"ds-player__bar\"><span></span></span></div></div>",
+      "css": ".ds-player { display: grid; grid-template-columns: 52px minmax(0,1fr); gap: 8px; align-items: center; color: #bec8dc; font: 8px/1.42 Tahoma, Verdana, Arial, sans-serif; } .ds-player__disc { display: block; width: 52px; height: 52px; border: 1px solid #707fa0; border-radius: 50%; background: radial-gradient(circle at center, #0b0d12 0 5px, #dff7ff 6px 8px, #315cff 9px 11px, #e8edf6 12px 17px, #8793a8 18px 20px, #161922 21px 25px); box-shadow: inset 0 0 0 2px #10131a, 0 0 10px rgba(48,97,255,.14); animation: ds-spin 10s linear infinite; } .ds-player__copy { display: grid; gap: 2px; min-width: 0; } .ds-player__copy a { overflow: hidden; color: #f2f5fc; text-overflow: ellipsis; white-space: nowrap; } .ds-player__copy a:hover { color: #fff; background: #2558ff; } .ds-player__copy a:focus-visible { outline: 2px solid var(--lime, #b8ff2c); outline-offset: 2px; } .ds-player__bar { display: block; height: 4px; margin-top: 4px; overflow: hidden; border: 1px solid #55617b; border-radius: 5px; background: #1d2230; } .ds-player__bar span { display: block; width: 62%; height: 100%; background: linear-gradient(90deg, var(--violet, #aa87ff), #315cff, var(--cyan, #74e9ff), var(--lime, #b8ff2c)); } @keyframes ds-spin { to { transform: rotate(360deg); } } @media (prefers-reduced-motion: reduce) { .ds-player__disc { animation: none; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Maintained Web Desktop",
+    "overview": "postigo.sh is a compact, authored corner of the web that makes professional evidence immediately legible. It borrows the density, directness, and material tactility of a cared-for personal homepage: dark blue desktop space, steel-framed modules, metallic titlebars, terse labels, tiny live-status surfaces, and a resident goat that makes the system unmistakably Piero's.\n\nThe world is preview-native, pinned from direction seed e23380ff. It rejects the generic portfolio hero-and-card stack without becoming a Windows clone: this is a normal, route-first site whose modules look like a personal desktop. The homepage is the densest expression; stable Work, About, Resume, Writings, Contact, and project-case routes use the same material and type system with more reading room. Project-window interaction is intentionally outside this system until that behavior is implemented and documented separately.\n\nunreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md",
+    "keyCharacteristics": [
+      "Compact Tahoma-led information density with Courier New reserved for system metadata.",
+      "Midnight blue-black surfaces, cool steel borders, and metallic gradient titlebars.",
+      "Blue, cyan, violet, and acid-lime signals used as state and wayfinding accents.",
+      "Hard-edged controls inside softly clipped modules; no modern pill-card language.",
+      "The embedded goat is a recurring signature, not a separate branding campaign.",
+      "Stable routes and honest public-presence states outrank decorative exploration."
+    ],
+    "rules": [
+      { "name": "The Signal, Not Wash Rule", "body": "Cyan, violet, and lime identify states or authored moments; they do not become full-screen decorative washes.", "section": "colors" },
+      { "name": "The Honest State Rule", "body": "Unavailable public data stays muted and explicit. Never recolor an unavailable state to resemble success or activity.", "section": "colors" },
+      { "name": "The Tahoma First Rule", "body": "New interface modules inherit Tahoma; do not introduce a display font to manufacture personality.", "section": "typography" },
+      { "name": "The Mono Has a Job Rule", "body": "Courier New is for metadata, timestamps, labels, and archival mechanics—not paragraphs or primary navigation.", "section": "typography" },
+      { "name": "The First-Viewport Rule", "body": "At desktop width, visitors must be able to identify Piero, see selected work, and locate public presence without opening or dragging anything.", "section": "layout" },
+      { "name": "The Main Column Leads Rule", "body": "Side rails provide context; the engineering identity, Work path, and evidence remain visually dominant.", "section": "layout" },
+      { "name": "The Border Before Shadow Rule", "body": "A component must read through its hard border and tonal surface before shadow is added.", "section": "elevation" },
+      { "name": "The No Fake Chrome Rule", "body": "Metallic titlebars label modules; they never display inert window controls.", "section": "shapes" },
+      { "name": "The Radius Hierarchy Rule", "body": "Large containers may be softly clipped, but actions and data rows stay hard and compact. Avoid pill-shaped navigation and rounded SaaS cards.", "section": "shapes" }
+    ],
+    "dos": [
+      "Do lead the first desktop viewport with identity, selected work, stable routes, and honest presence.",
+      "Do use one-pixel borders, metallic gradients, and restrained inset highlights to make depth tactile.",
+      "Do keep the goat embedded as a small resident signature in authored moments.",
+      "Do keep interactions semantic, keyboard-visible, route-first, and reduced-motion safe.",
+      "Do adapt content order and density at 780px; mobile is one direct column.",
+      "Do preserve the preview-native direction selected from seed e23380ff."
+    ],
+    "donts": [
+      "Don't regress to a generic centered hero followed by interchangeable portfolio cards.",
+      "Don't turn the system into literal Windows cosplay, terminal cosplay, glassmorphism, neon cyberpunk, or rounded SaaS chrome.",
+      "Don't add fake minimize, maximize, close, drag, or resize affordances to ordinary site modules.",
+      "Don't invent posts, photos, activity, metrics, or professional claims to fill empty surfaces.",
+      "Don't let cyan, violet, or lime become decorative full-screen washes.",
+      "Don't treat project-window behavior as implemented visual-system law; it is explicitly deferred."
+    ]
+  }
+}

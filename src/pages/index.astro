@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import DesktopShell from '../desktop/DesktopShell';
-import { identity, projectCases, prominentWork, selectedWork } from '../data/portfolio';
+import HomeSurface from '../components/HomeSurface.astro';
 ---
-<BaseLayout title="Piero Postigo Rocchetti | Software Engineer" description="Backend and product software engineering portfolio."><DesktopShell client:load identity={identity} records={selectedWork} prominentRecords={prominentWork} projects={projectCases} /></BaseLayout>
+<BaseLayout title="Piero Postigo Rocchetti | Software Engineer" description="Backend and product software engineering portfolio.">
+  <HomeSurface />
+</BaseLayout>

@@ -1,6 +1,5 @@
 ---
-import ProjectCaseDocument from '../../components/ProjectCaseDocument.astro';
-import DocumentNav from '../../components/DocumentNav.astro';
+import HomeSurface from '../../components/HomeSurface.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { projectCases, type ProjectCase } from '../../data/portfolio';
 
@@ -12,9 +11,5 @@ interface Props { project: ProjectCase }
 const { project } = Astro.props;
 ---
 <BaseLayout title={`${project.name} | Piero Postigo Rocchetti`} description={project.summary}>
-  <main class="document-shell project-document-shell">
-    <DocumentNav />
-    <a href="/work">← Work</a>
-    <ProjectCaseDocument project={project} />
-  </main>
+  <HomeSurface initialProjectSlug={project.slug} />
 </BaseLayout>
