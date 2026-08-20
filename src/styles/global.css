@@ -320,7 +320,7 @@ button, a { font: inherit; }
 @media (max-width: 780px) {
   body { padding: 10px 7px 36px; }
   .site-head { grid-template-columns: 150px minmax(0, 1fr) 66px; border-radius: 9px; }
-  .site-head__goat img { right: 9px; width: 43px; height: 43px; }
+  .site-head__goat img { right: 9px; bottom: -2px; width: 43px; height: 43px; }
   .site-grid { display: flex; flex-direction: column; gap: 11px; }
   .site-column { display: contents; }
   [data-mobile-order] { width: 100%; }

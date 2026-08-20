@@ -22,6 +22,17 @@ test('mobile follows the approved content priority and remains within the viewpo
     'updates-mini',
   ]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+
+  const mascotBounds = await page.locator('.site-head__goat img').evaluate((image) => {
+    const header = image.closest('.site-head');
+    if (!header) throw new Error('Expected the mascot to be inside the site header.');
+
+    const mascot = image.getBoundingClientRect();
+    const host = header.getBoundingClientRect();
+    return { mascotBottom: mascot.bottom, headerBottom: host.bottom };
+  });
+
+  expect(mascotBounds.mascotBottom).toBeLessThanOrEqual(mascotBounds.headerBottom + 2);
 });
 
 test('mobile keeps project links usable without JavaScript', async ({ page }) => {
