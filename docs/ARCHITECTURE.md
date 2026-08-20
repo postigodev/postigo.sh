@@ -1,336 +1,53 @@
-# ARCHITECTURE.md
+# Architecture
 
-## 1. Product architecture
+## Product architecture
 
-`portfolio-v2` is a statically delivered Astro site with a Preact-powered personal desktop environment as its primary interactive homepage.
-
-The production system is a synthesis of two references with clearly separated responsibilities:
-
-```text
-references/WIN98-template
-        │
-        └── behavioral reference
-            windows / dragging / focus / taskbar / minimize / maximize
-
-docs/stitch-design-system.md
-        │
-        └── canonical production skin
-            palette / typography / spacing / surfaces / component styling
-
-docs/design-direction.md
-        │
-        └── cultural + emotional direction
-            early web / archive / Y2K / cybergrunge / personal authorship
-
-docs/career/
-        │
-        └── factual professional truth
-
-                         ↓
-
-                  SPECIMEN_OS
-             production portfolio
-```
-
-The product must not become a fork of either reference.
-
----
-
-## 2. Stack
-
-Canonical stack:
-
-- Astro
-- Preact
-- TypeScript strict
-- plain/scoped CSS
-- CSS custom properties
-- Astro Content Collections or typed local content
-- Playwright
-- pnpm
-
-No SSR is required initially.
-
-No database is required.
-
-No global state library is required.
-
----
-
-## 3. Rendering model
-
-### Astro layer
-
-Astro owns:
-- route-level pages
-- SEO/meta
-- static project content
-- direct links
-- no-JS-compatible professional pages
-- content generation
-
-### Preact layer
-
-A single primary Preact island owns desktop interaction:
+`portfolio-v2` is a statically delivered Astro portfolio with focused Preact
+progressive enhancement. It is a route-first personal web surface, not a
+desktop OS.
 
 ```text
-DesktopShell
-├── DesktopSurface
-├── DesktopIcons
-├── WindowManager
-│   └── Window instances
-├── Taskbar
-├── StartMenu
-└── Apps
-    ├── Identity
-    ├── Work
-    ├── Project
-    ├── Resume
-    ├── Notes/Writing
-    ├── Contact
-    ├── Network
-    ├── NowPlaying
-    └── optional Terminal
+docs/career/ ── factual professional truth
+        │
+        ▼
+src/data/portfolio.ts + src/data/writings.ts ── typed production content
+        │
+        ├── Astro ── routes, documents, metadata, no-JS content
+        │
+        └── Preact ── project windows + live presence widgets
+
+DESIGN.md ── canonical production visual system
+references/preview.html ── binding visual/compositional reference (read-only)
 ```
 
-Do not hydrate static content unnecessarily.
+`references/preview.html` informs composition, density, and the authored
+personal-web character. It is read-only and production code has no runtime
+dependency on any file under `references/`.
 
----
+`DESIGN.md` is the canonical production visual system generated from the
+implemented world. Historical plans under `docs/superpowers/` are noncanonical
+and may describe retired desktop-shell work.
 
-## 4. Suggested source layout
+## Stack
 
-```text
-portfolio-v2/
-├── AGENTS.md
-├── ARCHITECTURE.md
-├── astro.config.mjs
-├── package.json
-├── pnpm-lock.yaml
-├── tsconfig.json
-│
-├── docs/
-│   ├── career/
-│   ├── stitch-design-system.md
-│   ├── design-direction.md
-│   ├── interaction-spec.md        # optional next
-│   └── content-model.md           # optional next
-│
-├── references/
-│   ├── README.md
-│   ├── stitch/
-│   └── WIN98-template/
-│
-├── public/
-│   ├── fonts/
-│   ├── icons/
-│   ├── images/
-│   └── textures/
-│
-├── src/
-│   ├── content/
-│   │   ├── projects/
-│   │   └── writing/
-│   ├── data/
-│   ├── desktop/
-│   │   ├── DesktopShell.tsx
-│   │   ├── DesktopSurface.tsx
-│   │   ├── DesktopIcons.tsx
-│   │   ├── Taskbar.tsx
-│   │   ├── StartMenu.tsx
-│   │   ├── Window.tsx
-│   │   ├── WindowManager.ts
-│   │   ├── windowReducer.ts
-│   │   ├── apps/
-│   │   └── types.ts
-│   ├── layouts/
-│   ├── pages/
-│   └── styles/
-│       ├── tokens.css
-│       ├── global.css
-│       ├── desktop.css
-│       └── textures.css
-│
-└── tests/
-    └── e2e/
-```
+- Astro for static delivery and routes
+- Preact for bounded client-side enhancement
+- TypeScript in strict mode
+- plain CSS and CSS custom properties
+- typed local data for portfolio and writing surfaces
+- pnpm, Vitest, and Playwright
 
-Do not create every file prematurely. This is a target shape.
+No database, SSR, global state library, component library, or animation
+framework is required for the current product.
 
----
+## Rendering model
 
-## 5. Window model
+### Astro
 
-Window behavior must be centralized and reusable.
+Astro owns route-level pages, static HTML, SEO metadata, direct navigation,
+portfolio documents, and useful no-JavaScript fallbacks.
 
-Suggested state:
-
-```ts
-type WindowState = {
-  id: AppId;
-  isOpen: boolean;
-  isMinimized: boolean;
-  isMaximized: boolean;
-  zIndex: number;
-  bounds: Bounds;
-  restoreBounds: Bounds | null;
-};
-```
-
-Exact types may evolve.
-
-Apps own content.
-
-The window manager owns mechanics.
-
----
-
-## 6. Window manager responsibilities
-
-Centralize:
-
-- register app/window
-- open
-- close
-- focus
-- z-index ordering
-- minimize
-- restore
-- maximize
-- move
-- preserve a recoverable titlebar while allowing partial viewport overflow
-- eight-direction resize with per-app minimum sizes
-- adapt geometry when the measured workspace changes
-- optional persistence
-- reducer-level reset support
-
-Do not duplicate these mechanics inside individual app components.
-
-Use native Pointer Events for drag behavior unless a concrete limitation appears.
-
----
-
-## 7. Behavioral reference: WIN98-template
-
-`references/WIN98-template` is useful for understanding:
-
-- focus model
-- z-index incrementing
-- draggable titlebars
-- viewport constraints
-- taskbar entries
-- minimize/restore logic
-- maximize/restore bounds
-- Start menu behavior
-- desktop icon behavior
-
-Production code should reimplement these ideas cleanly in TypeScript/Preact.
-
-Do not:
-- import the reference runtime
-- preserve stock visual CSS
-- preserve old globals/DOM scripting architecture
-- carry over unrelated demo apps
-
----
-
-## 8. Canonical skin: Stitch
-
-`docs/stitch-design-system.md` defines the production visual system.
-
-The desktop/window implementation must be skinned using those tokens and rules.
-
-Important:
-- Win98 determines behavior
-- Stitch determines appearance
-
-If stock Win98 CSS conflicts with Stitch, replace the stock style.
-
-### Desktop visual authority
-
-The approved desktop is a scoped, reference-first exception: its background,
-high-contrast composition, goat signature, window proportions, and surface
-relationships follow `references/stitch/code.html` more literally than the
-broader paper-based system. The exception applies only to `/` and its desktop
-overlays. Static content routes continue to use the shared production design
-system, and the exported reference remains read-only inspiration rather than a
-runtime dependency.
-
-### Unified native desktop placement
-
-Every app uses the same floating `Window` primitive and starts from numeric
-bounds supplied by the typed app registry. There is no authored-versus-floating
-state and no persistent navbar, sidebar, Selected Work panel, Network panel, or
-utility slot. Drag, eight-direction resize, focus, minimize, maximize, and
-restore belong to the window manager. Desktop-only utilities change desktop
-state only and never write browser history.
-
-Closing a desktop window changes window state, not browser traversal. If the
-closed singleton owns the current route, the current owned entry is replaced
-with the root URL without applying the root app. Explicit Back/Forward remains
-the only route-history action that opens a historical target.
-
----
-
-## 9. First-load desktop
-
-The homepage itself is the hero.
-
-The approved near-cold initial desktop state is:
-
-- Identity window open and dominant
-- desktop icons for About Piero, Projects, Resume, Contact, Network, and Player
-- taskbar visible
-- enough visible desktop background to communicate spatial freedom
-
-Do not open every app at boot.
-
-The first state is sparse and calm. Now Playing, Notes, Network, Selected Work,
-and project cases open independently through their launchers.
-
-Exploration may become denser as the user opens and overlaps windows.
-
----
-
-## 10. App registry
-
-Use one centralized typed app registry as the source of truth for desktop apps.
-
-Conceptually:
-
-```ts
-type AppDefinition = {
-  id: AppId;
-  title: string;
-  icon: DesktopIcon;
-  kind: AppKind;
-  route?: string;
-  defaultBounds: Bounds;
-  minSize: Size;
-  mobileMode: "fullscreen";
-  showOnDesktop: boolean;
-  showInStart: boolean;
-  startGroup?: "portfolio" | "utilities" | "policy";
-  contentWidth: "editorial" | "case" | "utility";
-};
-```
-
-All registered windows are singletons. The registry defines routable and
-desktop-only apps, labels, launch surfaces, initial geometry, minimum geometry,
-renderer kind, Start grouping, and inner content-width policy. Launcher labels
-may alias an existing singleton: About Piero targets Identity rather than a
-duplicate About window. The near-cold boot preset contains only `identity`.
-
-Window size is independent from inner content width. Editorial and case
-content use centered tokenized maximum widths, while utilities use their full
-client area. No maximum width belongs on the resizable window itself.
-
-Avoid scattered hardcoded title/path/default-size maps.
-
----
-
-## 11. Routes and deep links
-
-Core portfolio content must exist as normal routes:
+Stable routes are:
 
 ```text
 /
@@ -338,309 +55,88 @@ Core portfolio content must exist as normal routes:
 /work/[slug]
 /about
 /resume
+/writings
 /contact
-/notes
+/privacy
 ```
 
-Routable launchers are semantic links. With JavaScript, the desktop intercepts
-eligible same-origin navigation, opens or focuses exactly the target app, and
-uses browser history. Without JavaScript, the same links resolve to useful
-Astro documents. Desktop-only utilities are buttons and never mutate the URL.
+The homepage and a direct project route share the same Astro `HomeSurface`.
+Without JavaScript, project anchors navigate normally and the route remains
+readable.
 
-Start uses a classic vertical Piero OS rail with grouped icon rows. Desktop and
-Start share one authored icon primitive. Each window client owns a tokenized
-16px legacy scrollbar with inset track, beveled thumb/buttons, and diagonal
-corner grip; scrollbar visuals never replace window resize handles.
+### Preact
 
-Potential behavior:
+Preact is limited to three progressive enhancements:
 
-```text
-Desktop: open Koba
-→ project window opens
-→ URL becomes /work/koba
-→ Identity and Selected Work are unchanged
-
-Direct visit: /work/koba
-→ full project page renders
-→ if returning to desktop mode, relevant app may open
-```
+- `src/project-windows/ProjectWindowLayer.tsx` manages project-case windows.
+- `GitHubWidget.tsx` renders live public GitHub presence with an honest
+  unavailable state.
+- `NowPlayingWidget.tsx` renders fixed-owner Spotify presence with an honest
+  unavailable state.
 
-Do not build a fragile custom router when browser routing is enough.
+Static documents and ordinary homepage modules do not hydrate.
 
----
+## Project-window model
 
-## 12. Content architecture
+Only typed `ProjectCase` records use real window chrome. On desktop, visitors
+can open multiple project windows, focus one, drag it, resize it from eight
+edges/corners, maximize/restore it, and close it independently. The reducer and
+geometry helpers in `src/project-windows/` centralize this behavior.
 
-Facts come from `docs/career/`.
+Project links remain semantic anchors. The hydrated layer intercepts eligible
+same-origin `/work/[slug]` clicks to open or focus a singleton window and keep
+browser history synchronized. Direct routes boot the corresponding case window
+as an enhancement; closing or using browser Back/Forward preserves a coherent
+history snapshot.
 
-Production content should be normalized into typed project/experience models.
+At `780px` or a coarse pointer, project windows become fullscreen. Only the
+active case is shown; drag, resize, and maximize are disabled, body scrolling
+is locked while a case is open, and close restores a sensible focus target.
 
-Example project model:
+No taskbar, Start menu, desktop icon grid, app registry, boot sequence, or
+all-app window router exists in the shipped architecture. Ordinary site modules
+never show inert window controls.
 
-```ts
-type Project = {
-  slug: string;
-  name: string;
-  summary: string;
-  role?: string;
-  technologies: string[];
-  status?: string;
-  featured?: boolean;
-  cover?: string;
+## Content model
 
-  links: {
-    source?: string;
-    live?: string;
-    writeup?: string;
-  };
+`docs/career/` is the factual authority. `src/data/portfolio.ts` contains the
+typed identity, selected work, project cases, ownership boundaries, and public
+artifacts derived from that evidence.
 
-  evidence?: string[];
-};
-```
+`src/data/writings.ts` is a typed empty adapter. It intentionally returns no
+published writings until a future Markdown-backed publishing path is introduced.
+There is no writing backend, authentication, uploads, persistence, or admin
+surface in this version.
 
-Do not use Stitch placeholder projects as production data.
+## Styling and assets
 
----
+`src/styles/global.css` implements the `DESIGN.md` system: midnight surfaces,
+steel borders, metallic titlebars, compact Tahoma, Courier New metadata, and
+restrained blue/cyan/violet/lime signals. It also contains the project-window
+styles because that is the only interactive window primitive.
 
-## 13. Styling architecture
+Production assets live under `public/`. References remain isolated and are not
+bundled or imported at runtime.
 
-Create canonical design tokens from `docs/stitch-design-system.md`.
+## Presence functions
 
-Suggested token categories:
+Root Vercel Functions provide fixed-owner public presence data. Browser code
+never receives owner credentials, Spotify refresh tokens, or visitor login
+controls. GitHub and Spotify widgets render truthful unavailable states when
+their endpoints or configuration are unavailable.
 
-```css
-:root {
-  /* surfaces */
-  --surface: ...;
-  --surface-dim: ...;
-  --surface-container: ...;
-  --surface-container-high: ...;
+## Accessibility and resilience
 
-  /* content */
-  --on-surface: ...;
-  --on-surface-variant: ...;
+- Static routes and project anchors work without JavaScript.
+- Window controls are buttons; headings and dialogs expose accessible names.
+- Project-window focus returns to an opener or stable fallback after close.
+- Keyboard paths and visible focus states accompany pointer enhancement.
+- Reduced-motion preferences suppress decorative motion.
+- Mobile favors direct fullscreen case reading over freeform window behavior.
 
-  /* signals */
-  --primary: ...;
-  --secondary: ...;
-  --tertiary: ...;
+## Verification
 
-  /* legacy UI */
-  --legacy-gray: #c0c0c0;
-  --border-light: #ffffff;
-  --border-mid: #808080;
-  --border-dark: #1a1a1a;
-
-  /* typography */
-  --font-display: ...;
-  --font-body: ...;
-  --font-mono: ...;
-
-  /* spacing */
-  --unit: 4px;
-  --gutter: 16px;
-  --margin: 24px;
-  --panel-padding: 12px;
-}
-```
-
-Avoid styling directly from the WIN98-template variables.
-
----
-
-## 14. Real window chrome vs nested content
-
-Only actual interactive windows use:
-- titlebar
-- minimize button
-- maximize button
-- close button
-- drag surface
-- active/inactive window state
-
-Nested project cards and documents should not pretend to be windows unless they are actually independently movable/focusable.
-
-This preserves interaction truth.
-
----
-
-## 15. Texture strategy
-
-Use texture as controlled visual friction.
-
-Prefer:
-- small tiled halftone/noise assets
-- preprocessed dithered images
-- CSS scanline patterns
-- compressed low-resolution thumbnails
-- limited hover transformations
-
-Avoid:
-- giant full-screen PNG grain overlays
-- multi-megabyte wallpapers
-- runtime canvas noise
-- expensive shaders
-- large video backgrounds
-
----
-
-## 16. Fonts
-
-Initial canonical system:
-- Epilogue — headings
-- Space Grotesk — body
-- JetBrains Mono — metadata/system
-
-Custom experimental fonts can be evaluated later.
-
-Do not delay core implementation for font experiments.
-
----
-
-## 17. Performance architecture
-
-Initial load should contain only what is required to show:
-- desktop
-- taskbar
-- icons
-- identity window
-- minimal supporting status UI
-
-Lazy-load:
-- Terminal
-- rich project detail app
-- resume viewer if heavy
-- music functionality
-- optional experiments
-
-Avoid initial:
-- iframes
-- embeds
-- syntax highlighters
-- animation runtimes
-- large icon packs
-
----
-
-## 18. Mobile architecture
-
-At narrow breakpoints:
-
-- desktop icons may become app launcher rows/grid
-- windows become fullscreen/near-fullscreen
-- freeform drag/resize is disabled
-- taskbar may simplify
-- Close/Back remains obvious
-- same content components should be reused
-
-Do not maintain a second unrelated site.
-
----
-
-## 19. Accessibility architecture
-
-Window UI:
-- controls are buttons
-- title is programmatically understandable
-- focus states remain visible
-- closing should return focus sensibly when practical
-- keyboard users can reach core apps
-- double-click is optional enhancement
-- essential functions work with single click / keyboard
-
-Visual retro styling does not reduce accessibility requirements.
-
----
-
-## 20. Persistence
-
-Optional enhancement only.
-
-Possible:
-- window positions
-- open apps
-- desktop arrangement
-- theme
-
-Persisted state should be versioned.
-
-If invalid:
-- reset cleanly
-
-Always offer:
-- `Reset Desktop`
-
-Do not persist state before the designed first-run experience works well.
-
----
-
-## 21. Testing
-
-Critical Playwright coverage:
-
-1. homepage boots
-2. Identity is visible
-3. Work opens
-4. window focus/z-index changes correctly
-5. drag updates position and stays in bounds
-6. minimize/restore
-7. maximize/restore
-8. direct project route
-9. mobile open/close/navigation behavior
-
-Add visual regression only for a few valuable canonical states if needed later.
-
----
-
-## 22. Failure mode
-
-If Preact/desktop JavaScript fails:
-- identity should still be visible in HTML where practical
-- standard route navigation should still work
-- project/resume/contact routes remain usable
-
-The interactive desktop is an enhancement to a real site, not the only path to content.
-
----
-
-## 23. Implementation phases
-
-### Phase 1 — kernel
-- Astro + Preact setup
-- DesktopShell
-- WindowManager
-- Window
-- Taskbar
-- DesktopIcons
-- StartMenu
-- 2 dummy apps
-- open/focus/drag/minimize/maximize/restore/close
-
-### Phase 2 — identity
-- real Identity app
-- canonical first-load layout
-- goat emblem
-- direct links to core destinations
-
-### Phase 3 — work
-- Work app
-- project data model
-- project windows
-- `/work/[slug]`
-
-### Phase 4 — core content
-- Resume
-- About Piero launcher alias to Identity plus standalone `/about` document
-- Contact
-- Notes/Writing
-- Now Playing
-
-### Phase 5 — optional experiments
-- Terminal
-- boot sequence
-- visitor-counter aesthetic
-- audio enhancements
-- custom cursor
-- easter eggs
-
-Do not implement Phase 5 before the core portfolio is fast and complete.
+Run `pnpm check`, `pnpm test:unit`, `pnpm test:functions`, and `pnpm build` for
+the baseline. Use focused Playwright coverage for the static homepage,
+project-window history and geometry, direct project routes, and mobile
+fullscreen behavior. Run `git diff --check` before committing.

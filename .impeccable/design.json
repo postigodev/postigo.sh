@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-15T00:00:00-05:00",
+  "generatedAt": "2026-08-20T00:00:00-05:00",
   "title": "Design System: postigo.sh",
   "extensions": {
     "colorMeta": {
@@ -18,21 +18,58 @@
       "white": { "role": "neutral", "displayName": "White", "canonical": "#ffffff", "tonalRamp": ["#262626", "#4a4a4a", "#707070", "#969696", "#bcbcbc", "#d8d8d8", "#eeeeee", "#ffffff"] },
       "deep-surface": { "role": "neutral", "displayName": "Deep Surface", "canonical": "#151923", "tonalRamp": ["#0c0e13", "#151923", "#292f3e", "#434b5c", "#657084", "#8c96a7", "#bec5d0", "#eff2f6"] },
       "raised-surface": { "role": "neutral", "displayName": "Raised Surface", "canonical": "#202633", "tonalRamp": ["#0e1117", "#202633", "#353e50", "#505b6e", "#737f92", "#98a3b4", "#c4cad4", "#f1f3f6"] },
-      "link-blue": { "role": "primary", "displayName": "Link Blue", "canonical": "#8ec6ff", "tonalRamp": ["#071c34", "#123c68", "#286098", "#4787c5", "#68a9e9", "#8ec6ff", "#c2e0ff", "#eef7ff"] }
+      "link-blue": { "role": "primary", "displayName": "Link Blue", "canonical": "#8ec6ff", "tonalRamp": ["#071c34", "#123c68", "#286098", "#4787c5", "#68a9e9", "#8ec6ff", "#c2e0ff", "#eef7ff"] },
+      "rendered-color-strip-01": {"role":"implementation","displayName":"Rendered color strip 01","canonical":"#05070b","tonalRamp":["#05070b","#060806","#071000","#090b10","#0b0d12","#0f1218","#10131a","#11151d"]},
+      "rendered-color-strip-02": {"role":"implementation","displayName":"Rendered color strip 02","canonical":"#111620","tonalRamp":["#111620","#111723","#121722","#121820","#151923","#151a24","#151b2c","#161922"]},
+      "rendered-color-strip-03": {"role":"implementation","displayName":"Rendered color strip 03","canonical":"#16212b","tonalRamp":["#16212b","#171b25","#181f31","#1a1f2b","#1b1822","#1b1927","#1b2023","#1b202c"]},
+      "rendered-color-strip-04": {"role":"implementation","displayName":"Rendered color strip 04","canonical":"#1b212b","tonalRamp":["#1b212b","#1b2338","#1b241c","#1c2230","#1d2230","#1d2735","#1f241a","#1f2840"]},
+      "rendered-color-strip-05": {"role":"implementation","displayName":"Rendered color strip 05","canonical":"#201926","tonalRamp":["#201926","#202633","#20273a","#20283a","#223443","#232938","#242a38","#253017"]},
+      "rendered-color-strip-06": {"role":"implementation","displayName":"Rendered color strip 06","canonical":"#25324f","tonalRamp":["#25324f","#2548a8","#2558ff","#27365f","#2a3142","#2a3338","#2b3444","#2d293a"]},
+      "rendered-color-strip-07": {"role":"implementation","displayName":"Rendered color strip 07","canonical":"#2d2941","tonalRamp":["#2d2941","#2d3855","#2d394c","#2d3a2d","#30384a","#314055","#315cff","#32405e"]},
+      "rendered-color-strip-08": {"role":"implementation","displayName":"Rendered color strip 08","canonical":"#324b5d","tonalRamp":["#324b5d","#33405b","#34283f","#343a2c","#343c4d","#344057","#364054","#394253"]},
+      "rendered-color-strip-09": {"role":"implementation","displayName":"Rendered color strip 09","canonical":"#39465f","tonalRamp":["#39465f","#394768","#39486f","#395365","#3a455b","#3f4951","#40507f","#445168"]},
+      "rendered-color-strip-10": {"role":"implementation","displayName":"Rendered color strip 10","canonical":"#455e43","tonalRamp":["#455e43","#464056","#46525c","#46536d","#4a4568","#4a5a72","#4b5870","#4e6288"]},
+      "rendered-color-strip-11": {"role":"implementation","displayName":"Rendered color strip 11","canonical":"#4e684c","tonalRamp":["#4e684c","#4f4a66","#4f5d78","#505946","#50647f","#514063","#514b75","#515f79"]},
+      "rendered-color-strip-12": {"role":"implementation","displayName":"Rendered color strip 12","canonical":"#53617d","tonalRamp":["#53617d","#536274","#536a7c","#54617b","#55617a","#55617b","#55627b","#566b98"]},
+      "rendered-color-strip-13": {"role":"implementation","displayName":"Rendered color strip 13","canonical":"#5771a0","tonalRamp":["#5771a0","#58644c","#586684","#586885","#596680","#5a476d","#5a6f8d","#5b687f"]},
+      "rendered-color-strip-14": {"role":"implementation","displayName":"Rendered color strip 14","canonical":"#5b6882","tonalRamp":["#5b6882","#5c6a74","#5c87ff","#5d788d","#5e6d8a","#617089","#6178aa","#64718b"]},
+      "rendered-color-strip-15": {"role":"implementation","displayName":"Rendered color strip 15","canonical":"#65738d","tonalRamp":["#65738d","#665f8f","#667590","#667f60","#67738d","#677590","#68755e","#687590"]},
+      "rendered-color-strip-16": {"role":"implementation","displayName":"Rendered color strip 16","canonical":"#687999","tonalRamp":["#687999","#697680","#6a6884","#6b7690","#6c7c94","#6f876a","#707fa0","#708a2d"]},
+      "rendered-color-strip-17": {"role":"implementation","displayName":"Rendered color strip 17","canonical":"#708f20","tonalRamp":["#708f20","#716f8a","#74e9ff","#76608a","#7670a0","#779a1d","#78846a","#79b6ff"]},
+      "rendered-color-strip-18": {"role":"implementation","displayName":"Rendered color strip 18","canonical":"#7db8ff","tonalRamp":["#7db8ff","#7ee3ff","#826a97","#8495b7","#86b9ff","#8793a8","#8aaeff","#8befff"]},
+      "rendered-color-strip-19": {"role":"implementation","displayName":"Rendered color strip 19","canonical":"#8ec6ff","tonalRamp":["#8ec6ff","#8f9cb6","#8fa0ba","#8fa0bf","#95b5ff","#96a2ba","#96a5bf","#96a9cf"]},
+      "rendered-color-strip-20": {"role":"implementation","displayName":"Rendered color strip 20","canonical":"#9bd0ff","tonalRamp":["#9bd0ff","#9facb7","#a6b2ca","#a9b9da","#aa87ff","#aab5cb","#aebacf","#aebbd2"]},
+      "rendered-color-strip-21": {"role":"implementation","displayName":"Rendered color strip 21","canonical":"#b8ff2c","tonalRamp":["#b8ff2c","#b9c5da","#bec8dc","#c3b4ff","#c3ff84","#c4cfe2","#c5d0e6","#c6cde0"]},
+      "rendered-color-strip-22": {"role":"implementation","displayName":"Rendered color strip 22","canonical":"#c7d7c4","tonalRamp":["#c7d7c4","#c8c3d9","#c8d1e8","#c9d5e7","#cad4e6","#cc9cff","#ccd7c0","#cfff65"]},
+      "rendered-color-strip-23": {"role":"implementation","displayName":"Rendered color strip 23","canonical":"#d39eff","tonalRamp":["#d39eff","#d6dce9","#d7dced","#d7ff91","#d8cdf0","#d8e4ff","#d8ff72","#d8ff83"]},
+      "rendered-color-strip-24": {"role":"implementation","displayName":"Rendered color strip 24","canonical":"#d9ff83","tonalRamp":["#d9ff83","#dce6f8","#dce6fb","#dfe7f7","#dff7ff","#e8edf6","#eaf0ff","#eaf2ff"]},
+      "rendered-color-strip-25": {"role":"implementation","displayName":"Rendered color strip 25","canonical":"#edf2ff","tonalRamp":["#edf2ff","#eef2fb","#eef3ff","#eef4ff","#eef5f5","#f0f4ff","#f1effa","#f1f4fc"]},
+      "rendered-color-strip-26": {"role":"implementation","displayName":"Rendered color strip 26","canonical":"#f2f5fb","tonalRamp":["#f2f5fb","#f2f5fc","#f5f8ff","#fff","#ffffff","rgba(0,0,0,.18)","rgba(0,0,0,.24)","rgba(0,0,0,.26)"]},
+      "rendered-color-strip-27": {"role":"implementation","displayName":"Rendered color strip 27","canonical":"rgba(0,0,0,.34)","tonalRamp":["rgba(0,0,0,.34)","rgba(0,0,0,.38)","rgba(0,0,0,.48)","rgba(103,118,151,.45)","rgba(117,151,255,.7)","rgba(12, 15, 22, .84)","rgba(12, 15, 22, .91)","rgba(126,227,255,.08)"]},
+      "rendered-color-strip-28": {"role":"implementation","displayName":"Rendered color strip 28","canonical":"rgba(127,145,189,.22)","tonalRamp":["rgba(127,145,189,.22)","rgba(142,159,194,.45)","rgba(15,18,25,.96)","rgba(15,19,27,.98)","rgba(16,19,27,.99)","rgba(18,21,34,.98)","rgba(18,22,26,.98)","rgba(184,255,44,.68)"]},
+      "rendered-color-strip-29": {"role":"implementation","displayName":"Rendered color strip 29","canonical":"rgba(189,255,88,.08)","tonalRamp":["rgba(189,255,88,.08)","rgba(19, 22, 30, .97)","rgba(20,23,31,.96)","rgba(20,24,35,.99)","rgba(21,20,31,.98)","rgba(21,29,22,.98)","rgba(22,25,34,.98)","rgba(22,26,19,.98)"]},
+      "rendered-color-strip-30": {"role":"implementation","displayName":"Rendered color strip 30","canonical":"rgba(23,26,35,.98)","tonalRamp":["rgba(23,26,35,.98)","rgba(24,21,32,.98)","rgba(24,22,31,.98)","rgba(25,29,39,.98)","rgba(255,255,255,.025)","rgba(255,255,255,.04)","rgba(255,255,255,.05)","rgba(255,255,255,.08)"]},
+      "rendered-color-strip-31": {"role":"implementation","displayName":"Rendered color strip 31","canonical":"rgba(27,36,46,.98)","tonalRamp":["rgba(27,36,46,.98)","rgba(28,33,47,.98)","rgba(29, 33, 44, .97)","rgba(29,33,44,.98)","rgba(29,35,56,.98)","rgba(32,39,45,.98)","rgba(34,39,52,.96)","rgba(35,47,38,.98)"]},
+      "rendered-color-strip-32": {"role":"implementation","displayName":"Rendered color strip 32","canonical":"rgba(37,43,56,.98)","tonalRamp":["rgba(37,43,56,.98)","rgba(38,35,57,.98)","rgba(39,45,31,.98)","rgba(42,39,55,.98)","rgba(42,48,63,.98)","rgba(45,38,58,.98)","rgba(48,97,255,.14)","rgba(52,93,255,.12)"]},
+      "rendered-color-strip-33": {"role":"implementation","displayName":"Rendered color strip 33","canonical":"rgba(66,248,255,.08)","tonalRamp":["rgba(66,248,255,.08)","rgba(69,91,148,.98)","rgba(72,153,255,.14)","rgba(76,214,255,.09)","rgba(80,138,255,.18)","rgba(9,11,17,.99)"]}
     },
     "typographyMeta": {
       "hero": { "displayName": "Hero", "purpose": "Compact identity headline inside the homepage hero module." },
       "document-display": { "displayName": "Document Display", "purpose": "Responsive headings on stable routes and project cases." },
+      "chapter-display": { "displayName": "Chapter Display", "purpose": "Smaller responsive headings for case-study chapters." },
       "body": { "displayName": "Body", "purpose": "Dense interface copy and controls." },
       "module-title": { "displayName": "Module Title", "purpose": "Lowercase labels in metallic titlebars." },
       "metadata": { "displayName": "Metadata", "purpose": "Tickers, case labels, statuses, and archival annotations." },
-      "micro-label": { "displayName": "Micro Label", "purpose": "Tiny uppercase public-presence badges." }
+      "micro-label": { "displayName": "Micro Label", "purpose": "Tiny uppercase public-presence badges." },
+      "scale": { "displayName": "Implemented Type Scale", "purpose": "Exact rendered size steps, including compact UI labels and case-document displays." }
     },
     "shadows": [
       { "name": "module-lift", "value": "inset 0 1px 0 rgba(255,255,255,.05), 0 5px 12px rgba(0,0,0,.18)", "purpose": "Default lift for site modules and document navigation." },
       { "name": "header-lift", "value": "inset 0 1px 0 rgba(255,255,255,.08), inset 0 -1px 0 rgba(0,0,0,.34), 0 8px 18px rgba(0,0,0,.26)", "purpose": "Identity header depth." },
       { "name": "document-lift", "value": "0 7px 18px rgba(0,0,0,.24)", "purpose": "Stable-route reading panels." },
-      { "name": "focus-edge", "value": "0 0 0 1px #060806", "purpose": "Dark counter-edge behind the acid-lime focus outline." }
+      { "name": "focus-edge", "value": "0 0 0 1px #060806", "purpose": "Dark counter-edge behind the acid-lime focus outline." },
+      { "name": "project-window-lift", "value": "inset 0 1px 0 rgba(255,255,255,.05), 0 14px 34px rgba(0,0,0,.48)", "purpose": "Desktop project-case window separation." },
+      { "name": "disc-inset", "value": "inset 0 0 0 2px #10131a, 0 0 10px rgba(48,97,255,.14)", "purpose": "Now-playing disc material edge." }
     ],
     "motion": [
       { "name": "ticker", "value": "38s linear infinite", "purpose": "Slow continuous identity ticker." },
@@ -41,6 +78,9 @@
       { "name": "disc-spin", "value": "10s linear infinite", "purpose": "Now-playing disc motion." },
       { "name": "critter-walk", "value": "18s linear infinite", "purpose": "Decorative goat passage below the homepage grid." }
     ],
+    "roundedMeta": {
+      "implemented-steps": { "role": "implemented", "values": ["0px", "3px", "4px", "5px", "6px", "7px", "8px", "9px", "10px", "13px", "999px"] }
+    },
     "breakpoints": [
       { "name": "single-column", "value": "780px" }
     ]
@@ -97,11 +137,27 @@
       "description": "A live-presence player with a spinning disc, truncated copy, and multicolor progress.",
       "html": "<div class=\"ds-player\"><span class=\"ds-player__disc\" aria-hidden=\"true\"></span><div class=\"ds-player__copy\"><span class=\"ds-presence-label\">now playing</span><a href=\"#\"><strong>Track name</strong></a><span>Artist</span><span class=\"ds-player__bar\"><span></span></span></div></div>",
       "css": ".ds-player { display: grid; grid-template-columns: 52px minmax(0,1fr); gap: 8px; align-items: center; color: #bec8dc; font: 8px/1.42 Tahoma, Verdana, Arial, sans-serif; } .ds-player__disc { display: block; width: 52px; height: 52px; border: 1px solid #707fa0; border-radius: 50%; background: radial-gradient(circle at center, #0b0d12 0 5px, #dff7ff 6px 8px, #315cff 9px 11px, #e8edf6 12px 17px, #8793a8 18px 20px, #161922 21px 25px); box-shadow: inset 0 0 0 2px #10131a, 0 0 10px rgba(48,97,255,.14); animation: ds-spin 10s linear infinite; } .ds-player__copy { display: grid; gap: 2px; min-width: 0; } .ds-player__copy a { overflow: hidden; color: #f2f5fc; text-overflow: ellipsis; white-space: nowrap; } .ds-player__copy a:hover { color: #fff; background: #2558ff; } .ds-player__copy a:focus-visible { outline: 2px solid var(--lime, #b8ff2c); outline-offset: 2px; } .ds-player__bar { display: block; height: 4px; margin-top: 4px; overflow: hidden; border: 1px solid #55617b; border-radius: 5px; background: #1d2230; } .ds-player__bar span { display: block; width: 62%; height: 100%; background: linear-gradient(90deg, var(--violet, #aa87ff), #315cff, var(--cyan, #74e9ff), var(--lime, #b8ff2c)); } @keyframes ds-spin { to { transform: rotate(360deg); } } @media (prefers-reduced-motion: reduce) { .ds-player__disc { animation: none; } }"
+    },
+    {
+      "name": "Project Case Window",
+      "kind": "custom",
+      "refersTo": "project-window",
+      "description": "The only draggable, resizable, maximizable window; it holds a scrollable project case on desktop.",
+      "html": "<section class=\"ds-window\"><header><b>✦ preppie · case study</b><span><button>□</button><button>×</button></span></header><nav>cases: <a href=\"#\">Koba</a> <a href=\"#\">DM2Text</a></nav><article><small>PROFESSIONAL EXPERIENCE · 2026</small><h2>Preppie</h2><p>Evidence-led project document.</p></article></section>",
+      "css": ".ds-window { width:min(820px,100%); overflow:hidden; color:#d7dced; border:1px solid #515f79; border-radius:10px; background:linear-gradient(180deg,rgba(29,33,44,.97),rgba(19,22,30,.97)); box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 14px 34px rgba(0,0,0,.48); font:11px/1.42 Tahoma,Verdana,Arial,sans-serif; } .ds-window header { display:flex; min-height:31px; align-items:center; justify-content:space-between; gap:8px; padding:4px 5px 4px 10px; color:#fff; border-bottom:1px solid #6178aa; border-radius:9px 9px 0 0; background:linear-gradient(180deg,#40507f 0%,#25324f 54%,#181f31 55%,#39486f 100%); font:800 10px/1.25 Tahoma,Verdana,sans-serif; text-transform:lowercase; } .ds-window button { width:22px; height:20px; padding:0; color:#edf2ff; border:1px solid #65738d; border-radius:3px; background:linear-gradient(180deg,#3a455b,#1b202c); font:800 12px/1 Tahoma,sans-serif; } .ds-window button:hover { color:#fff; border-color:#96a9cf; background:#2558ff; } .ds-window button:focus-visible { outline:2px solid #b8ff2c; outline-offset:2px; } .ds-window nav { padding:5px 8px; color:#aebbd2; border-bottom:1px solid #46536d; background:rgba(15,18,25,.96); font:8px/1.2 'Courier New',monospace; } .ds-window nav a { padding:1px 4px; color:#dce6fb; border:1px solid #53617d; background:#20283a; } .ds-window article { padding:20px; } .ds-window small { color:#8ec6ff; font:700 12px/1.2 'Courier New',monospace; } .ds-window h2 { margin:18px 0 8px; color:#f5f8ff; font:900 clamp(2rem,7vw,4.5rem)/.95 Tahoma,Verdana,sans-serif; letter-spacing:-.04em; }"
+    },
+    {
+      "name": "Compact Project Case",
+      "kind": "custom",
+      "refersTo": "project-window",
+      "description": "The coarse-pointer and narrow-screen project case: one fullscreen active document without desktop mechanics.",
+      "html": "<section class=\"ds-compact-window\"><header>preppie · case study <button>×</button></header><article>Fullscreen project document</article></section>",
+      "css": ".ds-compact-window { min-height:240px; color:#d7dced; background:linear-gradient(180deg,rgba(29,33,44,.97),rgba(19,22,30,.97)); font:11px/1.42 Tahoma,Verdana,Arial,sans-serif; } .ds-compact-window header { display:flex; min-height:31px; align-items:center; justify-content:space-between; padding:4px 5px 4px 10px; color:#d6dce9; border-bottom:1px solid #54617b; background:linear-gradient(180deg,#30384a 0%,#1a1f2b 54%,#121722 55%,#2a3142 100%); font:800 10px/1.25 Tahoma,Verdana,sans-serif; text-transform:lowercase; } .ds-compact-window button { width:22px; height:20px; color:#edf2ff; border:1px solid #65738d; border-radius:3px; background:linear-gradient(180deg,#3a455b,#1b202c); } .ds-compact-window button:focus-visible { outline:2px solid #b8ff2c; outline-offset:2px; } .ds-compact-window article { padding:16px; }"
     }
   ],
   "narrative": {
     "northStar": "The Maintained Web Desktop",
-    "overview": "postigo.sh is a compact, authored corner of the web that makes professional evidence immediately legible. It borrows the density, directness, and material tactility of a cared-for personal homepage: dark blue desktop space, steel-framed modules, metallic titlebars, terse labels, tiny live-status surfaces, and a resident goat that makes the system unmistakably Piero's.\n\nThe world is preview-native, pinned from direction seed e23380ff. It rejects the generic portfolio hero-and-card stack without becoming a Windows clone: this is a normal, route-first site whose modules look like a personal desktop. The homepage is the densest expression; stable Work, About, Resume, Writings, Contact, and project-case routes use the same material and type system with more reading room. Project-window interaction is intentionally outside this system until that behavior is implemented and documented separately.\n\nunreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md",
+    "overview": "postigo.sh is a compact, authored corner of the web that makes professional evidence immediately legible. It borrows the density, directness, and material tactility of a cared-for personal homepage: dark blue desktop space, steel-framed modules, metallic titlebars, terse labels, tiny live-status surfaces, and a resident goat that makes the system unmistakably Piero's.\n\nThe world is preview-native, pinned from direction seed e23380ff. It rejects the generic portfolio hero-and-card stack without becoming a Windows clone: this is a normal, route-first site whose modules look like a personal desktop. The homepage is the densest expression; stable routes use the same material and type system with more reading room. Project cases alone progressively enhance into real desktop windows: they coexist, focus, drag, resize, maximize or restore, and close on fine pointers; at 780px or with a coarse pointer, the active case becomes the sole fullscreen document.",
     "keyCharacteristics": [
       "Compact Tahoma-led information density with Courier New reserved for system metadata.",
       "Midnight blue-black surfaces, cool steel borders, and metallic gradient titlebars.",
@@ -118,8 +174,9 @@
       { "name": "The First-Viewport Rule", "body": "At desktop width, visitors must be able to identify Piero, see selected work, and locate public presence without opening or dragging anything.", "section": "layout" },
       { "name": "The Main Column Leads Rule", "body": "Side rails provide context; the engineering identity, Work path, and evidence remain visually dominant.", "section": "layout" },
       { "name": "The Border Before Shadow Rule", "body": "A component must read through its hard border and tonal surface before shadow is added.", "section": "elevation" },
-      { "name": "The No Fake Chrome Rule", "body": "Metallic titlebars label modules; they never display inert window controls.", "section": "shapes" },
+      { "name": "The No Fake Chrome Rule", "body": "Metallic titlebars label ordinary modules; they never display inert window controls. Project cases are the sole exception because their controls are real.", "section": "shapes" },
       { "name": "The Radius Hierarchy Rule", "body": "Large containers may be softly clipped, but actions and data rows stay hard and compact. Avoid pill-shaped navigation and rounded SaaS cards.", "section": "shapes" }
+      ,{ "name": "The Project-Only Window Rule", "body": "A titlebar earns window controls only when it moves, resizes, maximizes, or closes a project case. Ordinary modules retain their titlebar ornament and never borrow these mechanics.", "section": "components" }
     ],
     "dos": [
       "Do lead the first desktop viewport with identity, selected work, stable routes, and honest presence.",
@@ -135,7 +192,7 @@
       "Don't add fake minimize, maximize, close, drag, or resize affordances to ordinary site modules.",
       "Don't invent posts, photos, activity, metrics, or professional claims to fill empty surfaces.",
       "Don't let cyan, violet, or lime become decorative full-screen washes.",
-      "Don't treat project-window behavior as implemented visual-system law; it is explicitly deferred."
+      "Don't apply project-window chrome or freeform mechanics to ordinary modules; only project cases are interactive windows."
     ]
   }
 }

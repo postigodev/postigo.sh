@@ -2,6 +2,7 @@
 name: "postigo.sh"
 description: "A maintained personal web desktop for Piero Postigo Rocchetti's engineering identity, selected work, and public presence."
 colors:
+  wallpaper-night: "#10131a"
   cold-ink: "#eef3ff"
   slate-muted: "#b9c5da"
   midnight-panel: "rgba(19, 22, 30, .97)"
@@ -17,6 +18,43 @@ colors:
   deep-surface: "#151923"
   raised-surface: "#202633"
   link-blue: "#8ec6ff"
+  active-blue: "#2558ff"
+  playback-blue: "#315cff"
+  focus-ink: "#060806"
+  action-ink: "#071000"
+  rendered-color-strip-01: "#05070b"
+  rendered-color-strip-02: "#111620"
+  rendered-color-strip-03: "#16212b"
+  rendered-color-strip-04: "#1b212b"
+  rendered-color-strip-05: "#201926"
+  rendered-color-strip-06: "#25324f"
+  rendered-color-strip-07: "#2d2941"
+  rendered-color-strip-08: "#324b5d"
+  rendered-color-strip-09: "#39465f"
+  rendered-color-strip-10: "#455e43"
+  rendered-color-strip-11: "#4e684c"
+  rendered-color-strip-12: "#53617d"
+  rendered-color-strip-13: "#5771a0"
+  rendered-color-strip-14: "#5b6882"
+  rendered-color-strip-15: "#65738d"
+  rendered-color-strip-16: "#687999"
+  rendered-color-strip-17: "#708f20"
+  rendered-color-strip-18: "#7db8ff"
+  rendered-color-strip-19: "#8ec6ff"
+  rendered-color-strip-20: "#9bd0ff"
+  rendered-color-strip-21: "#b8ff2c"
+  rendered-color-strip-22: "#c7d7c4"
+  rendered-color-strip-23: "#d39eff"
+  rendered-color-strip-24: "#d9ff83"
+  rendered-color-strip-25: "#edf2ff"
+  rendered-color-strip-26: "#f2f5fb"
+  rendered-color-strip-27: "rgba(0,0,0,.34)"
+  rendered-color-strip-28: "rgba(127,145,189,.22)"
+  rendered-color-strip-29: "rgba(189,255,88,.08)"
+  rendered-color-strip-30: "rgba(23,26,35,.98)"
+  rendered-color-strip-31: "rgba(27,36,46,.98)"
+  rendered-color-strip-32: "rgba(37,43,56,.98)"
+  rendered-color-strip-33: "rgba(66,248,255,.08)"
 typography:
   hero:
     fontFamily: "Tahoma, Verdana, Arial, sans-serif"
@@ -30,6 +68,12 @@ typography:
     fontWeight: 900
     lineHeight: 0.95
     letterSpacing: "-0.04em"
+  chapter-display:
+    fontFamily: "Tahoma, Verdana, Arial, sans-serif"
+    fontSize: "clamp(1.45rem, 4vw, 2.2rem)"
+    fontWeight: 700
+    lineHeight: 1.1
+    letterSpacing: "normal"
   body:
     fontFamily: "Tahoma, Verdana, Arial, sans-serif"
     fontSize: "11px"
@@ -54,23 +98,50 @@ typography:
     fontWeight: 700
     lineHeight: 1.2
     letterSpacing: "normal"
+  scale:
+    micro: "7px"
+    metadata: "8px"
+    compact: "9px"
+    module: "10px"
+    body: "11px"
+    control: "12px"
+    document-label: ".75rem"
+    document-copy: "1rem"
+    hero-mark: "17px"
+    album-mark: "18px"
+    wordmark: "24px"
+    hero: "26px"
 rounded:
   sharp: "0px"
+  micro: "3px"
   badge: "4px"
+  progress: "5px"
+  document-control: "6px"
   control: "7px"
   media: "8px"
+  titlebar: "9px"
   module: "10px"
   header: "13px"
   circle: "999px"
 spacing:
   hairline: "1px"
+  hairline-gap: "2px"
+  micro-inset: "3px"
   micro: "4px"
   compact: "5px"
   sm: "8px"
+  control: "10px"
   module-gap: "11px"
+  document-nav: "12px"
   column-gap: "13px"
   panel: "14px"
+  section: "16px"
   document: "18px"
+  window: "20px"
+  chapter-gap: "22px"
+  case-rhythm: "24px"
+  case-section: "28px"
+  case-chapter: "36px"
 components:
   site-module:
     backgroundColor: "{colors.midnight-panel}"
@@ -96,6 +167,17 @@ components:
     typography: "{typography.body}"
     rounded: "{rounded.module}"
     padding: "{spacing.document}"
+  project-window:
+    backgroundColor: "{colors.midnight-panel}"
+    textColor: "{colors.cold-ink}"
+    typography: "{typography.body}"
+    rounded: "{rounded.module}"
+  project-window-control:
+    backgroundColor: "{colors.raised-surface}"
+    textColor: "{colors.cold-ink}"
+    rounded: "{rounded.micro}"
+    width: "22px"
+    height: "20px"
 ---
 
 # Design System: postigo.sh
@@ -106,9 +188,7 @@ components:
 
 postigo.sh is a compact, authored corner of the web that makes professional evidence immediately legible. It borrows the density, directness, and material tactility of a cared-for personal homepage: dark blue desktop space, steel-framed modules, metallic titlebars, terse labels, tiny live-status surfaces, and a resident goat that makes the system unmistakably Piero's.
 
-The world is preview-native, pinned from direction seed `e23380ff`. It rejects the generic portfolio hero-and-card stack without becoming a Windows clone: this is a normal, route-first site whose modules look like a personal desktop. The homepage is the densest expression; stable Work, About, Resume, Writings, Contact, and project-case routes use the same material and type system with more reading room. Project-window interaction is intentionally outside this system until that behavior is implemented and documented separately.
-
-unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+The world is preview-native, pinned from direction seed `e23380ff`. It rejects the generic portfolio hero-and-card stack without becoming a Windows clone: this is a normal, route-first site whose modules look like a personal desktop. The homepage is the densest expression; stable Work, About, Resume, Writings, Contact, and project-case routes use the same material and type system with more reading room. Project cases alone progressively enhance into real desktop windows: on fine-pointer desktop they can coexist, focus, move, resize from all eight edges and corners, maximize or restore, and close. At `max-width: 780px` or with a coarse pointer, the active case becomes the sole fullscreen document; drag, resize, and maximize disappear while close and direct project routes remain clear.
 
 **Key Characteristics:**
 
@@ -148,6 +228,8 @@ The palette is a cold desktop night punctuated by electrical blue, cyan, violet,
 
 **The Signal, Not Wash Rule.** Cyan, violet, and lime identify states or authored moments; they do not become full-screen decorative washes.
 
+**The Built Palette Rule.** The semantic swatches above are the reusable authoring palette. The sidecar records every implemented titlebar, copy, border, overlay, and media shade so their stepped composition is preserved rather than treated as undocumented drift.
+
 **The Honest State Rule.** Unavailable public data stays muted and explicit. Never recolor an unavailable state to resemble success or activity.
 
 ## Typography
@@ -168,6 +250,7 @@ The palette is a cold desktop night punctuated by electrical blue, cyan, violet,
 - **Module Title** (`typography.module-title`): lowercase metallic titlebars with compact horizontal padding and a restrained tracking lift.
 - **Metadata** (`typography.metadata`): tickers, case labels, statuses, and small archival annotations; uppercase only when the label is categorical.
 - **Micro Label** (`typography.micro-label`): presence badges and other tiny, high-contrast state tags.
+- **Implemented Scale** (`typography.scale`): 7px, 8px, 9px, 10px, 11px, 12px, .75rem, 1rem, 17px, 18px, 24px, and 26px are intentional rendered steps; document and chapter displays use the declared fluid clamps.
 
 **The Tahoma First Rule.** New interface modules inherit Tahoma; do not introduce a display font to manufacture personality.
 
@@ -177,7 +260,7 @@ The palette is a cold desktop night punctuated by electrical blue, cyan, violet,
 
 The homepage uses a centered canvas capped at 952px. Above the content, a three-part identity header uses 200px / fluid / 90px columns. The first viewport then resolves into a 160px navigation-profile rail, a fluid primary column, and a 226px live-presence rail with 13px gutters. The main column owns the dominant hero and selected work; side columns hold orientation and presence rather than competing calls to action.
 
-Module interiors are dense: 8px is the default body inset, 11px the vertical module rhythm, and 13px the desktop column rhythm. Stable documents expand to 980–1040px canvases, 18px panel padding, readable lines up to 72ch, and evidence grids that privilege artifacts over ornament.
+Module interiors are dense: 8px is the default body inset, 11px the vertical module rhythm, and 13px the desktop column rhythm. Stable documents expand to 980–1040px canvases, 18px panel padding, readable lines up to 72ch, and evidence grids that privilege artifacts over ornament. Case windows begin at 820px × 620px with 460px × 340px as the interaction minimum; their content remains capped at 1040px inside a scrollable body.
 
 At 780px and below, the homepage becomes one ordered column. Desktop column wrappers disappear from layout, the hero goat returns to normal flow, project metadata stacks below titles, and evidence grids collapse to one column. This responsive transformation preserves reading order and direct routes; it does not reproduce freeform desktop behavior on touch screens.
 
@@ -200,11 +283,11 @@ Depth is structural and low-amplitude. One-pixel steel borders establish every m
 
 ## Shapes
 
-The form language is compact and mechanical. Hero actions remain square, tiny state badges use a 4px corner, navigation controls use 6–7px corners, images and footers use 7–8px corners, and site modules use 10px corners. The identity header is the softest major surface at 13px. One-pixel borders are mandatory on material containers, controls, progress tracks, and media.
+The form language is compact and mechanical. Hero actions remain square, tiny window controls use 3px corners, state badges use 4px, progress tracks use 5px, document navigation uses 6px, navigation controls use 7px, images and footers use 8px, titlebars use 9px, and site modules use 10px. The identity header is the softest major surface at 13px. One-pixel borders are mandatory on material containers, controls, progress tracks, and media.
 
 Circular geometry is reserved for the spinning playback disc. The goat remains a clipped square image with modest rounding; never crop it into a generic avatar circle. Titlebar ornament is truthful decoration only: modules may show the star and tiny status rail, but must not imply minimize, maximize, or close behavior.
 
-**The No Fake Chrome Rule.** Metallic titlebars label modules; they never display inert window controls.
+**The No Fake Chrome Rule.** Metallic titlebars label ordinary modules; they never display inert window controls. Project cases are the sole exception: their titlebars carry real desktop-only drag, resize, maximize, and close behavior.
 
 **The Radius Hierarchy Rule.** Large containers may be softly clipped, but actions and data rows stay hard and compact. Avoid pill-shaped navigation and rounded SaaS cards.
 
@@ -252,6 +335,16 @@ The player pairs a 52px spinning disc with truncated track metadata and a four-p
 
 Work, About, Resume, Writings, Contact, and case-study routes reuse the same dark panels and steel borders at a more readable scale. Large Tahoma headings, Courier New context labels, linear evidence rows, and unrounded artifact frames keep these pages connected to the homepage without forcing its three-column density everywhere.
 
+### Project Case Windows
+
+Project cases are the only real windows in the system.
+
+- **Desktop mechanics:** a 31px metallic titlebar is the drag surface. A focused window receives the brighter blue titlebar and sits above its siblings; it has real maximize/restore and close buttons, plus eight invisible 8–12px resize hit areas. The shadow deepens to `0 14px 34px rgba(0,0,0,.48)` so the active document separates from the underlying desktop.
+- **Window document:** the sticky 8px Courier New case switcher sits above a scrollable evidence document. Controls are 22px × 20px, 3px-rounded metallic buttons; hover changes them to active blue.
+- **Compact/coarse pointer:** one active case fills the viewport, loses its border, radius, shadow, drag cursor, resize handles, and maximize control. Close remains real, and opening a case still preserves the direct `/work/[slug]` route.
+
+**The Project-Only Window Rule.** A titlebar earns window controls only when it moves, resizes, maximizes, or closes a project case. Ordinary modules retain their titlebar ornament and never borrow these mechanics.
+
 ## Do's and Don'ts
 
 ### Do:
@@ -270,4 +363,4 @@ Work, About, Resume, Writings, Contact, and case-study routes reuse the same dar
 - **Don't** add fake minimize, maximize, close, drag, or resize affordances to ordinary site modules.
 - **Don't** invent posts, photos, activity, metrics, or professional claims to fill empty surfaces.
 - **Don't** let cyan, violet, or lime become decorative full-screen washes.
-- **Don't** treat project-window behavior as implemented visual-system law; it is explicitly deferred.
+- **Don't** apply project-window chrome or freeform mechanics to ordinary modules; only project cases are interactive windows.

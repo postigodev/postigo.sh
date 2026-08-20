@@ -36,6 +36,7 @@ export default function ProjectWindowLayer({ projects, initialSlugs = [] }: Prop
   const sessionId = useRef('');
   const historyState = useRef<ProjectHistoryState | null>(null);
   const openers = useRef(new Map<string, HTMLElement>());
+  const pendingFocus = useRef<HTMLElement | null>(null);
   const stateRef = useRef(state);
   stateRef.current = state;
 
@@ -70,13 +71,36 @@ export default function ProjectWindowLayer({ projects, initialSlugs = [] }: Prop
     if (activeSlug) focusHeading(activeSlug);
 
     const onPopState = (event: PopStateEvent) => {
-      if (!isProjectHistoryState(event.state) || event.state.sessionId !== sessionId.current) return;
+      const previousActive = historyState.current?.activeSlug ?? null;
+      if (!isProjectHistoryState(event.state) || event.state.sessionId !== sessionId.current) {
+        const match = location.pathname.replace(/\/$/, '').match(/^\/work\/([^/]+)$/);
+        const recoveredSlug = match?.[1] && validSlugs.has(match[1]) ? match[1] : null;
+        const recovered = projectRootHistory(sessionId.current, recoveredSlug ? [recoveredSlug] : [], recoveredSlug);
+        history.replaceState(recovered, '', location.href);
+        historyState.current = recovered;
+        dispatch({ type: 'restoreSnapshot', openSlugs: recovered.openSlugs, activeSlug: recovered.activeSlug });
+        if (recoveredSlug) {
+          pendingFocus.current = null;
+          focusHeading(recoveredSlug);
+        }
+        else if (previousActive) {
+          pendingFocus.current = openers.current.get(previousActive)
+            ?? document.querySelector<HTMLElement>(`a[href="/work/${previousActive}"]`);
+        }
+        return;
+      }
       const openSlugs = event.state.openSlugs.filter((slug) => validSlugs.has(slug));
       const nextActive = event.state.activeSlug && validSlugs.has(event.state.activeSlug) ? event.state.activeSlug : null;
       historyState.current = { ...event.state, openSlugs, activeSlug: nextActive };
       dispatch({ type: 'restoreSnapshot', openSlugs, activeSlug: nextActive });
-      if (nextActive) focusHeading(nextActive);
-      else requestAnimationFrame(() => document.querySelector<HTMLElement>('[data-project-launcher]')?.focus());
+      if (nextActive) {
+        pendingFocus.current = null;
+        focusHeading(nextActive);
+      }
+      else if (!pendingFocus.current && previousActive) {
+        pendingFocus.current = openers.current.get(previousActive)
+          ?? document.querySelector<HTMLElement>(`a[href="/work/${previousActive}"]`);
+      }
     };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
@@ -133,6 +157,11 @@ export default function ProjectWindowLayer({ projects, initialSlugs = [] }: Prop
     historyState.current = replacement;
   };
 
+  const toggleMaximizeProject = (slug: string) => {
+    focusProject(slug);
+    dispatch({ type: 'toggleMaximize', slug, workspace });
+  };
+
   const closeProject = (slug: string) => {
     const current = historyState.current;
     if (!current) return;
@@ -141,6 +170,9 @@ export default function ProjectWindowLayer({ projects, initialSlugs = [] }: Prop
       : state.activeSlug;
     const historyAction = projectHistoryForClose(current, sessionId.current, slug, state.activeSlug, fallback);
     if (historyAction.kind === 'back') {
+      pendingFocus.current = current.previous?.activeSlug
+        ? null
+        : openers.current.get(slug) ?? document.querySelector<HTMLElement>(`a[href="/work/${slug}"]`);
       history.back();
       return;
     }
@@ -148,17 +180,81 @@ export default function ProjectWindowLayer({ projects, initialSlugs = [] }: Prop
     history.replaceState(replacement, '', routeFor(fallback));
     historyState.current = replacement;
     dispatch({ type: 'close', slug });
-    requestAnimationFrame(() => {
-      if (fallback) focusHeading(fallback);
-      else {
-        const opener = openers.current.get(slug);
-        if (opener?.isConnected) opener.focus();
-        else document.querySelector<HTMLElement>(`a[href="/work/${slug}"]`)?.focus();
-      }
-    });
+    if (fallback) focusHeading(fallback);
+    else pendingFocus.current = openers.current.get(slug)
+      ?? document.querySelector<HTMLElement>(`a[href="/work/${slug}"]`);
   };
 
-  return <div class="project-window-layer" data-project-window-layer data-window-layer-ready={ready} data-mobile={compact} aria-label="Open project case studies">
+  useEffect(() => {
+    if (state.activeSlug || !pendingFocus.current) return;
+    const target = pendingFocus.current;
+    pendingFocus.current = null;
+    requestAnimationFrame(() => {
+      if (target.isConnected) target.focus();
+      else document.querySelector<HTMLElement>('[data-project-launcher]')?.focus();
+    });
+  }, [state.activeSlug]);
+
+  useEffect(() => {
+    const activeSlug = state.activeSlug;
+    if (!compact || !activeSlug) return;
+    const dialog = document.querySelector<HTMLElement>(`[data-project-window="${activeSlug}"]`);
+    if (!dialog) return;
+
+    let windowHost: HTMLElement = dialog;
+    while (windowHost.parentElement && windowHost.parentElement !== document.body) windowHost = windowHost.parentElement;
+    const background = Array.from(document.body.children).filter((element): element is HTMLElement => (
+      element instanceof HTMLElement && element !== windowHost
+    ));
+    const previous = background.map((element) => ({
+      element,
+      inert: element.inert,
+      ariaHidden: element.getAttribute('aria-hidden'),
+    }));
+    background.forEach((element) => {
+      element.inert = true;
+      element.setAttribute('aria-hidden', 'true');
+    });
+
+    const focusable = () => Array.from(dialog.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    )).filter((element) => !element.hasAttribute('hidden'));
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeProject(activeSlug);
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const candidates = focusable();
+      if (candidates.length === 0) {
+        event.preventDefault();
+        dialog.querySelector<HTMLElement>('.project-window__titlebar h2')?.focus();
+        return;
+      }
+      const first = candidates[0];
+      const last = candidates.at(-1)!;
+      if (event.shiftKey && (document.activeElement === first || !dialog.contains(document.activeElement))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !dialog.contains(document.activeElement))) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown, true);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown, true);
+      previous.forEach(({ element, inert, ariaHidden }) => {
+        element.inert = inert;
+        if (ariaHidden === null) element.removeAttribute('aria-hidden');
+        else element.setAttribute('aria-hidden', ariaHidden);
+      });
+    };
+  }, [compact, state.activeSlug]);
+
+  return <div class="project-window-layer" data-project-window-layer data-window-layer-ready={ready} data-compact={compact} aria-label="Open project case studies">
     {Object.values(state.windows).map((window) => {
       const project = projectMap.get(window.slug);
       if (!project) return null;
@@ -172,7 +268,7 @@ export default function ProjectWindowLayer({ projects, initialSlugs = [] }: Prop
         active={state.activeSlug === window.slug}
         onFocus={() => focusProject(window.slug)}
         onClose={() => closeProject(window.slug)}
-        onMaximize={() => dispatch({ type: 'toggleMaximize', slug: window.slug, workspace })}
+        onMaximize={() => toggleMaximizeProject(window.slug)}
         onBoundsChange={(bounds) => dispatch({ type: 'setBounds', slug: window.slug, bounds })}
       />;
     })}
