@@ -158,7 +158,7 @@ export default function ProjectWindowLayer({ projects, initialSlugs = [] }: Prop
     });
   };
 
-  return <div class="project-window-layer" data-project-window-layer data-window-layer-ready={ready} data-mobile={compact} aria-label="Open project case studies">
+  return <div class="project-window-layer" data-project-window-layer data-window-layer-ready={ready} data-compact={compact} aria-label="Open project case studies">
     {Object.values(state.windows).map((window) => {
       const project = projectMap.get(window.slug);
       if (!project) return null;

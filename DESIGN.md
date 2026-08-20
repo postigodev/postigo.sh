@@ -108,8 +108,6 @@ postigo.sh is a compact, authored corner of the web that makes professional evid
 
 The world is preview-native, pinned from direction seed `e23380ff`. It rejects the generic portfolio hero-and-card stack without becoming a Windows clone: this is a normal, route-first site whose modules look like a personal desktop. The homepage is the densest expression; stable Work, About, Resume, Writings, Contact, and project-case routes use the same material and type system with more reading room. Project cases alone progressively enhance into real desktop windows; their mechanics are documented in `docs/ARCHITECTURE.md`.
 
-unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
-
 **Key Characteristics:**
 
 - Compact Tahoma-led information density with Courier New reserved for system metadata.

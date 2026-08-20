@@ -152,3 +152,34 @@ test.describe('mobile project windows', () => {
     await expect(window.getByRole('button', { name: 'Close Preppie' })).toBeVisible();
   });
 });
+
+test.describe('wide coarse-pointer project windows', () => {
+  test.use({ viewport: { width: 1024, height: 768 }, hasTouch: true });
+
+  test('uses the compact fullscreen model above the narrow breakpoint', async ({ page }) => {
+    await page.goto('/');
+    await waitForWindowLayer(page);
+    await expect(page.locator('[data-project-window-layer]')).toHaveAttribute('data-compact', 'true');
+
+    await projectLink(page, 'Preppie').click();
+    const preppie = projectWindow(page, 'preppie');
+    await expect(preppie).toBeVisible();
+    expect(await preppie.boundingBox()).toEqual({ x: 0, y: 0, width: 1024, height: 768 });
+    await expect(preppie.locator('[data-resize-handle]')).toHaveCount(0);
+    await expect(preppie.locator('[data-maximize-project]')).toHaveCount(0);
+
+    const titlebar = preppie.locator('[data-window-titlebar]');
+    const titleBounds = await titlebar.boundingBox();
+    if (!titleBounds) throw new Error('Missing coarse-pointer titlebar');
+    await page.mouse.move(titleBounds.x + 80, titleBounds.y + 15);
+    await page.mouse.down();
+    await page.mouse.move(titleBounds.x + 180, titleBounds.y + 95, { steps: 4 });
+    await page.mouse.up();
+    expect(await preppie.boundingBox()).toEqual({ x: 0, y: 0, width: 1024, height: 768 });
+
+    await preppie.getByRole('link', { name: 'Koba' }).click();
+    await expect(preppie).toBeHidden();
+    await expect(projectWindow(page, 'koba')).toBeVisible();
+    expect(await projectWindow(page, 'koba').boundingBox()).toEqual({ x: 0, y: 0, width: 1024, height: 768 });
+  });
+});

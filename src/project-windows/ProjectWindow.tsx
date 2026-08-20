@@ -61,7 +61,7 @@ export default function ProjectWindow({ project, projects, window, workspace, co
     <div class="project-window__titlebar" data-window-titlebar onPointerDown={startDrag}>
       <h2 id={titleId} tabIndex={-1}>{window.title} · case study</h2>
       <div class="project-window__controls" onPointerDown={(event) => event.stopPropagation()}>
-        <button type="button" data-window-control data-maximize-project aria-label={`${window.isMaximized ? 'Restore' : 'Maximize'} ${window.title}`} onClick={onMaximize}>□</button>
+        {!compact && <button type="button" data-window-control data-maximize-project aria-label={`${window.isMaximized ? 'Restore' : 'Maximize'} ${window.title}`} onClick={onMaximize}>□</button>}
         <button type="button" data-window-control data-close-project aria-label={`Close ${window.title}`} onClick={onClose}>×</button>
       </div>
     </div>
