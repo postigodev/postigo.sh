@@ -106,7 +106,7 @@ components:
 
 postigo.sh is a compact, authored corner of the web that makes professional evidence immediately legible. It borrows the density, directness, and material tactility of a cared-for personal homepage: dark blue desktop space, steel-framed modules, metallic titlebars, terse labels, tiny live-status surfaces, and a resident goat that makes the system unmistakably Piero's.
 
-The world is preview-native, pinned from direction seed `e23380ff`. It rejects the generic portfolio hero-and-card stack without becoming a Windows clone: this is a normal, route-first site whose modules look like a personal desktop. The homepage is the densest expression; stable Work, About, Resume, Writings, Contact, and project-case routes use the same material and type system with more reading room. Project-window interaction is intentionally outside this system until that behavior is implemented and documented separately.
+The world is preview-native, pinned from direction seed `e23380ff`. It rejects the generic portfolio hero-and-card stack without becoming a Windows clone: this is a normal, route-first site whose modules look like a personal desktop. The homepage is the densest expression; stable Work, About, Resume, Writings, Contact, and project-case routes use the same material and type system with more reading room. Project cases alone progressively enhance into real desktop windows; their mechanics are documented in `docs/ARCHITECTURE.md`.
 
 unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
 
@@ -204,7 +204,7 @@ The form language is compact and mechanical. Hero actions remain square, tiny st
 
 Circular geometry is reserved for the spinning playback disc. The goat remains a clipped square image with modest rounding; never crop it into a generic avatar circle. Titlebar ornament is truthful decoration only: modules may show the star and tiny status rail, but must not imply minimize, maximize, or close behavior.
 
-**The No Fake Chrome Rule.** Metallic titlebars label modules; they never display inert window controls.
+**The No Fake Chrome Rule.** Metallic titlebars label ordinary modules; they never display inert window controls. Project cases are the sole exception: their titlebars carry real desktop-only drag, resize, maximize, and close behavior.
 
 **The Radius Hierarchy Rule.** Large containers may be softly clipped, but actions and data rows stay hard and compact. Avoid pill-shaped navigation and rounded SaaS cards.
 
@@ -270,4 +270,4 @@ Work, About, Resume, Writings, Contact, and case-study routes reuse the same dar
 - **Don't** add fake minimize, maximize, close, drag, or resize affordances to ordinary site modules.
 - **Don't** invent posts, photos, activity, metrics, or professional claims to fill empty surfaces.
 - **Don't** let cyan, violet, or lime become decorative full-screen washes.
-- **Don't** treat project-window behavior as implemented visual-system law; it is explicitly deferred.
+- **Don't** apply project-window chrome or freeform mechanics to ordinary modules; only project cases are interactive windows.

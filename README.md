@@ -1,7 +1,25 @@
 # postigo.sh v2
 
-Static Astro portfolio with a progressively enhanced Preact desktop shell and
-root Vercel Functions for fixed-owner public presence data.
+Static Astro portfolio with route-first documents, project-only Preact window
+enhancement, and root Vercel Functions for fixed-owner public presence data.
+
+## Architecture
+
+- `references/preview.html` is the binding visual/compositional reference. It
+  is read-only and never a production runtime dependency.
+- `DESIGN.md` is the canonical production visual system generated from the
+  implemented site.
+- Astro owns routes, documents, metadata, and no-JavaScript-readable content.
+- Preact enhances only project-case windows and live GitHub/Spotify presence
+  widgets.
+- Project cases are the only draggable/resizable windows: desktop supports
+  multiple cases, while mobile presents fullscreen cases without drag/resize.
+- Professional facts come from `docs/career/` and typed local portfolio data.
+- `src/data/writings.ts` is an intentionally empty typed adapter prepared for a
+  future Markdown backend; no writing backend exists today.
+
+See `docs/ARCHITECTURE.md` for the current implementation model. Historical
+plans under `docs/superpowers/` are noncanonical and may describe retired work.
 
 ## Local development
 
@@ -41,6 +59,13 @@ The unmodified white Spotify full-logo asset comes from Spotify's official
 download (`2024-spotify-full-logo.zip`).
 
 ## Verification
+
+```powershell
+pnpm check
+pnpm test:unit
+pnpm test:functions
+pnpm build
+```
 
 `pnpm test:e2e` builds and serves `dist/` for static UI behavior.
 `pnpm test:e2e:functions` runs routing and request-boundary checks under
