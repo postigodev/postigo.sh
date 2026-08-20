@@ -330,6 +330,17 @@ button, a { font: inherit; }
   .project-window-layer[data-window-layer-ready="false"] .project-window-document { padding: 16px; }
 }
 
+@media (pointer: coarse) {
+  /* Static fallback mirrors the hydrated compact window model on touch-first devices. */
+  .project-window-layer[data-window-layer-ready="false"] { z-index: 1000; }
+  .project-window-layer[data-window-layer-ready="false"] .project-window { position: fixed !important; inset: 0 !important; width: auto !important; height: auto !important; border: 0; border-radius: 0; box-shadow: none; }
+  .project-window-layer[data-window-layer-ready="false"] .project-window:not([data-active="true"]) { display: none; }
+  .project-window-layer[data-window-layer-ready="false"] .project-window__titlebar { border-radius: 0; cursor: default; touch-action: auto; }
+  .project-window-layer[data-window-layer-ready="false"] .project-window__controls [data-maximize-project], .project-window-layer[data-window-layer-ready="false"] .project-resize { display: none; }
+  .project-window-layer[data-window-layer-ready="false"] .project-window__body { border-radius: 0; }
+  .project-window-layer[data-window-layer-ready="false"] .project-window-document { padding: 16px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: 0s !important; }
 }

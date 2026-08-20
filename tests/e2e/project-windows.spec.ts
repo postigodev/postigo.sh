@@ -87,6 +87,31 @@ test('Back and Forward restore exact project snapshots and focus does not add de
   await expect(projectWindow(page, 'koba')).toHaveAttribute('data-active', 'true');
 });
 
+test('Back through a same-page hash closes project windows and keeps the hash URL', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('a[href="#album"]').click();
+  await expect(page).toHaveURL(/\/#album$/);
+  await projectLink(page, 'Preppie').click();
+  await expect(projectWindow(page, 'preppie')).toBeVisible();
+
+  await page.goBack();
+
+  await expect(page).toHaveURL(/\/#album$/);
+  await expect(projectWindow(page, 'preppie')).toBeHidden();
+});
+
+test('maximizing an inactive window focuses it and synchronizes the URL', async ({ page }) => {
+  await page.goto('/');
+  await projectLink(page, 'Preppie').click();
+  await projectWindow(page, 'preppie').getByRole('link', { name: 'Koba' }).click();
+
+  await projectWindow(page, 'preppie').getByRole('button', { name: 'Maximize Preppie' }).click();
+
+  await expect(page).toHaveURL(/\/work\/preppie$/);
+  await expect(projectWindow(page, 'preppie')).toHaveAttribute('data-active', 'true');
+  await expect(projectWindow(page, 'preppie')).toHaveAttribute('data-maximized', 'true');
+});
+
 test('closing an active project never resurrects a project removed from the current snapshot', async ({ page }) => {
   await page.goto('/');
   await waitForWindowLayer(page);
@@ -181,5 +206,58 @@ test.describe('wide coarse-pointer project windows', () => {
     await expect(preppie).toBeHidden();
     await expect(projectWindow(page, 'koba')).toBeVisible();
     expect(await projectWindow(page, 'koba').boundingBox()).toEqual({ x: 0, y: 0, width: 1024, height: 768 });
+  });
+
+  test('contains compact modal focus and restores it after Escape', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    const opener = page.getByRole('link', { name: 'Preppie', exact: true }).first();
+    await opener.click();
+
+    const dialog = page.getByRole('dialog', { name: /Preppie · case study/ });
+    await expect(dialog).toBeVisible();
+    const focusable = dialog.locator('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])');
+    await focusable.last().focus();
+    await page.keyboard.press('Tab');
+    await expect(focusable.first()).toBeFocused();
+
+    await page.keyboard.press('Shift+Tab');
+    await expect(focusable.last()).toBeFocused();
+    expect(await page.locator('main').evaluate((element) => Boolean(element.closest('[inert]')))).toBe(true);
+
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    await expect(opener).toBeFocused();
+    expect(await page.locator('main').evaluate((element) => Boolean(element.closest('[inert]')))).toBe(false);
+  });
+
+  test('does not retain stale opener focus across nested compact history', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    const preppieOpener = page.getByRole('link', { name: 'Preppie', exact: true }).first();
+    await preppieOpener.click();
+    await projectWindow(page, 'preppie').getByRole('link', { name: 'Koba' }).click();
+
+    await page.keyboard.press('Escape');
+    await expect(projectWindow(page, 'preppie')).toBeVisible();
+    await page.goBack();
+
+    await expect(projectWindow(page, 'preppie')).toBeHidden();
+    await expect(preppieOpener).toBeFocused();
+  });
+});
+
+test.describe('wide coarse-pointer no-JavaScript fallback', () => {
+  test.use({ viewport: { width: 1024, height: 768 }, hasTouch: true, javaScriptEnabled: false });
+
+  test('renders the direct case fullscreen without desktop controls', async ({ page }) => {
+    await page.goto('/work/preppie');
+    const preppie = projectWindow(page, 'preppie');
+    await expect(preppie).toBeVisible();
+    expect(await preppie.boundingBox()).toEqual({ x: 0, y: 0, width: 1024, height: 768 });
+    expect(await preppie.locator('[data-resize-handle]').evaluateAll((handles) => (
+      handles.every((handle) => getComputedStyle(handle).display === 'none')
+    ))).toBe(true);
+    await expect(preppie.locator('[data-maximize-project]')).toBeHidden();
   });
 });
