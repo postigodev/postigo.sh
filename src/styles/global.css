@@ -132,6 +132,7 @@ button, a { font: inherit; }
 .hero-action:hover { color: #fff; background: #2558ff; }
 .floating-goat { position: absolute; top: 14px; right: 14px; width: 89px; height: 89px; object-fit: cover; border: 1px solid #64718b; border-radius: 8px; animation: tiny-tilt 5.5s ease-in-out infinite; }
 .tiny-caption { position: absolute; top: 111px; right: 9px; width: 96px; color: #8f9cb6; font: 7px/1.2 "Courier New", monospace; text-align: center; }
+.tiny-caption.tech-icons { display: flex; align-items: center; justify-content: center; gap: 8px; }
 
 #projects { border-color: #566b98; background: radial-gradient(circle at 92% 18%, rgba(52,93,255,.12), transparent 110px), linear-gradient(180deg, rgba(29,35,56,.98), rgba(18,21,34,.98)); }
 #projects .site-module__title { border-bottom-color: #6178aa; background: linear-gradient(180deg, #40507f 0%, #25324f 54%, #181f31 55%, #39486f 100%); }
@@ -204,7 +205,7 @@ button, a { font: inherit; }
 .album-empty p { margin: 0; color: #9facb7; font-size: 8px; }
 
 .critter-lane { position: relative; height: 42px; margin-top: 9px; overflow: hidden; border-bottom: 1px dashed rgba(103,118,151,.45); pointer-events: none; }
-.critter-lane img { position: absolute; bottom: 2px; left: -34px; width: 31px; height: 31px; object-fit: cover; border: 1px solid #6b7690; border-radius: 7px; animation: walk 18s linear infinite; }
+.critter-lane img { position: absolute; bottom: 2px; left: -34px; width: 31px; height: 31px; object-fit: cover; border-radius: 7px; animation: walk 18s linear infinite; }
 .critter-lane span { position: absolute; bottom: 0; left: 4px; color: #8f9cb6; font: 7px/1 "Courier New", monospace; }
 .site-footer { margin-top: 4px; padding: 6px 8px; color: #a6b2ca; border: 1px solid #55627b; border-radius: 8px; background: linear-gradient(180deg, rgba(34,39,52,.96), rgba(20,23,31,.96)); text-align: center; }
 

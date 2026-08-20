@@ -26,7 +26,7 @@ const writings = getPublishedWritings();
     </p>
     <div class="site-head__goat">
       <img src="/images/site/goat-profile.webp" width="80" height="80" alt="Goat, the postigo.sh site mascot" />
-      <span>resident</span>
+      <span>@me</span>
     </div>
   </header>
 
@@ -38,8 +38,12 @@ const writings = getPublishedWritings();
         <p>{identity.descriptor}</p>
         <p>{identity.thesis}</p>
         <a class="hero-action" href="/work">Explore selected work</a>
-        <img class="floating-goat" src="/images/site/goat-profile.webp" width="80" height="80" alt="" />
-        <span class="tiny-caption">postigo.sh resident</span>
+        <img class="floating-goat" src="/images/site/example.webp" width="80" height="80" alt="" />
+        <span class="tiny-caption tech-icons" aria-label="Core technologies">
+          <img src="/images/techs/typescript.png" width="14" height="14" alt="TypeScript" />
+          <img src="/images/techs/python.png" width="14" height="14" alt="Python" />
+          <img src="/images/techs/rust.png" width="14" height="14" alt="Rust" />
+        </span>
       </SiteModule>
 
       <SiteModule id="projects" title="projects" column="main">
@@ -60,7 +64,7 @@ const writings = getPublishedWritings();
 
     <aside class="site-column site-column--left" aria-label="Profile and navigation">
       <SiteModule id="profile-card" title="profile card" column="left">
-        <img src="/images/site/goat-profile.webp" width="80" height="80" alt="Goat, the postigo.sh site mascot" />
+        <img src="/images/site/goat-profile-2.webp" width="80" height="80" alt="Goat, the postigo.sh site mascot" />
         <div class="profile-lines"><strong>{identity.name}</strong><br />{identity.primaryIdentity}<br />{identity.descriptor}<br /><br /><span class="mini-online">● public profile</span></div>
       </SiteModule>
 
@@ -100,7 +104,7 @@ const writings = getPublishedWritings();
     </aside>
   </div>
 
-  <div class="critter-lane" aria-hidden="true"><img src="/images/site/goat-profile.webp" width="80" height="80" alt="" /><span>↑ site creature</span></div>
+  <div class="critter-lane" aria-hidden="true"><img src="/images/site/roflneko.gif" width="80" height="80" alt="" /><span>↑ site creature</span></div>
   <footer class="site-footer">postigo.sh · {identity.primaryIdentity} · <a href="/privacy">privacy</a></footer>
 </div>
 <ProjectWindowLayer projects={projectCases} initialSlugs={initialProjectSlug ? [initialProjectSlug] : []} client:load />
