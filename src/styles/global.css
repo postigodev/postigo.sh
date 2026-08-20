@@ -85,10 +85,10 @@ button, a { font: inherit; }
 .wordmark { color: #f2f5fb; font: 900 24px/1 Arial, sans-serif; letter-spacing: -1.2px; text-decoration: none; text-shadow: 0 0 10px rgba(80,138,255,.18); }
 .wordmark:hover { color: #fff; background: transparent; }
 .head-links { margin-top: 5px; color: #aab5cb; font-size: 9px; }
-.ticker-window { min-width: 0; margin: 0; overflow: hidden; border-block: 1px solid rgba(127,145,189,.22); background: rgba(255,255,255,.04); white-space: nowrap; }
+.ticker-window { transform: translateY(-10px); min-width: 0; margin: 0; overflow: hidden; border-block: 1px solid rgba(127,145,189,.22); background: rgba(255,255,255,.04); white-space: nowrap; }
 .ticker-track { display: inline-block; min-width: max-content; padding: 4px 0; color: #a9b9da; font: 8px/1.2 "Courier New", monospace; animation: ticker 38s linear infinite; }
-.site-head__goat { position: relative; height: 66px; }
-.site-head__goat img { position: absolute; right: 15px; bottom: -2px; width: 53px; height: 53px; object-fit: cover; border: 1px solid #586885; border-radius: 9px; background: #232938; animation: goat-bob 3.6s ease-in-out infinite; }
+.site-head__goat { position: relative; height: 69px; }
+.site-head__goat img { position: absolute; right: 15px; bottom: -35px; width: 53px; height: 93px; object-fit: cover; animation: goat-bob 3.6s ease-in-out infinite; }
 .site-head__goat span { position: absolute; right: 3px; bottom: 3px; z-index: 1; padding: 1px 3px; color: #d8ff72; background: #0f1218; border: 1px solid #596680; border-radius: 3px; font-size: 7px; transform: rotate(3deg); }
 
 .site-grid { display: grid; grid-template-columns: 160px minmax(0, 1fr) 226px; gap: 13px; align-items: start; }
@@ -130,7 +130,16 @@ button, a { font: inherit; }
 #welcome .hero-name { color: #fff; font-weight: 700; }
 .hero-action { display: inline-block; margin-top: 6px; padding: 4px 7px; color: #071000; border: 1px solid #779a1d; background: var(--lime); font-weight: 700; text-decoration: none; }
 .hero-action:hover { color: #fff; background: #2558ff; }
-.floating-goat { position: absolute; top: 14px; right: 14px; width: 89px; height: 89px; object-fit: cover; border: 1px solid #64718b; border-radius: 8px; animation: tiny-tilt 5.5s ease-in-out infinite; }
+.floating-goat {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 95px;
+  height: 95px;
+  object-fit: cover;
+  border-radius: 8px;
+  animation: tiny-tilt 5.5s ease-in-out infinite;
+}
 .tiny-caption { position: absolute; top: 111px; right: 9px; width: 96px; color: #8f9cb6; font: 7px/1.2 "Courier New", monospace; text-align: center; }
 .tiny-caption.tech-icons { display: flex; align-items: center; justify-content: center; gap: 8px; }
 
@@ -301,7 +310,10 @@ button, a { font: inherit; }
 
 @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes goat-bob { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-3px) rotate(1deg); } }
-@keyframes tiny-tilt { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(1.2deg); } }
+@keyframes tiny-tilt {
+  0%, 100% { transform: scaleX(-1) rotate(0deg); }
+  50% { transform: scaleX(-1) rotate(-1.2deg); }
+}
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes walk { 0% { left: -34px; transform: scaleX(1); } 48% { left: calc(100% + 4px); transform: scaleX(1); } 50% { left: calc(100% + 4px); transform: scaleX(-1); } 98% { left: -34px; transform: scaleX(-1); } 100% { left: -34px; transform: scaleX(1); } }
 
