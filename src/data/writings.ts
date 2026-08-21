@@ -1,9 +1,6 @@
-export interface WritingSummary {
-  slug: string;
-  title: string;
-  summary: string;
-  publishedAt: string;
-}
+import type { WritingSummary } from '../writings/domain';
+
+export type { WritingSummary } from '../writings/domain';
 
 export function getPublishedWritings(): readonly WritingSummary[] {
   return [];
