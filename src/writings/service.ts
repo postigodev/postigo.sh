@@ -37,8 +37,12 @@ export interface WritingServiceDependencies {
   now?: () => Date;
 }
 
-export interface WritingPdfOperationOptions {
+export interface WritingPdfUploadOptions {
   token: string;
+}
+
+export interface WritingPdfCleanupOptions {
+  token?: string;
 }
 
 export class WritingSlugConflictError extends Error {
@@ -170,6 +174,13 @@ function pdfRecordUpdate(
   };
 }
 
+function requirePdfCleanupToken(token: string | undefined): string {
+  if (!token?.trim()) {
+    throw new Error('A blob token is required to clean up a stored writing PDF.');
+  }
+  return token;
+}
+
 export function createWritingService({
   repository,
   pdfStorage = vercelBlobWritingPdfStorage,
@@ -276,7 +287,7 @@ export function createWritingService({
     async attachWritingPdf(
       id: string,
       file: File,
-      { token }: WritingPdfOperationOptions,
+      { token }: WritingPdfUploadOptions,
     ): Promise<WritingServiceResult<Writing>> {
       const existingRow = await repository.getById(id);
       if (!existingRow) throw new WritingNotFoundError(id);
@@ -327,7 +338,7 @@ export function createWritingService({
 
     async removeWritingPdf(
       id: string,
-      { token }: WritingPdfOperationOptions,
+      { token }: WritingPdfCleanupOptions = {},
     ): Promise<WritingServiceResult<Writing | null>> {
       const existingRow = await repository.getById(id);
       if (!existingRow) return { data: null, warnings: [] };
@@ -337,7 +348,10 @@ export function createWritingService({
 
       if (previousPdfPathname) {
         try {
-          await pdfStorage.delete({ pathname: previousPdfPathname, token });
+          await pdfStorage.delete({
+            pathname: previousPdfPathname,
+            token: requirePdfCleanupToken(token),
+          });
         } catch (cause) {
           const warning: WritingServiceWarning = {
             code: 'removed_pdf_cleanup_failed',
@@ -357,7 +371,7 @@ export function createWritingService({
 
     async deleteWriting(
       id: string,
-      { token }: WritingPdfOperationOptions,
+      { token }: WritingPdfCleanupOptions = {},
     ): Promise<WritingServiceResult<Writing | null>> {
       const deletedRow = await repository.delete(id);
       if (!deletedRow) return { data: null, warnings: [] };
@@ -366,7 +380,10 @@ export function createWritingService({
 
       if (deletedRow.pdfPathname) {
         try {
-          await pdfStorage.delete({ pathname: deletedRow.pdfPathname, token });
+          await pdfStorage.delete({
+            pathname: deletedRow.pdfPathname,
+            token: requirePdfCleanupToken(token),
+          });
         } catch (cause) {
           const warning: WritingServiceWarning = {
             code: 'deleted_writing_pdf_cleanup_failed',
@@ -436,21 +453,21 @@ export async function unpublishWriting(id: string): Promise<Writing | null> {
 export async function attachWritingPdf(
   id: string,
   file: File,
-  options: WritingPdfOperationOptions,
+  options: WritingPdfUploadOptions,
 ): Promise<WritingServiceResult<Writing>> {
   return (await productionService()).attachWritingPdf(id, file, options);
 }
 
 export async function removeWritingPdf(
   id: string,
-  options: WritingPdfOperationOptions,
+  options: WritingPdfCleanupOptions = {},
 ): Promise<WritingServiceResult<Writing | null>> {
   return (await productionService()).removeWritingPdf(id, options);
 }
 
 export async function deleteWriting(
   id: string,
-  options: WritingPdfOperationOptions,
+  options: WritingPdfCleanupOptions = {},
 ): Promise<WritingServiceResult<Writing | null>> {
   return (await productionService()).deleteWriting(id, options);
 }

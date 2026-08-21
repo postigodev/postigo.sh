@@ -6,16 +6,16 @@ import {
   type WritingAuthor,
 } from '../writings/domain';
 
-const formListValueSchema = z.union([
-  z.string(),
-  z.array(z.string()),
-  z.null(),
-]);
-
 const nullableFormTextSchema = z.union([z.string(), z.null()]);
+const repeatedTextSchema = z.array(z.string());
+
+export const writingIdSchema = z
+  .string({ error: 'Writing ID is required.' })
+  .trim()
+  .pipe(z.uuid({ error: 'Writing ID must be a valid UUID.' }));
 
 const writingFormFields = {
-  slug: z.union([z.string(), z.null()]).optional(),
+  slug: nullableFormTextSchema.optional(),
   title: z.string(),
   subtitle: nullableFormTextSchema,
   description: nullableFormTextSchema,
@@ -23,63 +23,68 @@ const writingFormFields = {
   contentMarkdown: z.string(),
   type: z.enum(WRITING_TYPES),
   language: z.string(),
-  authors: formListValueSchema,
-  tags: formListValueSchema,
-  topics: formListValueSchema,
+  authors: repeatedTextSchema,
+  tags: repeatedTextSchema,
+  topics: repeatedTextSchema,
   canonicalUrl: nullableFormTextSchema,
   seoTitle: nullableFormTextSchema,
   seoDescription: nullableFormTextSchema,
   ogImageUrl: nullableFormTextSchema,
 };
 
-export const createWritingActionInputSchema = z.object(writingFormFields);
-
-export const updateWritingActionInputSchema = z.object({
-  id: z.string(),
+const createWritingFormSchema = z.object(writingFormFields);
+const updateWritingFormSchema = z.object({
+  id: writingIdSchema,
   ...writingFormFields,
 });
-
-export const writingIdActionInputSchema = z.object({ id: z.string() });
-
-export const deleteWritingActionInputSchema = z.object({
-  id: z.string(),
-  expectedSlug: z.string(),
+const writingIdFormSchema = z.object({ id: writingIdSchema });
+const deleteWritingFormSchema = z.object({
+  id: writingIdSchema,
+  expectedSlug: z.string().trim().min(1, 'Slug confirmation is required.'),
 });
-
-export const uploadWritingPdfActionInputSchema = z.object({
-  id: z.string(),
+const uploadWritingPdfFormSchema = z.object({
+  id: writingIdSchema,
   file: z.custom<File>(
     (value) => typeof File !== 'undefined' && value instanceof File,
     'A PDF File is required.',
   ),
 });
 
-export type CreateWritingActionInput = z.input<
-  typeof createWritingActionInputSchema
->;
-export type UpdateWritingActionInput = z.input<
-  typeof updateWritingActionInputSchema
->;
-export type WritingIdActionInput = z.input<typeof writingIdActionInputSchema>;
-export type DeleteWritingActionInput = z.input<
-  typeof deleteWritingActionInputSchema
->;
-export type UploadWritingPdfActionInput = z.input<
-  typeof uploadWritingPdfActionInputSchema
->;
-
-type FormListValue = z.output<typeof formListValueSchema>;
-
 const authorObjectSchema = z.object({
   name: z.string(),
   url: z.string().optional(),
 });
 
-function formEntries(value: FormListValue): string[] {
-  if (value === null) return [];
-  return (Array.isArray(value) ? value : [value]).flatMap((entry) =>
-    entry.split(/\r?\n/),
-  );
+function scalar(form: FormData, name: string): FormDataEntryValue | null {
+  return form.get(name);
+}
+
+function repeated(form: FormData, name: string): FormDataEntryValue[] {
+  return form.getAll(name);
+}
+
+function writingFieldsFromForm(form: FormData) {
+  return {
+    slug: scalar(form, 'slug'),
+    title: scalar(form, 'title'),
+    subtitle: scalar(form, 'subtitle'),
+    description: scalar(form, 'description'),
+    excerpt: scalar(form, 'excerpt'),
+    contentMarkdown: scalar(form, 'contentMarkdown'),
+    type: scalar(form, 'type'),
+    language: scalar(form, 'language'),
+    authors: repeated(form, 'authors'),
+    tags: repeated(form, 'tags'),
+    topics: repeated(form, 'topics'),
+    canonicalUrl: scalar(form, 'canonicalUrl'),
+    seoTitle: scalar(form, 'seoTitle'),
+    seoDescription: scalar(form, 'seoDescription'),
+    ogImageUrl: scalar(form, 'ogImageUrl'),
+  };
+}
+
+function formEntries(value: string[]): string[] {
+  return value.flatMap((entry) => entry.split(/\r?\n/));
 }
 
 function invalidAuthors(message: string): never {
@@ -92,7 +97,7 @@ function invalidAuthors(message: string): never {
   ]);
 }
 
-export function parseAuthors(value: FormListValue): WritingAuthor[] {
+export function parseAuthors(value: string[]): WritingAuthor[] {
   const entries = formEntries(value)
     .map((entry) => entry.trim())
     .filter(Boolean);
@@ -124,7 +129,7 @@ export function parseAuthors(value: FormListValue): WritingAuthor[] {
   });
 }
 
-export function parseStringList(value: FormListValue): string[] {
+export function parseStringList(value: string[]): string[] {
   return formEntries(value)
     .flatMap((entry) => entry.split(','))
     .map((entry) => entry.trim())
@@ -141,7 +146,7 @@ export function parseNullableText(
 }
 
 function normalizeWritingFields(
-  input: z.output<typeof createWritingActionInputSchema>,
+  input: z.output<typeof createWritingFormSchema>,
 ): CreateWritingInput {
   const slug = parseNullableText(input.slug);
   return {
@@ -164,16 +169,45 @@ function normalizeWritingFields(
 }
 
 export function parseCreateWritingActionInput(
-  input: unknown,
+  form: FormData,
 ): CreateWritingInput {
-  return normalizeWritingFields(createWritingActionInputSchema.parse(input));
+  return normalizeWritingFields(
+    createWritingFormSchema.parse(writingFieldsFromForm(form)),
+  );
 }
 
-export function parseUpdateWritingActionInput(input: unknown): {
+export function parseUpdateWritingActionInput(form: FormData): {
   id: string;
   values: UpdateWritingInput;
 } {
-  const parsed = updateWritingActionInputSchema.parse(input);
+  const parsed = updateWritingFormSchema.parse({
+    id: scalar(form, 'id'),
+    ...writingFieldsFromForm(form),
+  });
   const { id, ...fields } = parsed;
   return { id, values: normalizeWritingFields(fields) };
+}
+
+export function parseWritingIdActionInput(form: FormData): { id: string } {
+  return writingIdFormSchema.parse({ id: scalar(form, 'id') });
+}
+
+export function parseDeleteWritingActionInput(form: FormData): {
+  id: string;
+  expectedSlug: string;
+} {
+  return deleteWritingFormSchema.parse({
+    id: scalar(form, 'id'),
+    expectedSlug: scalar(form, 'expectedSlug'),
+  });
+}
+
+export function parseUploadWritingPdfActionInput(form: FormData): {
+  id: string;
+  file: File;
+} {
+  return uploadWritingPdfFormSchema.parse({
+    id: scalar(form, 'id'),
+    file: scalar(form, 'file'),
+  });
 }

@@ -25,16 +25,11 @@ import {
   updateWriting,
 } from '../writings/service';
 import {
-  deleteWritingActionInputSchema,
   parseCreateWritingActionInput,
+  parseDeleteWritingActionInput,
   parseUpdateWritingActionInput,
-  uploadWritingPdfActionInputSchema,
-  writingIdActionInputSchema,
-  type CreateWritingActionInput,
-  type DeleteWritingActionInput,
-  type UpdateWritingActionInput,
-  type UploadWritingPdfActionInput,
-  type WritingIdActionInput,
+  parseUploadWritingPdfActionInput,
+  parseWritingIdActionInput,
 } from './writing-input';
 
 export type WritingActionErrorCode =
@@ -77,7 +72,7 @@ export interface WritingActionServices {
   getWritingById(id: string): Promise<Writing | null>;
   deleteWriting(
     id: string,
-    options: { token: string },
+    options: { token?: string },
   ): Promise<WritingServiceResult<Writing | null>>;
   attachWritingPdf(
     id: string,
@@ -86,7 +81,7 @@ export interface WritingActionServices {
   ): Promise<WritingServiceResult<Writing>>;
   removeWritingPdf(
     id: string,
-    options: { token: string },
+    options: { token?: string },
   ): Promise<WritingServiceResult<Writing | null>>;
 }
 
@@ -222,7 +217,7 @@ export function createWritingActionHandlers(
   dependencies: WritingActionDependencies = productionDependencies,
 ) {
   return {
-    createWriting(input: CreateWritingActionInput, context: WritingActionContext) {
+    createWriting(input: FormData, context: WritingActionContext) {
       return runAuthorized(context, dependencies, async () =>
         success(
           await dependencies.services.createWriting(
@@ -232,7 +227,7 @@ export function createWritingActionHandlers(
       );
     },
 
-    updateWriting(input: UpdateWritingActionInput, context: WritingActionContext) {
+    updateWriting(input: FormData, context: WritingActionContext) {
       return runAuthorized(context, dependencies, async () => {
         const { id, values } = parseUpdateWritingActionInput(input);
         const updated = await dependencies.services.updateWriting(id, values);
@@ -241,27 +236,27 @@ export function createWritingActionHandlers(
       });
     },
 
-    publishWriting(input: WritingIdActionInput, context: WritingActionContext) {
+    publishWriting(input: FormData, context: WritingActionContext) {
       return runAuthorized(context, dependencies, async () => {
-        const { id } = writingIdActionInputSchema.parse(input);
+        const { id } = parseWritingIdActionInput(input);
         const published = await dependencies.services.publishWriting(id);
         if (!published) throw notFound(id);
         return success(published);
       });
     },
 
-    unpublishWriting(input: WritingIdActionInput, context: WritingActionContext) {
+    unpublishWriting(input: FormData, context: WritingActionContext) {
       return runAuthorized(context, dependencies, async () => {
-        const { id } = writingIdActionInputSchema.parse(input);
+        const { id } = parseWritingIdActionInput(input);
         const unpublished = await dependencies.services.unpublishWriting(id);
         if (!unpublished) throw notFound(id);
         return success(unpublished);
       });
     },
 
-    deleteWriting(input: DeleteWritingActionInput, context: WritingActionContext) {
+    deleteWriting(input: FormData, context: WritingActionContext) {
       return runAuthorized(context, dependencies, async () => {
-        const { id, expectedSlug } = deleteWritingActionInputSchema.parse(input);
+        const { id, expectedSlug } = parseDeleteWritingActionInput(input);
         const existing = await dependencies.services.getWritingById(id);
         if (!existing) throw notFound(id);
         if (existing.slug !== expectedSlug.trim()) {
@@ -270,19 +265,21 @@ export function createWritingActionHandlers(
             'The slug confirmation does not match the writing being deleted.',
           );
         }
-        const token = await dependencies.getBlobToken();
-        const result = await dependencies.services.deleteWriting(id, { token });
+        const options = existing.pdf
+          ? { token: await dependencies.getBlobToken() }
+          : {};
+        const result = await dependencies.services.deleteWriting(id, options);
         if (!result.data) throw notFound(id);
         return publicResult(result);
       });
     },
 
     uploadWritingPdf(
-      input: UploadWritingPdfActionInput,
+      input: FormData,
       context: WritingActionContext,
     ) {
       return runAuthorized(context, dependencies, async () => {
-        const { id, file } = uploadWritingPdfActionInputSchema.parse(input);
+        const { id, file } = parseUploadWritingPdfActionInput(input);
         const token = await dependencies.getBlobToken();
         return publicResult(
           await dependencies.services.attachWritingPdf(id, file, { token }),
@@ -290,11 +287,15 @@ export function createWritingActionHandlers(
       });
     },
 
-    removeWritingPdf(input: WritingIdActionInput, context: WritingActionContext) {
+    removeWritingPdf(input: FormData, context: WritingActionContext) {
       return runAuthorized(context, dependencies, async () => {
-        const { id } = writingIdActionInputSchema.parse(input);
-        const token = await dependencies.getBlobToken();
-        const result = await dependencies.services.removeWritingPdf(id, { token });
+        const { id } = parseWritingIdActionInput(input);
+        const existing = await dependencies.services.getWritingById(id);
+        if (!existing) throw notFound(id);
+        const options = existing.pdf
+          ? { token: await dependencies.getBlobToken() }
+          : {};
+        const result = await dependencies.services.removeWritingPdf(id, options);
         if (!result.data) throw notFound(id);
         return publicResult(result);
       });

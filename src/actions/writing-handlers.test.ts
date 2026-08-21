@@ -1,7 +1,11 @@
 import { BlobError } from '@vercel/blob';
 import { describe, expect, it, vi } from 'vitest';
 import { ServerConfigurationError } from '../lib/server-env';
-import type { Writing, WritingServiceWarning } from '../writings/domain';
+import type {
+  Writing,
+  WritingPdfMetadata,
+  WritingServiceWarning,
+} from '../writings/domain';
 import { WritingSlugConflictError } from '../writings/service';
 import {
   createWritingActionHandlers,
@@ -12,7 +16,7 @@ import {
 import { parseAuthors, parseNullableText, parseStringList } from './writing-input';
 
 const writing: Writing = {
-  id: 'writing-1',
+  id: '00000000-0000-4000-8000-000000000001',
   slug: 'writing-one',
   title: 'Writing one',
   subtitle: null,
@@ -35,25 +39,58 @@ const writing: Writing = {
   publishedAt: null,
 };
 
-const validWritingInput = {
-  slug: 'writing-one',
-  title: 'Writing one',
-  subtitle: null,
-  description: null,
-  excerpt: null,
-  contentMarkdown: '# Writing one',
-  type: 'essay' as const,
-  language: 'en',
-  authors: 'Piero|https://example.com/piero\nSecond Author',
-  tags: 'astro, auth',
-  topics: ['portfolio', 'security'],
-  canonicalUrl: null,
-  seoTitle: null,
-  seoDescription: null,
-  ogImageUrl: null,
+const pdf: WritingPdfMetadata = {
+  url: 'https://blob.example/paper.pdf',
+  pathname: 'writings/writing-1/paper.pdf',
+  filename: 'paper.pdf',
+  size: 8,
+  mimeType: 'application/pdf',
 };
 
 const context = { request: { headers: new Headers({ cookie: 'session=x' }) } };
+
+function writingForm(options: {
+  id?: string;
+  authors?: string[];
+  status?: string;
+} = {}): FormData {
+  const form = new FormData();
+  if (options.id !== undefined) form.set('id', options.id);
+  form.set('slug', 'writing-one');
+  form.set('title', 'Writing one');
+  form.set('contentMarkdown', '# Writing one');
+  form.set('type', 'essay');
+  form.set('language', 'en');
+  for (const author of options.authors ?? [
+    'Piero|https://example.com/piero',
+    'Second Author',
+  ]) {
+    form.append('authors', author);
+  }
+  form.append('tags', 'astro, auth');
+  form.append('topics', 'portfolio');
+  form.append('topics', 'security');
+  if (options.status) form.set('status', options.status);
+  return form;
+}
+
+function idForm(id = writing.id): FormData {
+  const form = new FormData();
+  form.set('id', id);
+  return form;
+}
+
+function deleteForm(expectedSlug: string, id = writing.id): FormData {
+  const form = idForm(id);
+  form.set('expectedSlug', expectedSlug);
+  return form;
+}
+
+function pdfForm(file: File, id = writing.id): FormData {
+  const form = idForm(id);
+  form.set('file', file);
+  return form;
+}
 
 function serviceDoubles(
   overrides: Partial<WritingActionServices> = {},
@@ -98,11 +135,17 @@ function expectFailure(code: string) {
 
 describe('writing action input parsing', () => {
   it('supports multiple authors with optional URLs and flexible lists', () => {
-    expect(parseAuthors('Piero|https://example.com\nSecond Author')).toEqual([
+    expect(
+      parseAuthors(['Piero|https://example.com', 'Second Author']),
+    ).toEqual([
       { name: 'Piero', url: 'https://example.com' },
       { name: 'Second Author' },
     ]);
-    expect(parseAuthors('[{"name":"One"},{"name":"Two","url":"https://two.example"}]')).toEqual([
+    expect(
+      parseAuthors([
+        '[{"name":"One"},{"name":"Two","url":"https://two.example"}]',
+      ]),
+    ).toEqual([
       { name: 'One' },
       { name: 'Two', url: 'https://two.example' },
     ]);
@@ -116,7 +159,7 @@ describe('writing action input parsing', () => {
 });
 
 describe('writing action authorization boundary', () => {
-  it('authorizes first for every mutation and never calls a service when signed out', async () => {
+  it('authorizes first for every mutation and never parses or calls services when signed out', async () => {
     const services = serviceDoubles();
     const authorize = vi.fn(async () => ({ status: 'unauthenticated' as const }));
     const getBlobToken = vi.fn(async () => 'blob-token');
@@ -125,15 +168,15 @@ describe('writing action authorization boundary', () => {
       getBlobToken,
       services,
     });
-    const pdf = new File(['%PDF-1.7'], 'paper.pdf', { type: 'application/pdf' });
+    const malformed = new FormData();
     const calls = [
-      () => handlers.createWriting(validWritingInput, context),
-      () => handlers.updateWriting({ id: writing.id, ...validWritingInput }, context),
-      () => handlers.publishWriting({ id: writing.id }, context),
-      () => handlers.unpublishWriting({ id: writing.id }, context),
-      () => handlers.deleteWriting({ id: writing.id, expectedSlug: writing.slug }, context),
-      () => handlers.uploadWritingPdf({ id: writing.id, file: pdf }, context),
-      () => handlers.removeWritingPdf({ id: writing.id }, context),
+      () => handlers.createWriting(malformed, context),
+      () => handlers.updateWriting(malformed, context),
+      () => handlers.publishWriting(malformed, context),
+      () => handlers.unpublishWriting(malformed, context),
+      () => handlers.deleteWriting(malformed, context),
+      () => handlers.uploadWritingPdf(malformed, context),
+      () => handlers.removeWritingPdf(malformed, context),
     ];
 
     for (const call of calls) {
@@ -160,9 +203,9 @@ describe('writing action authorization boundary', () => {
       }),
     );
 
-    await expect(
-      handlers.publishWriting({ id: writing.id }, context),
-    ).rejects.toEqual(expectFailure('FORBIDDEN'));
+    await expect(handlers.publishWriting(new FormData(), context)).rejects.toEqual(
+      expectFailure('FORBIDDEN'),
+    );
   });
 });
 
@@ -171,20 +214,13 @@ describe('writing action service delegation', () => {
     const dependencies = actionDependencies();
     const handlers = createWritingActionHandlers(dependencies);
 
-    await handlers.createWriting(
-      { ...validWritingInput, status: 'published' } as typeof validWritingInput,
-      context,
-    );
+    await handlers.createWriting(writingForm({ status: 'published' }), context);
     await handlers.updateWriting(
-      {
-        id: writing.id,
-        ...validWritingInput,
-        status: 'published',
-      } as typeof validWritingInput & { id: string },
+      writingForm({ id: writing.id, status: 'published' }),
       context,
     );
-    await handlers.publishWriting({ id: writing.id }, context);
-    await handlers.unpublishWriting({ id: writing.id }, context);
+    await handlers.publishWriting(idForm(), context);
+    await handlers.unpublishWriting(idForm(), context);
 
     expect(dependencies.services.createWriting).toHaveBeenCalledWith(
       expect.not.objectContaining({ status: expect.anything() }),
@@ -203,28 +239,45 @@ describe('writing action service delegation', () => {
       message: 'Blob cleanup failed.',
       cause: new Error('private upstream detail'),
     };
+    const writingWithPdf = { ...writing, pdf };
     const services = serviceDoubles({
-      deleteWriting: vi.fn(async () => ({ data: writing, warnings: [warning] })),
+      getWritingById: vi.fn(async () => writingWithPdf),
+      deleteWriting: vi.fn(async () => ({
+        data: writingWithPdf,
+        warnings: [warning],
+      })),
     });
     const handlers = createWritingActionHandlers(actionDependencies({ services }));
 
     await expect(
-      handlers.deleteWriting(
-        { id: writing.id, expectedSlug: 'wrong-slug' },
-        context,
-      ),
+      handlers.deleteWriting(deleteForm('wrong-slug'), context),
     ).rejects.toEqual(expectFailure('PRECONDITION_FAILED'));
     expect(services.deleteWriting).not.toHaveBeenCalled();
 
     await expect(
-      handlers.deleteWriting(
-        { id: writing.id, expectedSlug: writing.slug },
-        context,
-      ),
+      handlers.deleteWriting(deleteForm(writing.slug), context),
     ).resolves.toEqual({
-      data: writing,
+      data: writingWithPdf,
       warnings: [{ code: warning.code, message: warning.message }],
     });
+    expect(services.deleteWriting).toHaveBeenCalledWith(writing.id, {
+      token: 'blob-token',
+    });
+  });
+
+  it('does not require Blob configuration for delete or remove without a PDF', async () => {
+    const services = serviceDoubles();
+    const getBlobToken = vi.fn(async () => 'blob-token');
+    const handlers = createWritingActionHandlers(
+      actionDependencies({ services, getBlobToken }),
+    );
+
+    await handlers.deleteWriting(deleteForm(writing.slug), context);
+    await handlers.removeWritingPdf(idForm(), context);
+
+    expect(getBlobToken).not.toHaveBeenCalled();
+    expect(services.deleteWriting).toHaveBeenCalledWith(writing.id, {});
+    expect(services.removeWritingPdf).toHaveBeenCalledWith(writing.id, {});
   });
 
   it('surfaces PDF service warnings unchanged', async () => {
@@ -240,7 +293,7 @@ describe('writing action service delegation', () => {
     const file = new File(['%PDF-1.7'], 'paper.pdf', { type: 'application/pdf' });
 
     await expect(
-      handlers.uploadWritingPdf({ id: writing.id, file }, context),
+      handlers.uploadWritingPdf(pdfForm(file), context),
     ).resolves.toEqual({
       data: writing,
       warnings: [{ code: warning.code, message: warning.message }],
@@ -248,7 +301,39 @@ describe('writing action service delegation', () => {
   });
 });
 
-describe('writing action error mapping', () => {
+describe('writing action validation and error mapping', () => {
+  it('uses one UUID validator for every ID-bearing mutation', async () => {
+    const services = serviceDoubles();
+    const authorize = vi.fn(async () => ({
+      status: 'authorized' as const,
+      session: {
+        user: { email: 'admin@example.com' },
+        session: { id: 'session-1' },
+      },
+    }));
+    const handlers = createWritingActionHandlers(
+      actionDependencies({ services, authorize }),
+    );
+    const invalidId = 'not-a-uuid';
+    const file = new File(['%PDF-1.7'], 'paper.pdf', { type: 'application/pdf' });
+    const calls = [
+      () => handlers.updateWriting(writingForm({ id: invalidId }), context),
+      () => handlers.publishWriting(idForm(invalidId), context),
+      () => handlers.unpublishWriting(idForm(invalidId), context),
+      () => handlers.deleteWriting(deleteForm(writing.slug, invalidId), context),
+      () => handlers.uploadWritingPdf(pdfForm(file, invalidId), context),
+      () => handlers.removeWritingPdf(idForm(invalidId), context),
+    ];
+
+    for (const call of calls) {
+      await expect(call()).rejects.toEqual(expectFailure('BAD_REQUEST'));
+    }
+    expect(authorize).toHaveBeenCalledTimes(calls.length);
+    for (const service of Object.values(services)) {
+      expect(service).not.toHaveBeenCalled();
+    }
+  });
+
   it('maps conflict, not-found, validation, config, and blob failures', async () => {
     const conflictHandlers = createWritingActionHandlers(
       actionDependencies({
@@ -260,7 +345,7 @@ describe('writing action error mapping', () => {
       }),
     );
     await expect(
-      conflictHandlers.createWriting(validWritingInput, context),
+      conflictHandlers.createWriting(writingForm(), context),
     ).rejects.toEqual(expectFailure('CONFLICT'));
 
     const notFoundHandlers = createWritingActionHandlers(
@@ -269,12 +354,12 @@ describe('writing action error mapping', () => {
       }),
     );
     await expect(
-      notFoundHandlers.publishWriting({ id: 'missing' }, context),
+      notFoundHandlers.publishWriting(idForm(), context),
     ).rejects.toEqual(expectFailure('NOT_FOUND'));
 
     await expect(
       conflictHandlers.createWriting(
-        { ...validWritingInput, authors: '[invalid' },
+        writingForm({ authors: ['[invalid'] }),
         context,
       ),
     ).rejects.toEqual(expectFailure('BAD_REQUEST'));
@@ -288,8 +373,9 @@ describe('writing action error mapping', () => {
         }),
       }),
     );
+    const file = new File(['%PDF-1.7'], 'paper.pdf', { type: 'application/pdf' });
     await expect(
-      configHandlers.removeWritingPdf({ id: writing.id }, context),
+      configHandlers.uploadWritingPdf(pdfForm(file), context),
     ).rejects.toEqual(expectFailure('SERVICE_UNAVAILABLE'));
 
     const blobHandlers = createWritingActionHandlers(
@@ -301,9 +387,8 @@ describe('writing action error mapping', () => {
         }),
       }),
     );
-    const file = new File(['%PDF-1.7'], 'paper.pdf', { type: 'application/pdf' });
     await expect(
-      blobHandlers.uploadWritingPdf({ id: writing.id, file }, context),
+      blobHandlers.uploadWritingPdf(pdfForm(file), context),
     ).rejects.toEqual(expectFailure('BAD_GATEWAY'));
   });
 
@@ -320,7 +405,7 @@ describe('writing action error mapping', () => {
     );
 
     const failure = await handlers
-      .updateWriting({ id: writing.id, ...validWritingInput }, context)
+      .updateWriting(writingForm({ id: writing.id }), context)
       .catch((error: unknown) => error);
     expect(failure).toBeInstanceOf(WritingActionFailure);
     expect(failure).toMatchObject({
