@@ -227,14 +227,15 @@ button, a { font: inherit; }
 .document-shell h1, .document-panel h1 { margin: 18px 0 12px; color: #f5f8ff; font: 900 clamp(2rem, 8vw, 4.5rem)/.95 Tahoma, Verdana, sans-serif; letter-spacing: -.04em; }
 .document-shell h2 { margin: 32px 0 10px; color: #eaf0ff; }
 .document-shell h3 { margin: 18px 0 4px; color: #d8e4ff; }
-.document-shell p, .document-shell li { max-width: 72ch; color: #c4cfe2; }
+.document-shell p, .document-shell li { max-width: 72ch; overflow-wrap: break-word; color: #c4cfe2; }
 .writing-header { padding-bottom: 18px; border-bottom: 1px solid #55627b; }
 .writing-kicker, .writing-byline { font-family: "Courier New", monospace; }
 .writing-kicker { color: #9bd0ff !important; text-transform: uppercase; }
 .writing-subtitle { color: #e7ecf7 !important; font-size: 1.1rem; }
-.writing-markdown { margin-top: 24px; line-height: 1.65; }
+.writing-markdown { margin-top: 24px; line-height: 1.65; font-size: 1rem; }
 .writing-markdown pre { max-width: 100%; padding: 12px; overflow: auto; border: 1px solid #55627b; background: #090b10; }
 .writing-markdown img { max-width: 100%; height: auto; }
+.writing-markdown p { font-size: 16px; } 
 .admin-shell { max-width: 1060px; }
 .admin-shell .document-panel > h1:first-child { margin-top: 0; }
 .admin-auth-controls { display: inline-flex; align-items: center; gap: 8px; }
