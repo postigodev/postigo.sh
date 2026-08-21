@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { getGitHubSnapshot } from '../../api/_lib/github';
+import { getGitHubSnapshot } from '../../src/lib/presence/github';
 
 function githubResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });

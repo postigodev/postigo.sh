@@ -173,12 +173,15 @@ styles because that is the only interactive window primitive.
 Production assets live under `public/`. References remain isolated and are not
 bundled or imported at runtime.
 
-## Presence functions
+## Presence routes
 
-Root Vercel Functions provide fixed-owner public presence data. Browser code
-never receives owner credentials, Spotify refresh tokens, or visitor login
-controls. GitHub and Spotify widgets render truthful unavailable states when
-their endpoints or configuration are unavailable.
+Astro API routes provide fixed-owner public presence data through the same
+server router that owns Better Auth. Their request handlers remain isolated in
+`src/lib/presence/`; browser code never receives owner credentials, Spotify
+refresh tokens, or visitor login controls. GitHub and Spotify widgets render
+truthful unavailable states when their endpoints or configuration are
+unavailable. Do not add a parallel root `api/` Vercel Functions tree: splitting
+ownership of the `/api` namespace can shadow Astro's `/api/auth/*` catch-all.
 
 ## Deployment and schema lifecycle
 

@@ -5,7 +5,7 @@ import {
   jsonForMethod,
   readJsonBounded,
   spotifyCache,
-} from '../../api/_lib/http';
+} from '../../src/lib/presence/http';
 
 describe('guardPublicRead', () => {
   it.each(['POST', 'PUT', 'PATCH', 'DELETE'])('rejects %s', (method) => {

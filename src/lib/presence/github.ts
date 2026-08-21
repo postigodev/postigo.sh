@@ -1,4 +1,4 @@
-import { staticGitHubFallback, type GitHubSnapshotView } from '../../src/data/presence.js';
+import { staticGitHubFallback, type GitHubSnapshotView } from '../../data/presence.js';
 import { readJsonBounded } from './http.js';
 
 const PROFILE_ENDPOINT = 'https://api.github.com/users/postigodev';

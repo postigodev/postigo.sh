@@ -7,7 +7,15 @@ import { spawn } from 'node:child_process';
 const repository = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const staging = await mkdtemp(join(tmpdir(), 'postigo-vercel-local-'));
 const globalConfig = join(staging, '.vercel-global');
-const entries = ['api', 'public', 'src', 'astro.config.mjs', 'package.json', 'pnpm-lock.yaml', 'tsconfig.json'];
+const entries = [
+  'public',
+  'src',
+  'astro.config.mjs',
+  'astro.shared.config.mjs',
+  'package.json',
+  'pnpm-lock.yaml',
+  'tsconfig.json',
+];
 
 for (const entry of entries) {
   await cp(join(repository, entry), join(staging, entry), { recursive: true });

@@ -1,4 +1,4 @@
-import type { NowPlayingView } from '../../src/data/presence.js';
+import type { NowPlayingView } from '../../data/presence.js';
 import { readJsonBounded } from './http.js';
 
 const TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token';

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { getNowPlaying, loadSpotifyEnvironment, type SpotifyEnvironment } from '../../api/_lib/spotify';
+import { getNowPlaying, loadSpotifyEnvironment, type SpotifyEnvironment } from '../../src/lib/presence/spotify';
 
 const environment: SpotifyEnvironment = {
   clientId: 'client-id',
