@@ -40,11 +40,29 @@ test('Sendo public route hides provenance and uses an archive source action', as
   await expect(page.getByRole('link', { name: /Source repository/ })).toHaveClass(/archive-action/);
 });
 
-test('direct writings route is a useful static empty state', async ({ page }) => {
+test('direct writings route reports its no-database fallback honestly', async ({ page }) => {
   await page.goto('/writings');
   await expect(page.getByRole('heading', { level: 1, name: 'Writings' })).toBeVisible();
-  await expect(page.getByText('No published writing yet.')).toBeVisible();
-  await expect(page.getByText('This section is under construction.')).toBeVisible();
+  await expect(page.locator('.document-panel')).toContainText(/No published writing yet|Writings are temporarily unavailable/);
+});
+
+test('admin login remains an ordinary useful document without backend credentials', async ({ page }) => {
+  await page.goto('/admin/login?next=https://attacker.example/steal');
+  await expect(page.getByRole('heading', { level: 1, name: 'Admin sign in' })).toBeVisible();
+  await expect(page.getByText('limited to the configured portfolio administrator')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Sign in with GitHub' })).toBeVisible();
+});
+
+test('public writing detail and PDF distinguish an unavailable backend from not found', async ({ request }) => {
+  const detail = await request.get('/writings/not-published-here');
+  expect(detail.status()).toBe(503);
+  expect(await detail.text()).toContain('Writings unavailable');
+
+  const pdf = await request.get('/writings/not-published-here/paper.pdf', {
+    maxRedirects: 0,
+  });
+  expect(pdf.status()).toBe(503);
+  expect(await pdf.text()).toBe('PDF unavailable.');
 });
 
 test.describe('without JavaScript', () => {
@@ -63,6 +81,7 @@ test.describe('without JavaScript', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Preppie', exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: /PR #44/ })).toBeVisible();
   });
+
 });
 
 test('project content survives an unavailable screenshot', async ({ page }) => {

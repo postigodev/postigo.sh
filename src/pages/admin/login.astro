@@ -1,0 +1,21 @@
+---
+import AdminAuthControls from '../../components/AdminAuthControls';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { safeAdminNextPath } from '../../lib/admin-paths';
+
+export const prerender = false;
+
+const next = safeAdminNextPath(Astro.url.searchParams.get('next') ?? '/admin');
+const oauthError = Astro.url.searchParams.has('error');
+---
+<BaseLayout title="Admin sign in | postigo.sh" description="Administrator sign in for postigo.sh writings.">
+  <main class="document-shell admin-shell">
+    <article class="document-panel">
+      <h1>Admin sign in</h1>
+      <p>This area is limited to the configured portfolio administrator.</p>
+      {oauthError && <p class="admin-feedback admin-feedback--error" role="alert">GitHub sign-in did not complete. Please try again.</p>}
+      <AdminAuthControls mode="sign-in" next={next} client:load />
+      <p><a href="/">Return to the public site</a></p>
+    </article>
+  </main>
+</BaseLayout>

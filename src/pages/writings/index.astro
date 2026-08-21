@@ -1,18 +1,20 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import DocumentNav from '../../components/DocumentNav.astro';
-import { getPublishedWritings } from '../../data/writings';
+import { getPublishedWritingsOrFallback } from '../../data/writings';
 
-export const prerender = true;
+export const prerender = false;
 
-const writings = getPublishedWritings();
+const { writings, available } = await getPublishedWritingsOrFallback();
 ---
 <BaseLayout title="Writings | Piero Postigo Rocchetti" description="Published writing by Piero Postigo Rocchetti.">
   <main class="document-shell">
     <DocumentNav />
     <article class="document-panel">
       <h1>Writings</h1>
-      {writings.length > 0
+      {!available
+        ? <p class="empty-state"><strong>Writings are temporarily unavailable.</strong><span>Please try again later.</span></p>
+        : writings.length > 0
         ? <ol>{writings.map((writing) => <li><a href={`/writings/${writing.slug}`}>{writing.title}</a><p>{writing.summary}</p></li>)}</ol>
         : <p class="empty-state"><strong>No published writing yet.</strong><span>This section is under construction.</span></p>}
     </article>

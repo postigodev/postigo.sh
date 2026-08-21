@@ -1,0 +1,28 @@
+---
+import { WRITING_TYPES, type Writing } from '../writings/domain';
+
+interface Props { writing?: Writing }
+const { writing } = Astro.props;
+const authors = writing?.authors.map((author) => `${author.name}${author.url ? `|${author.url}` : ''}`).join('\n') ?? 'Piero Postigo Rocchetti';
+---
+<div class="admin-form-grid">
+  <label>Title <input name="title" required value={writing?.title ?? ''} /></label>
+  <label>Slug <input name="slug" value={writing?.slug ?? ''} placeholder="generated-from-title" /></label>
+  <label>Subtitle <input name="subtitle" value={writing?.subtitle ?? ''} /></label>
+  <label>Type
+    <select name="type" required>
+      {WRITING_TYPES.map((type) => <option value={type} selected={(writing?.type ?? 'article') === type}>{type}</option>)}
+    </select>
+  </label>
+  <label>Language <input name="language" required value={writing?.language ?? 'en-US'} /></label>
+  <label class="admin-form-wide">Description <textarea name="description" rows="3">{writing?.description ?? ''}</textarea></label>
+  <label class="admin-form-wide">Excerpt <textarea name="excerpt" rows="3">{writing?.excerpt ?? ''}</textarea></label>
+  <label class="admin-form-wide">Markdown <textarea name="contentMarkdown" rows="22" required>{writing?.contentMarkdown ?? ''}</textarea></label>
+  <label class="admin-form-wide">Authors <small>One per line: Name or Name|https://url</small><textarea name="authors" rows="3" required>{authors}</textarea></label>
+  <label>Tags <small>Comma or newline separated</small><textarea name="tags" rows="3">{writing?.tags.join(', ') ?? ''}</textarea></label>
+  <label>Topics <small>Comma or newline separated</small><textarea name="topics" rows="3">{writing?.topics.join(', ') ?? ''}</textarea></label>
+  <label class="admin-form-wide">Canonical URL <input name="canonicalUrl" type="url" value={writing?.canonicalUrl ?? ''} /></label>
+  <label>SEO title <input name="seoTitle" value={writing?.seoTitle ?? ''} /></label>
+  <label>SEO description <textarea name="seoDescription" rows="3">{writing?.seoDescription ?? ''}</textarea></label>
+  <label class="admin-form-wide">Open Graph image URL <input name="ogImageUrl" type="url" value={writing?.ogImageUrl ?? ''} /></label>
+</div>

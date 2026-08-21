@@ -1,0 +1,116 @@
+---
+import { z } from 'zod';
+import DocumentNav from '../../components/DocumentNav.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getSiteConfig } from '../../lib/server-env';
+import { renderWritingMarkdown } from '../../writings/markdown';
+import { buildWritingMetadata, type WritingMetadata } from '../../writings/metadata';
+import type { Writing } from '../../writings/domain';
+import { getPublishedWritingBySlug } from '../../writings/service';
+
+export const prerender = false;
+
+const slug = Astro.params.slug ?? '';
+let status: 200 | 404 | 503 = 200;
+let writing: Writing | null = null;
+
+try {
+  writing = await getPublishedWritingBySlug(slug);
+  if (!writing) status = 404;
+} catch (error) {
+  if (error instanceof z.ZodError) {
+    status = 404;
+  } else {
+    status = 503;
+    console.error('Unable to load the published writing.', { slug, error });
+  }
+}
+
+let metadata: WritingMetadata | undefined;
+let rendered: Awaited<ReturnType<typeof renderWritingMarkdown>> | undefined;
+let siteUrl: string | undefined;
+if (writing && status === 200) {
+  try {
+    const { SITE_URL } = await getSiteConfig();
+    siteUrl = SITE_URL;
+    metadata = buildWritingMetadata(writing, { siteUrl: SITE_URL });
+    rendered = await renderWritingMarkdown(writing.contentMarkdown);
+  } catch (error) {
+    status = 503;
+    console.error('Unable to render the published writing.', { slug, error });
+  }
+}
+
+Astro.response.status = status;
+const pageTitle =
+  status === 404
+    ? 'Writing not found | Piero Postigo Rocchetti'
+    : status === 503
+      ? 'Writings unavailable | Piero Postigo Rocchetti'
+      : `${metadata?.title ?? writing?.title} | Piero Postigo Rocchetti`;
+const pageDescription =
+  status === 404
+    ? 'The requested published writing was not found.'
+    : status === 503
+      ? 'Published writing is temporarily unavailable.'
+      : metadata?.description ?? writing?.title ?? '';
+const publicationDate = writing?.publishedAt?.toISOString();
+const stablePdfUrl = status === 200 && writing?.pdf && siteUrl
+  ? new URL(`/writings/${encodeURIComponent(writing.slug)}/paper.pdf`, siteUrl).toString()
+  : undefined;
+const safeAuthorUrl = (value: string | undefined) => {
+  if (!value) return undefined;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:'
+      ? url.toString()
+      : undefined;
+  } catch {
+    return undefined;
+  }
+};
+---
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl={status === 200 ? metadata?.canonicalUrl : undefined}
+  openGraph={status === 200 ? metadata?.openGraph : undefined}
+  jsonLd={status === 200 ? metadata?.jsonLd : undefined}
+  citation={status === 200 && writing ? {
+    title: writing.title,
+    authors: writing.authors.map((author) => author.name),
+    publicationDate,
+    pdfUrl: stablePdfUrl,
+  } : undefined}
+>
+  <main class="document-shell writing-document">
+    <DocumentNav />
+    {status === 404 ? (
+      <article class="document-panel">
+        <h1>Writing not found</h1>
+        <p>No published writing exists at this address.</p>
+      </article>
+    ) : status === 503 || !writing || !rendered ? (
+      <article class="document-panel">
+        <h1>Writings unavailable</h1>
+        <p>This published writing cannot be loaded right now. Please try again later.</p>
+      </article>
+    ) : (
+      <article class="document-panel">
+        <header class="writing-header">
+          <p class="writing-kicker">{writing.type} · {writing.language}</p>
+          <h1>{writing.title}</h1>
+          {writing.subtitle && <p class="writing-subtitle">{writing.subtitle}</p>}
+          <p class="writing-byline">
+            By {writing.authors.map((author, index) => (
+              <Fragment>{index > 0 ? ', ' : ''}{safeAuthorUrl(author.url) ? <a href={safeAuthorUrl(author.url)}>{author.name}</a> : author.name}</Fragment>
+            ))}
+            {publicationDate && <> · <time datetime={publicationDate}>{new Date(publicationDate).toLocaleDateString('en-US', { dateStyle: 'long' })}</time></>}
+          </p>
+          {writing.pdf && <p><a href={`/writings/${writing.slug}/paper.pdf`}>View paper PDF</a></p>}
+        </header>
+        <div class="writing-markdown" set:html={rendered.html} />
+      </article>
+    )}
+  </main>
+</BaseLayout>

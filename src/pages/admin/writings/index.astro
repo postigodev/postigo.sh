@@ -1,0 +1,40 @@
+---
+import AdminShell from '../../../components/AdminShell.astro';
+import type { Writing } from '../../../writings/domain';
+import { listWritingsForAdmin } from '../../../writings/service';
+
+export const prerender = false;
+
+let writings: Writing[] = [];
+let unavailable = false;
+try {
+  writings = await listWritingsForAdmin();
+} catch (error) {
+  unavailable = true;
+  Astro.response.status = 503;
+  console.error('Unable to load writings for the administrator.', { error });
+}
+---
+<AdminShell title="Writings" description="Manage postigo.sh writing drafts and publications.">
+  <h1>Writings</h1>
+  <p><a href="/admin/writings/new">Create a draft</a></p>
+  {unavailable ? (
+    <p class="admin-feedback admin-feedback--error" role="alert">Writing administration is temporarily unavailable.</p>
+  ) : writings.length === 0 ? (
+    <p>No drafts or published writings exist yet.</p>
+  ) : (
+    <table class="admin-table">
+      <thead><tr><th>Title</th><th>Status</th><th>Updated</th><th></th></tr></thead>
+      <tbody>
+        {writings.map((writing) => (
+          <tr>
+            <td><strong>{writing.title}</strong><br /><code>{writing.slug}</code></td>
+            <td>{writing.status}</td>
+            <td><time datetime={writing.updatedAt.toISOString()}>{writing.updatedAt.toLocaleDateString('en-US')}</time></td>
+            <td><a href={`/admin/writings/${writing.id}`}>Edit</a></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+</AdminShell>

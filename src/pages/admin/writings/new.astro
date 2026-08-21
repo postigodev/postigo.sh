@@ -1,0 +1,25 @@
+---
+import { actions } from 'astro:actions';
+import AdminShell from '../../../components/AdminShell.astro';
+import AdminWritingFields from '../../../components/AdminWritingFields.astro';
+
+export const prerender = false;
+
+const result = Astro.getActionResult(actions.createWriting);
+---
+<AdminShell title="New writing" description="Create a postigo.sh writing draft.">
+  <h1>New writing</h1>
+  <p>New writings are saved as drafts and remain private until explicitly published.</p>
+  {result?.error && <p class="admin-feedback admin-feedback--error" role="alert"><strong>{result.error.code}:</strong> {result.error.message}</p>}
+  {result && !result.error && (
+    <div class="admin-feedback admin-feedback--success" role="status">
+      <p>Draft created: <strong>{result.data.data.title}</strong>.</p>
+      {result.data.warnings.map((warning) => <p>{warning.message}</p>)}
+      <p><a href={`/admin/writings/${result.data.data.id}`}>Continue editing this draft</a></p>
+    </div>
+  )}
+  <form method="POST" action={actions.createWriting} class="admin-form">
+    <AdminWritingFields />
+    <button type="submit">Create draft</button>
+  </form>
+</AdminShell>

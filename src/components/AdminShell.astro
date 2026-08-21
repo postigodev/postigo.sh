@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AdminAuthControls from './AdminAuthControls';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+<BaseLayout title={`${title} | postigo.sh admin`} description={description}>
+  <main class="document-shell admin-shell">
+    <nav class="document-nav" aria-label="Admin">
+      <a href="/admin">Admin</a>
+      <a href="/admin/writings">Writings</a>
+      <a href="/admin/writings/new">New draft</a>
+      <a href="/">Public site</a>
+      <AdminAuthControls mode="sign-out" client:load />
+    </nav>
+    <article class="document-panel">
+      <slot />
+    </article>
+  </main>
+</BaseLayout>

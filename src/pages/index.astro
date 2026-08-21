@@ -1,9 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import HomeSurface from '../components/HomeSurface.astro';
+import { getPublishedWritingsOrFallback } from '../data/writings';
 
-export const prerender = true;
+export const prerender = false;
+
+const writingsLoad = await getPublishedWritingsOrFallback();
 ---
 <BaseLayout title="Piero Postigo Rocchetti | Software Engineer" description="Backend and product software engineering portfolio.">
-  <HomeSurface />
+  <HomeSurface
+    writings={writingsLoad.writings}
+    writingsUnavailable={!writingsLoad.available}
+  />
 </BaseLayout>

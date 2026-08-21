@@ -1,0 +1,10 @@
+---
+import AdminShell from '../../components/AdminShell.astro';
+
+export const prerender = false;
+---
+<AdminShell title="Admin" description="Manage postigo.sh writings.">
+  <h1>Admin</h1>
+  <p>Manage published writing and drafts. The public portfolio remains route-first and independent from this workspace.</p>
+  <p><a href="/admin/writings">Open writings</a> · <a href="/admin/writings/new">Create a draft</a></p>
+</AdminShell>

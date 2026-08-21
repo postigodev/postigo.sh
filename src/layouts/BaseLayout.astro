@@ -1,12 +1,32 @@
 ---
 import '../styles/global.css';
+import type { WritingMetadata } from '../writings/metadata';
 
 interface Props {
   title: string;
   description: string;
+  canonicalUrl?: string;
+  openGraph?: WritingMetadata['openGraph'];
+  jsonLd?: WritingMetadata['jsonLd'];
+  citation?: {
+    title: string;
+    authors: readonly string[];
+    publicationDate?: string;
+    pdfUrl?: string;
+  };
 }
 
-const { title, description } = Astro.props;
+const {
+  title,
+  description,
+  canonicalUrl,
+  openGraph,
+  jsonLd,
+  citation,
+} = Astro.props;
+const serializedJsonLd = jsonLd
+  ? JSON.stringify(jsonLd).replaceAll('<', '\\u003c')
+  : undefined;
 const directionContract = `<!--
 THESIS: A maintained personal web desktop makes professional evidence immediately legible and refuses the generic portfolio hero-card stack.
 OWN-WORLD: Dark blue, violet, cyan, and acid-green modules use compact Tahoma type, metallic gradient titlebars, hard borders, and the embedded goat signature.
@@ -22,6 +42,28 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    {openGraph && (
+      <>
+        <meta property="og:type" content={openGraph.type} />
+        <meta property="og:title" content={openGraph.title} />
+        <meta property="og:description" content={openGraph.description} />
+        <meta property="og:url" content={openGraph.url} />
+        <meta property="og:locale" content={openGraph.locale} />
+        <meta property="article:modified_time" content={openGraph.modifiedTime} />
+        {openGraph.publishedTime && <meta property="article:published_time" content={openGraph.publishedTime} />}
+        {openGraph.image && <meta property="og:image" content={openGraph.image} />}
+      </>
+    )}
+    {citation && (
+      <>
+        <meta name="citation_title" content={citation.title} />
+        {citation.authors.map((author) => <meta name="citation_author" content={author} />)}
+        {citation.publicationDate && <meta name="citation_publication_date" content={citation.publicationDate} />}
+        {citation.pdfUrl && <meta name="citation_pdf_url" content={citation.pdfUrl} />}
+      </>
+    )}
+    {serializedJsonLd && <script is:inline type="application/ld+json" set:html={serializedJsonLd} />}
     <title>{title}</title>
   </head>
   <body><Fragment set:html={directionContract} /><slot /></body>

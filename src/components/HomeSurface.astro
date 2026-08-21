@@ -4,12 +4,19 @@ import NowPlayingWidget from './NowPlayingWidget';
 import SiteModule from './SiteModule.astro';
 import { identity, projectCases, selectedWork } from '../data/portfolio';
 import { resumeContent } from '../data/siteContent';
-import { getPublishedWritings } from '../data/writings';
+import type { WritingSummary } from '../data/writings';
 import ProjectWindowLayer from '../project-windows/ProjectWindowLayer';
 
-interface Props { initialProjectSlug?: string }
-const { initialProjectSlug } = Astro.props;
-const writings = getPublishedWritings();
+interface Props {
+  initialProjectSlug?: string;
+  writings?: readonly WritingSummary[];
+  writingsUnavailable?: boolean;
+}
+const {
+  initialProjectSlug,
+  writings = [],
+  writingsUnavailable = false,
+} = Astro.props;
 ---
 <div class="site-page" data-home-surface>
   <header class="site-head">
@@ -53,7 +60,9 @@ const writings = getPublishedWritings();
       </SiteModule>
 
       <SiteModule id="writings-box" title="writings" column="main">
-        {writings.length > 0
+        {writingsUnavailable
+          ? <p class="empty-state"><strong>Writings are temporarily unavailable.</strong><span>The rest of the portfolio remains available.</span></p>
+          : writings.length > 0
           ? <ol class="writing-list">{writings.map((writing) => <li><a href={`/writings/${writing.slug}`}>{writing.title}</a><span>{writing.summary}</span></li>)}</ol>
           : <p class="empty-state"><strong>No published writing yet.</strong><span>This section is under construction; no placeholder essays are listed.</span></p>}
         <a href="/writings">Open writings</a>

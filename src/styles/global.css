@@ -228,6 +228,34 @@ button, a { font: inherit; }
 .document-shell h2 { margin: 32px 0 10px; color: #eaf0ff; }
 .document-shell h3 { margin: 18px 0 4px; color: #d8e4ff; }
 .document-shell p, .document-shell li { max-width: 72ch; color: #c4cfe2; }
+.writing-header { padding-bottom: 18px; border-bottom: 1px solid #55627b; }
+.writing-kicker, .writing-byline { font-family: "Courier New", monospace; }
+.writing-kicker { color: #9bd0ff !important; text-transform: uppercase; }
+.writing-subtitle { color: #e7ecf7 !important; font-size: 1.1rem; }
+.writing-markdown { margin-top: 24px; line-height: 1.65; }
+.writing-markdown pre { max-width: 100%; padding: 12px; overflow: auto; border: 1px solid #55627b; background: #090b10; }
+.writing-markdown img { max-width: 100%; height: auto; }
+.admin-shell { max-width: 1060px; }
+.admin-shell .document-panel > h1:first-child { margin-top: 0; }
+.admin-auth-controls { display: inline-flex; align-items: center; gap: 8px; }
+.admin-auth-controls p { margin: 0; color: #ffb5b5; }
+.admin-form { display: grid; gap: 16px; margin-top: 20px; }
+.admin-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.admin-form label, .admin-operation label { display: grid; gap: 5px; color: #e8eefb; font-weight: 700; }
+.admin-form small { color: #aebbd2; font-weight: 400; }
+.admin-form-wide { grid-column: 1 / -1; }
+.admin-form input, .admin-form textarea, .admin-form select, .admin-operation input { width: 100%; padding: 8px; color: #eef3ff; border: 1px solid #667590; background: #0e121a; font: inherit; }
+.admin-form textarea { resize: vertical; }
+.admin-shell button { width: max-content; padding: 7px 10px; color: #f4f7ff; border: 1px solid #687590; background: #25324f; font: 700 .8rem/1.2 Tahoma, sans-serif; cursor: pointer; }
+.admin-shell button:disabled { opacity: .65; cursor: wait; }
+.admin-feedback { padding: 10px; border: 1px solid #6b7690; background: #161c29; }
+.admin-feedback--success { border-color: #708a2d; }
+.admin-feedback--error { border-color: #a85858; }
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table th, .admin-table td { padding: 9px; border: 1px solid #55627b; text-align: left; }
+.admin-operation { margin-top: 28px; padding-top: 16px; border-top: 1px solid #55627b; }
+.admin-operation form { display: grid; gap: 10px; margin-top: 10px; }
+.admin-danger-zone { border-top-color: #a85858; }
 
 .project-document-shell { max-width: 1040px; }
 .case-header { padding-bottom: 24px; border-bottom: 1px solid #667590; }
@@ -331,6 +359,9 @@ button, a { font: inherit; }
   .project-list li { grid-template-columns: 1fr; }
   .project-list span { text-align: left; }
   .ownership-boundary, .case-chapter, .evidence-row, .artifact-list a { grid-template-columns: 1fr; }
+  .admin-form-grid { grid-template-columns: 1fr; }
+  .admin-form-wide { grid-column: auto; }
+  .admin-table { display: block; overflow-x: auto; }
   .case-chapter { gap: 8px; }
   .evidence-arrow { justify-self: start; }
   /* Static fallback before hydration and when JavaScript is unavailable. */

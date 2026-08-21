@@ -1,0 +1,127 @@
+---
+import { actions } from 'astro:actions';
+import AdminShell from '../../../components/AdminShell.astro';
+import AdminWritingFields from '../../../components/AdminWritingFields.astro';
+import { writingIdSchema } from '../../../actions/writing-input';
+import type { Writing } from '../../../writings/domain';
+import { getWritingById } from '../../../writings/service';
+
+export const prerender = false;
+
+const parsedId = writingIdSchema.safeParse(Astro.params.id);
+const updateResult = Astro.getActionResult(actions.updateWriting);
+const publishResult = Astro.getActionResult(actions.publishWriting);
+const unpublishResult = Astro.getActionResult(actions.unpublishWriting);
+const uploadResult = Astro.getActionResult(actions.uploadWritingPdf);
+const removeResult = Astro.getActionResult(actions.removeWritingPdf);
+const deleteResult = Astro.getActionResult(actions.deleteWriting);
+const feedback = [
+  { success: 'Writing saved.', result: updateResult },
+  { success: 'Writing published.', result: publishResult },
+  { success: 'Writing returned to draft.', result: unpublishResult },
+  { success: 'PDF attached.', result: uploadResult },
+  { success: 'PDF removed.', result: removeResult },
+  { success: 'Writing deleted.', result: deleteResult },
+].find((entry) => entry.result);
+const deleted = Boolean(deleteResult && !deleteResult.error);
+
+let writing: Writing | null = null;
+let unavailable = false;
+if (!parsedId.success) {
+  Astro.response.status = 404;
+} else if (!deleted) {
+  try {
+    writing = await getWritingById(parsedId.data);
+    if (!writing) Astro.response.status = 404;
+  } catch (error) {
+    unavailable = true;
+    Astro.response.status = 503;
+    console.error('Unable to load the writing for editing.', {
+      id: parsedId.data,
+      error,
+    });
+  }
+}
+---
+<AdminShell title={writing?.title ?? (deleted ? 'Writing deleted' : 'Writing editor')} description="Edit a postigo.sh writing.">
+  {feedback?.result?.error && (
+    <p class="admin-feedback admin-feedback--error" role="alert"><strong>{feedback.result.error.code}:</strong> {feedback.result.error.message}</p>
+  )}
+  {feedback?.result && !feedback.result.error && (
+    <div class="admin-feedback admin-feedback--success" role="status">
+      <p>{feedback.success}</p>
+      {feedback.result.data.warnings.map((warning) => <p><strong>Warning:</strong> {warning.message}</p>)}
+    </div>
+  )}
+
+  {deleted ? (
+    <>
+      <h1>Writing deleted</h1>
+      <p><a href="/admin/writings">Return to writings</a></p>
+    </>
+  ) : unavailable ? (
+    <>
+      <h1>Writing editor unavailable</h1>
+      <p>Please try again later.</p>
+    </>
+  ) : !writing ? (
+    <>
+      <h1>Writing not found</h1>
+      <p>The requested writing ID does not exist.</p>
+    </>
+  ) : (
+    <>
+      <h1>Edit {writing.title}</h1>
+      <p>Status: <strong>{writing.status}</strong> · <a href={`/writings/${writing.slug}`}>Public route</a></p>
+
+      <form method="POST" action={actions.updateWriting} class="admin-form">
+        <input type="hidden" name="id" value={writing.id} />
+        <AdminWritingFields writing={writing} />
+        <button type="submit">Save writing</button>
+      </form>
+
+      <section class="admin-operation">
+        <h2>Publication</h2>
+        {writing.status === 'draft' ? (
+          <form method="POST" action={actions.publishWriting}>
+            <input type="hidden" name="id" value={writing.id} />
+            <button type="submit">Publish</button>
+          </form>
+        ) : (
+          <form method="POST" action={actions.unpublishWriting}>
+            <input type="hidden" name="id" value={writing.id} />
+            <button type="submit">Unpublish</button>
+          </form>
+        )}
+      </section>
+
+      <section class="admin-operation">
+        <h2>Paper PDF</h2>
+        {writing.pdf ? (
+          <>
+            <p><a href={`/writings/${writing.slug}/paper.pdf`}>{writing.pdf.filename}</a> ({Math.ceil(writing.pdf.size / 1024)} KB)</p>
+            <form method="POST" action={actions.removeWritingPdf}>
+              <input type="hidden" name="id" value={writing.id} />
+              <button type="submit">Remove PDF</button>
+            </form>
+          </>
+        ) : <p>No PDF attached.</p>}
+        <form method="POST" enctype="multipart/form-data" action={actions.uploadWritingPdf}>
+          <input type="hidden" name="id" value={writing.id} />
+          <label>PDF file <input type="file" name="file" accept="application/pdf,.pdf" required /></label>
+          <button type="submit">{writing.pdf ? 'Replace PDF' : 'Upload PDF'}</button>
+        </form>
+      </section>
+
+      <section class="admin-operation admin-danger-zone">
+        <h2>Delete writing</h2>
+        <p>This removes the writing and attempts to remove its attached PDF.</p>
+        <form method="POST" action={actions.deleteWriting}>
+          <input type="hidden" name="id" value={writing.id} />
+          <label>Type <code>{writing.slug}</code> to confirm <input name="expectedSlug" required autocomplete="off" /></label>
+          <button type="submit">Delete writing</button>
+        </form>
+      </section>
+    </>
+  )}
+</AdminShell>
