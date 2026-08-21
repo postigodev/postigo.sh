@@ -73,15 +73,15 @@ describe('writings schema', () => {
         'pdfMimeType',
       ]),
     );
-    expect(propertyNames).not.toEqual(
-      expect.arrayContaining([
-        'openGraphTitle',
-        'openGraphDescription',
-        'openGraphImageUrl',
-        'pdfFileName',
-        'pdfSizeBytes',
-      ]),
-    );
+    for (const forbiddenPropertyName of [
+      'openGraphTitle',
+      'openGraphDescription',
+      'openGraphImageUrl',
+      'pdfFileName',
+      'pdfSizeBytes',
+    ]) {
+      expect(propertyNames).not.toContain(forbiddenPropertyName);
+    }
     expect(columnNames).toEqual(
       expect.arrayContaining([
         'og_image_url',
@@ -92,14 +92,14 @@ describe('writings schema', () => {
         'pdf_mime_type',
       ]),
     );
-    expect(columnNames).not.toEqual(
-      expect.arrayContaining([
-        'open_graph_title',
-        'open_graph_description',
-        'open_graph_image_url',
-        'pdf_file_name',
-        'pdf_size_bytes',
-      ]),
-    );
+    for (const forbiddenColumnName of [
+      'open_graph_title',
+      'open_graph_description',
+      'open_graph_image_url',
+      'pdf_file_name',
+      'pdf_size_bytes',
+    ]) {
+      expect(columnNames).not.toContain(forbiddenColumnName);
+    }
   });
 });
