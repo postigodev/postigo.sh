@@ -151,7 +151,7 @@ describe('writing service publication behavior', () => {
     await expect(service.listWritingsForAdmin()).resolves.toHaveLength(2);
   });
 
-  it('sets publishedAt once and preserves it through unpublish and republish', async () => {
+  it('publishes once and preserves publishedAt through dedicated unpublish and republish calls', async () => {
     const firstPublish = new Date('2026-03-01T00:00:00.000Z');
     const later = new Date('2026-04-01T00:00:00.000Z');
     const draft = record();
@@ -159,16 +159,29 @@ describe('writing service publication behavior', () => {
     const now = vi.fn(() => firstPublish);
     const service = createWritingService({ repository: repo, now });
 
-    const published = await service.updateWriting(draft.id, { status: 'published' });
+    const published = await service.publishWriting(draft.id);
     expect(published?.publishedAt).toBe(firstPublish);
+    expect(published?.status).toBe('published');
 
-    await service.updateWriting(draft.id, { status: 'draft' });
-    now.mockReturnValue(later);
-    const republished = await service.updateWriting(draft.id, {
-      status: 'published',
+    const unpublished = await service.unpublishWriting(draft.id);
+    expect(unpublished).toMatchObject({
+      status: 'draft',
+      publishedAt: firstPublish,
     });
+    now.mockReturnValue(later);
+    const republished = await service.publishWriting(draft.id);
     expect(republished?.publishedAt).toBe(firstPublish);
+    expect(republished?.status).toBe('published');
     expect(now).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns null from dedicated publication APIs when the writing does not exist', async () => {
+    const { repo } = repository();
+    const service = createWritingService({ repository: repo });
+
+    await expect(service.publishWriting('missing')).resolves.toBeNull();
+    await expect(service.unpublishWriting('missing')).resolves.toBeNull();
+    expect(repo.update).not.toHaveBeenCalled();
   });
 
   it('sets publishedAt for newly created published writings and canonicalizes input', async () => {

@@ -256,6 +256,23 @@ export function createWritingService({
       }
     },
 
+    async publishWriting(id: string): Promise<Writing | null> {
+      const existing = await repository.getById(id);
+      if (!existing) return null;
+      const updated = await repository.update(id, {
+        status: 'published',
+        ...(existing.publishedAt ? {} : { publishedAt: now() }),
+      });
+      return updated ? mapWritingRecord(updated) : null;
+    },
+
+    async unpublishWriting(id: string): Promise<Writing | null> {
+      const existing = await repository.getById(id);
+      if (!existing) return null;
+      const updated = await repository.update(id, { status: 'draft' });
+      return updated ? mapWritingRecord(updated) : null;
+    },
+
     async attachWritingPdf(
       id: string,
       file: File,
@@ -405,6 +422,14 @@ export async function updateWriting(
   input: UpdateWritingInput,
 ): Promise<Writing | null> {
   return (await productionService()).updateWriting(id, input);
+}
+
+export async function publishWriting(id: string): Promise<Writing | null> {
+  return (await productionService()).publishWriting(id);
+}
+
+export async function unpublishWriting(id: string): Promise<Writing | null> {
+  return (await productionService()).unpublishWriting(id);
 }
 
 export async function attachWritingPdf(
