@@ -124,12 +124,12 @@ export const writings = pgTable(
     canonicalUrl: text('canonical_url'),
     seoTitle: text('seo_title'),
     seoDescription: text('seo_description'),
-    openGraphTitle: text('open_graph_title'),
-    openGraphDescription: text('open_graph_description'),
-    openGraphImageUrl: text('open_graph_image_url'),
+    ogImageUrl: text('og_image_url'),
     pdfUrl: text('pdf_url'),
-    pdfFileName: text('pdf_file_name'),
-    pdfSizeBytes: integer('pdf_size_bytes'),
+    pdfPathname: text('pdf_pathname'),
+    pdfFilename: text('pdf_filename'),
+    pdfSize: integer('pdf_size'),
+    pdfMimeType: text('pdf_mime_type'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),

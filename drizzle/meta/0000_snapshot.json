@@ -1,5 +1,5 @@
 {
-  "id": "13bbe654-7a18-4b66-a5ad-2f70535613ad",
+  "id": "07d6b030-2786-4c9a-8a4c-e39d98ba3f83",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -493,20 +493,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "open_graph_title": {
-          "name": "open_graph_title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "open_graph_description": {
-          "name": "open_graph_description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "open_graph_image_url": {
-          "name": "open_graph_image_url",
+        "og_image_url": {
+          "name": "og_image_url",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -517,15 +505,27 @@
           "primaryKey": false,
           "notNull": false
         },
-        "pdf_file_name": {
-          "name": "pdf_file_name",
+        "pdf_pathname": {
+          "name": "pdf_pathname",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "pdf_size_bytes": {
-          "name": "pdf_size_bytes",
+        "pdf_filename": {
+          "name": "pdf_filename",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pdf_size": {
+          "name": "pdf_size",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pdf_mime_type": {
+          "name": "pdf_mime_type",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },

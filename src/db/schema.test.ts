@@ -56,4 +56,50 @@ describe('writings schema', () => {
     expect(writings.topics.notNull).toBe(true);
     expect(writings.publishedAt.notNull).toBe(false);
   });
+
+  it('uses only the approved Open Graph image and PDF metadata fields', () => {
+    const propertyNames = Object.keys(writings);
+    const columnNames = getTableConfig(writings).columns.map(
+      (column) => column.name,
+    );
+
+    expect(propertyNames).toEqual(
+      expect.arrayContaining([
+        'ogImageUrl',
+        'pdfUrl',
+        'pdfPathname',
+        'pdfFilename',
+        'pdfSize',
+        'pdfMimeType',
+      ]),
+    );
+    expect(propertyNames).not.toEqual(
+      expect.arrayContaining([
+        'openGraphTitle',
+        'openGraphDescription',
+        'openGraphImageUrl',
+        'pdfFileName',
+        'pdfSizeBytes',
+      ]),
+    );
+    expect(columnNames).toEqual(
+      expect.arrayContaining([
+        'og_image_url',
+        'pdf_url',
+        'pdf_pathname',
+        'pdf_filename',
+        'pdf_size',
+        'pdf_mime_type',
+      ]),
+    );
+    expect(columnNames).not.toEqual(
+      expect.arrayContaining([
+        'open_graph_title',
+        'open_graph_description',
+        'open_graph_image_url',
+        'pdf_file_name',
+        'pdf_size_bytes',
+      ]),
+    );
+  });
 });
