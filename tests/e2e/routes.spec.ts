@@ -40,7 +40,7 @@ test('Sendo public route hides provenance and uses an archive source action', as
   await expect(page.getByRole('link', { name: /Source repository/ })).toHaveClass(/archive-action/);
 });
 
-test('direct writings route reports its no-database fallback honestly', async ({ page }) => {
+test('direct writings route reports its unavailable-backend fallback honestly', async ({ page }) => {
   await page.goto('/writings');
   await expect(page.getByRole('heading', { level: 1, name: 'Writings' })).toBeVisible();
   await expect(page.locator('.document-panel')).toContainText(/No published writing yet|Writings are temporarily unavailable/);

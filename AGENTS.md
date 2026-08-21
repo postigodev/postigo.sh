@@ -12,7 +12,7 @@ The production site combines:
 - the implemented preview-native visual world in `DESIGN.md`
 - the compositional reference in `references/preview.html`
 - factual professional content verified in `docs/career/`
-- static-first Astro routes with narrowly scoped Preact enhancement
+- mixed static/on-demand Astro routes with narrowly scoped Preact enhancement
 
 Never invent professional facts.
 
@@ -25,6 +25,10 @@ Use:
 - Astro
 - Preact
 - TypeScript (`strict`)
+- Drizzle ORM with Neon Postgres
+- Better Auth with GitHub OAuth
+- Astro Actions for writing mutations
+- Vercel Blob for writing PDFs
 - plain CSS / scoped CSS / CSS custom properties
 - typed local portfolio content
 - Playwright for critical interaction tests
@@ -82,7 +86,8 @@ files unless explicitly asked.
 
 Astro owns:
 
-- routes and static HTML
+- static and on-demand routes
+- server-rendered HTML and Astro Actions
 - SEO and metadata
 - stable documents and direct links
 - no-JavaScript-readable content where practical
@@ -91,6 +96,7 @@ Preact owns progressive enhancement only:
 
 - project-case windows in `src/project-windows/`
 - live GitHub and Spotify presence widgets
+- tiny admin sign-in and sign-out controls
 
 Do not turn the site into an SPA or hydrate static documents unnecessarily.
 
@@ -111,8 +117,16 @@ Core content must remain useful at stable routes:
 - `/about`
 - `/resume`
 - `/writings`
+- `/writings/[slug]`
+- `/writings/[slug]/paper.pdf`
 - `/contact`
 - `/privacy`
+- `/admin/login`
+
+Protected writing administration lives under `/admin`, while Better Auth is
+served at `/api/auth/*`. Public writing routes must distinguish not-found
+content from an unavailable database. Admin routes must fail closed when auth
+or database configuration is absent.
 
 Project launchers are semantic links. After Preact hydrates, eligible same-origin
 project links progressively open or focus a project window while preserving
@@ -130,10 +144,15 @@ Professional content is data-driven. Do not duplicate factual text across
 components or leak mock projects, locations, roles, metrics, activity, or posts
 into production.
 
-Use the typed writing adapter in `src/data/writings.ts`. It currently returns an
-honest empty collection and is intentionally prepared for a future Markdown
-backend; there is no writing backend, authentication, upload, persistence, or
-administration feature today.
+Use the async writing facade in `src/data/writings.ts` for public summaries. It
+loads published records through the writing service and returns an honest
+unavailable state when the database cannot be reached. Drizzle/Neon is the
+canonical persistence path, Better Auth protects the admin, Astro Actions own
+mutations, and Vercel Blob stores optional writing PDFs.
+
+Keep the writing backend route-first and server-owned. Its addition does not
+authorize a Phase 2 visual redesign, SPA conversion, or expansion of window
+chrome beyond project cases.
 
 When content is uncertain, consult `docs/career/` before publishing it.
 
@@ -177,12 +196,16 @@ Before declaring implementation work complete, run the relevant checks. Baseline
 - `pnpm check`
 - `pnpm test:unit`
 - `pnpm test:functions` when function code or contracts are in scope
+- `pnpm build:e2e`
+- `pnpm test:e2e`
 - `pnpm build`
 - focused Playwright coverage for changed critical interaction paths
 
 Critical browser flows include the static homepage, project-window open/focus,
 desktop drag/resize/maximize/close, direct project routes, and fullscreen mobile
-project cases.
+project cases. Backend flows also include honest no-credential public fallbacks,
+public admin login, fail-closed protected admin routes, and writing/PDF method
+contracts.
 
 ## Definition of done
 

@@ -2,6 +2,7 @@
 /docs/career
 /node_modules
 /dist
+/.e2e-dist
 /.astro
 /.superpowers
 /playwright-report

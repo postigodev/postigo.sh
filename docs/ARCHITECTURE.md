@@ -2,19 +2,23 @@
 
 ## Product architecture
 
-`portfolio-v2` is a statically delivered Astro portfolio with focused Preact
-progressive enhancement. It is a route-first personal web surface, not a
-desktop OS.
+`portfolio-v2` is a route-first Astro portfolio with a mixed rendering model:
+stable professional documents are prerendered, while the homepage, writings,
+authentication, and admin surfaces render on demand. Focused Preact islands add
+only the interactions that require a browser runtime. It remains a personal web
+surface, not a desktop OS.
 
 ```text
 docs/career/ ── factual professional truth
         │
         ▼
-src/data/portfolio.ts + src/data/writings.ts ── typed production content
+src/data/portfolio.ts + async writings facade ── typed production content
         │
-        ├── Astro ── routes, documents, metadata, no-JS content
-        │
-        └── Preact ── project windows + live presence widgets
+        ├── Astro ── static/on-demand routes, Actions, metadata, no-JS content
+        ├── Drizzle/Neon ── auth and writing records
+        ├── Better Auth ── GitHub OAuth and admin sessions
+        ├── Vercel Blob ── optional writing PDFs
+        └── Preact ── project windows + presence + tiny admin auth controls
 
 DESIGN.md ── canonical production visual system
 references/preview.html ── binding visual/compositional reference (read-only)
@@ -30,22 +34,30 @@ and may describe retired desktop-shell work.
 
 ## Stack
 
-- Astro for static delivery and routes
+- Astro server output with prerendered and on-demand routes
+- the Vercel adapter for production deployment
 - Preact for bounded client-side enhancement
 - TypeScript in strict mode
 - plain CSS and CSS custom properties
-- typed local data for portfolio and writing surfaces
+- typed local portfolio data and an async writing facade
+- Drizzle ORM with Neon Postgres for auth and writing records
+- Better Auth with GitHub OAuth for administrator sessions
+- Astro Actions for authorized writing mutations
+- Vercel Blob for optional writing PDFs
 - pnpm, Vitest, and Playwright
 
-No database, SSR, global state library, component library, or animation
-framework is required for the current product.
+No global state library, component library, animation framework, SPA shell, or
+second schema generator is required. `src/db/schema.ts` and checked-in Drizzle
+migrations are the single database schema authority.
 
 ## Rendering model
 
 ### Astro
 
-Astro owns route-level pages, static HTML, SEO metadata, direct navigation,
-portfolio documents, and useful no-JavaScript fallbacks.
+Astro owns route-level pages, server HTML, SEO metadata, direct navigation,
+Astro Actions, and useful no-JavaScript fallbacks. Static professional documents
+are prerendered; routes that read configuration, authentication, or published
+writing data render on demand.
 
 Stable routes are:
 
@@ -56,9 +68,25 @@ Stable routes are:
 /about
 /resume
 /writings
+/writings/[slug]
+/writings/[slug]/paper.pdf
 /contact
 /privacy
+/admin/login
+/admin
+/admin/writings
+/admin/writings/new
+/admin/writings/[id]
+/api/auth/*
 ```
+
+The writing index and detail routes are public. A stable PDF route resolves
+stored PDF metadata and redirects only to valid HTTPS Blob URLs. `/admin/login`
+is public; middleware protects every other `/admin` route and fails closed with
+503 when database or authentication configuration is absent. Better Auth owns
+the `/api/auth/*` request handlers. Astro Actions create, update, publish,
+unpublish, delete, upload, and detach writing data after the same authorization
+check.
 
 The homepage and a direct project route share the same Astro `HomeSurface`.
 Without JavaScript, project anchors navigate normally and the route remains
@@ -66,13 +94,15 @@ readable.
 
 ### Preact
 
-Preact is limited to three progressive enhancements:
+Preact is limited to four progressive enhancements:
 
 - `src/project-windows/ProjectWindowLayer.tsx` manages project-case windows.
 - `GitHubWidget.tsx` renders live public GitHub presence with an honest
   unavailable state.
 - `NowPlayingWidget.tsx` renders fixed-owner Spotify presence with an honest
   unavailable state.
+- `AdminAuthControls.tsx` provides the small GitHub sign-in and sign-out
+  controls; admin documents and mutations remain server-owned.
 
 Static documents and ordinary homepage modules do not hydrate.
 
@@ -103,10 +133,23 @@ never show inert window controls.
 typed identity, selected work, project cases, ownership boundaries, and public
 artifacts derived from that evidence.
 
-`src/data/writings.ts` is a typed empty adapter. It intentionally returns no
-published writings until a future Markdown-backed publishing path is introduced.
-There is no writing backend, authentication, uploads, persistence, or admin
-surface in this version.
+`src/data/writings.ts` is an async facade over the writing service. It projects
+published database records into homepage/index summaries and converts backend
+configuration or database failures into an explicit unavailable state. It does
+not fabricate an empty publishing history when the backend cannot be reached.
+
+`src/db/schema.ts` defines the Better Auth and writing tables. The writing
+repository and service own persistence and domain behavior; public routes only
+select published records. Better Auth establishes GitHub sessions, and
+authorization grants admin access only when the normalized session email exactly
+matches `ADMIN_EMAIL`. Vercel Blob stores optional PDF objects while Postgres
+stores their public URL and cleanup metadata.
+
+Public routes distinguish missing content from unavailable infrastructure: a
+valid absent record is 404, while an unconfigured or unreachable backend is 503.
+The homepage and writing index remain readable with an honest unavailable
+message. The public admin login also renders without credentials, while protected
+admin routes fail closed.
 
 ## Styling and assets
 
@@ -125,6 +168,19 @@ never receives owner credentials, Spotify refresh tokens, or visitor login
 controls. GitHub and Spotify widgets render truthful unavailable states when
 their endpoints or configuration are unavailable.
 
+## Deployment and schema lifecycle
+
+Production uses `@astrojs/vercel`. Vercel must provide the database, Better Auth,
+GitHub OAuth, administrator, Blob, and site URL variables required by the routes
+being used. Production builds never apply database migrations. Schema changes
+flow from `src/db/schema.ts` through `pnpm db:generate`; `pnpm db:migrate` is an
+explicit release operation against a deliberately selected database.
+
+Browser tests use a separate `@astrojs/node` standalone build in the ignored
+`.e2e-dist/` directory. This exercises SSR and asset delivery without changing
+the production adapter or requiring credentials. The no-credential contract is
+part of the E2E suite.
+
 ## Accessibility and resilience
 
 - Static routes and project anchors work without JavaScript.
@@ -136,7 +192,8 @@ their endpoints or configuration are unavailable.
 
 ## Verification
 
-Run `pnpm check`, `pnpm test:unit`, `pnpm test:functions`, and `pnpm build` for
-the baseline. Use focused Playwright coverage for the static homepage,
-project-window history and geometry, direct project routes, and mobile
-fullscreen behavior. Run `git diff --check` before committing.
+Run `pnpm check`, `pnpm test:unit`, `pnpm test:functions`, `pnpm build:e2e`,
+`pnpm test:e2e`, and `pnpm build` for the baseline. Playwright covers the
+homepage, no-credential backend behavior, project-window history and geometry,
+direct project routes, writing/PDF contracts, and mobile fullscreen behavior.
+Run `git diff --check` before committing.
