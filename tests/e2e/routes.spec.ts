@@ -62,7 +62,26 @@ test('public writing detail and PDF distinguish an unavailable backend from not 
     maxRedirects: 0,
   });
   expect(pdf.status()).toBe(503);
+  expect(pdf.headers()['cache-control']).toBe('no-store');
   expect(await pdf.text()).toBe('PDF unavailable.');
+
+  const head = await request.head('/writings/not-published-here/paper.pdf');
+  expect(head.status()).toBe(503);
+  expect(head.headers()['cache-control']).toBe('no-store');
+  expect(await head.body()).toHaveLength(0);
+});
+
+test('stable writing PDF route rejects unsupported methods explicitly', async ({ request, baseURL }) => {
+  const response = await request.post('/writings/not-published-here/paper.pdf', {
+    headers: { origin: baseURL ?? 'http://127.0.0.1:4323' },
+    data: '',
+  });
+
+  expect(response.status()).toBe(405);
+  expect(response.headers()['allow']).toBe('GET, HEAD');
+  expect(response.headers()['cache-control']).toBe('no-store');
+  expect(response.headers()['content-type']).toContain('text/plain');
+  expect(await response.text()).toBe('Method not allowed.');
 });
 
 test.describe('without JavaScript', () => {

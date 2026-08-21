@@ -1,5 +1,6 @@
 import { createAuthClient } from 'better-auth/client';
 import { useState } from 'preact/hooks';
+import { runAdminAuthOperation } from '../lib/admin-auth-operation';
 import { safeAdminNextPath } from '../lib/admin-paths';
 
 interface Props {
@@ -17,13 +18,17 @@ export default function AdminAuthControls({ mode, next = '/admin' }: Props) {
     setPending(true);
     setError('');
     const callbackURL = safeAdminNextPath(next);
-    const result = await authClient.signIn.social({
-      provider: 'github',
-      callbackURL,
-      errorCallbackURL: `/admin/login?error=oauth&next=${encodeURIComponent(callbackURL)}`,
-    });
-    if (result.error) {
-      setError(result.error.message ?? 'GitHub sign-in could not be started.');
+    try {
+      const errorMessage = await runAdminAuthOperation(
+        () => authClient.signIn.social({
+          provider: 'github',
+          callbackURL,
+          errorCallbackURL: `/admin/login?error=oauth&next=${encodeURIComponent(callbackURL)}`,
+        }),
+        'GitHub sign-in could not be started.',
+      );
+      if (errorMessage) setError(errorMessage);
+    } finally {
       setPending(false);
     }
   }
@@ -31,13 +36,16 @@ export default function AdminAuthControls({ mode, next = '/admin' }: Props) {
   async function signOut() {
     setPending(true);
     setError('');
-    const result = await authClient.signOut();
-    if (result.error) {
-      setError(result.error.message ?? 'Sign-out failed.');
+    try {
+      const errorMessage = await runAdminAuthOperation(
+        () => authClient.signOut(),
+        'Sign-out failed.',
+        () => window.location.assign('/admin/login'),
+      );
+      if (errorMessage) setError(errorMessage);
+    } finally {
       setPending(false);
-      return;
     }
-    window.location.assign('/admin/login');
   }
 
   return (

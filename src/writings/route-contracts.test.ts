@@ -36,7 +36,10 @@ describe('writing route boundaries', () => {
 
     expect(pdf).toContain('status: 307');
     expect(pdf).toContain('location: blobUrl.toString()');
-    expect(pdf).toContain('export const HEAD = GET');
+    expect(pdf).toContain("'cache-control': 'no-store'");
+    expect(pdf).toContain('export const HEAD: APIRoute');
+    expect(pdf).toContain('export const ALL: APIRoute');
+    expect(pdf).toContain("allow: 'GET, HEAD'");
     expect(pdf).not.toContain('arrayBuffer(');
   });
 });
@@ -67,6 +70,9 @@ describe('admin document contracts', () => {
 
     expect(controls).toContain("provider: 'github'");
     expect(controls).toContain('safeAdminNextPath(next)');
+    expect(controls).toContain('finally');
+    expect(controls).toContain('GitHub sign-in could not be started.');
+    expect(controls).toContain('Sign-out failed.');
     expect(shell).toContain('AdminAuthControls mode="sign-out" client:load');
   });
 });
