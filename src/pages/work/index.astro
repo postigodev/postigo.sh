@@ -2,6 +2,9 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import DocumentNav from '../../components/DocumentNav.astro';
 import { projectCases, prominentWork, selectedWork } from '../../data/portfolio';
+
+export const prerender = true;
+
 const caseSlugs = new Set<string>(projectCases.map((project) => project.slug));
 const workGroups = [
   { title: 'Selected work', records: selectedWork },

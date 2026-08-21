@@ -1,4 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'; import DocumentNav from '../components/DocumentNav.astro'; import { identity } from '../data/portfolio';
+
+export const prerender = true;
 ---
 <BaseLayout title="Contact | Piero Postigo Rocchetti" description="Contact Piero Postigo Rocchetti."><main class="document-shell"><DocumentNav /><p>[CONTACT]</p><h1>Contact</h1><ul><li><a href={identity.links.email}>Email</a></li><li><a href={identity.links.github}>GitHub</a></li><li><a href={identity.links.linkedin}>LinkedIn</a></li></ul></main></BaseLayout>

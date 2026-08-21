@@ -3,6 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import DocumentNav from '../../components/DocumentNav.astro';
 import { getPublishedWritings } from '../../data/writings';
 
+export const prerender = true;
+
 const writings = getPublishedWritings();
 ---
 <BaseLayout title="Writings | Piero Postigo Rocchetti" description="Published writing by Piero Postigo Rocchetti.">

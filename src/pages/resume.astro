@@ -2,5 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import DocumentNav from '../components/DocumentNav.astro';
 import { resumeContent } from '../data/siteContent';
+
+export const prerender = true;
 ---
 <BaseLayout title="Resume | Piero Postigo Rocchetti" description="Resume for Piero Postigo Rocchetti."><main class="document-shell"><DocumentNav /><p>{resumeContent.eyebrow}</p><h1>{resumeContent.title}</h1>{resumeContent.paragraphs.map((paragraph) => <p>{paragraph}</p>)}</main></BaseLayout>

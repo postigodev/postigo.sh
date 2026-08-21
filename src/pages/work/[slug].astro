@@ -3,6 +3,8 @@ import HomeSurface from '../../components/HomeSurface.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { projectCases, type ProjectCase } from '../../data/portfolio';
 
+export const prerender = true;
+
 export function getStaticPaths() {
   return projectCases.map((project) => ({ params: { slug: project.slug }, props: { project } }));
 }

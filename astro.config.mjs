@@ -1,7 +1,18 @@
-import { defineConfig } from 'astro/config';
+import vercel from '@astrojs/vercel';
+import { defineConfig, envField } from 'astro/config';
 import preact from '@astrojs/preact';
 
 export default defineConfig({
-  output: 'static',
+  output: 'server',
+  adapter: vercel(),
+  env: {
+    schema: {
+      DATABASE_URL: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+      }),
+    },
+  },
   integrations: [preact()],
 });
