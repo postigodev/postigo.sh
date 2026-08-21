@@ -177,14 +177,88 @@ button, a { font: inherit; }
 .resume-snippet { color: #c9d5e7; }
 .resume-snippet strong { color: #eef4ff; }
 
-.project-list, .writing-list, .activity-list { margin: 0; padding: 0; list-style: none; }
-.project-list li, .writing-list li, .activity-list li { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(120px, auto); gap: 8px; align-items: baseline; padding: 6px 7px 6px 17px; color: #c8d1e8; border-bottom: 1px solid #364054; }
-.project-list li::before { content: "★"; position: absolute; left: 4px; top: 7px; color: #8aaeff; font-size: 8px; }
-.project-list li:last-child, .writing-list li:last-child, .activity-list li:last-child { border-bottom: 0; }
-.project-list a, .writing-list a, .activity-list a { color: #f0f4ff; font-weight: 700; }
-.project-list span, .writing-list span, .activity-list span { color: #aebbd2; font-size: 8px; text-align: right; }
-.activity-list li { grid-template-columns: 1fr; padding-left: 7px; }
-.activity-list span { color: #ccd7c0; text-align: left; }
+.project-list,
+.writing-list,
+.activity-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project-list li,
+.writing-list li,
+.activity-list li {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, auto);
+  gap: 8px;
+  align-items: baseline;
+  padding: 6px 7px 6px 17px;
+  color: #c8d1e8;
+  border-bottom: 1px solid #364054;
+}
+
+.project-list li::before {
+  content: "★";
+  position: absolute;
+  left: 4px;
+  top: 7px;
+  color: #8aaeff;
+  font-size: 8px;
+}
+
+.project-list li:last-child,
+.writing-list li:last-child,
+.activity-list li:last-child {
+  border-bottom: 0;
+}
+
+.project-list a,
+.writing-list a,
+.activity-list a {
+  color: #f0f4ff;
+  font-weight: 700;
+}
+
+.project-list span,
+.writing-list span,
+.activity-list span {
+  color: #aebbd2;
+  font-size: 8px;
+  text-align: right;
+}
+
+
+/* writings */
+
+.writing-list li {
+  grid-template-columns: 1fr;
+  gap: 4px;
+  align-items: start;
+  padding-left: 7px;
+}
+
+.writing-list li > * {
+  min-width: 0;
+}
+
+.writing-list span {
+  text-align: left;
+  line-height: 1.4;
+}
+
+
+/* activity */
+
+.activity-list li {
+  grid-template-columns: 1fr;
+  padding-left: 7px;
+}
+
+.activity-list span {
+  color: #ccd7c0;
+  text-align: left;
+}
 
 .empty-state { display: grid; gap: 3px; margin: 0 0 8px; padding: 10px; color: #c6cde0; border: 1px dashed #687590; background: rgba(255,255,255,.025); }
 .empty-state strong { color: #f1f4fc; }
