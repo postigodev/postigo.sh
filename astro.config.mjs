@@ -12,6 +12,41 @@ export default defineConfig({
         access: 'secret',
         optional: true,
       }),
+      BETTER_AUTH_SECRET: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+      }),
+      BETTER_AUTH_URL: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+      }),
+      GITHUB_CLIENT_ID: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+      }),
+      GITHUB_CLIENT_SECRET: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+      }),
+      ADMIN_EMAIL: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+      }),
+      BLOB_READ_WRITE_TOKEN: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+      }),
+      SITE_URL: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+      }),
     },
   },
   integrations: [preact()],

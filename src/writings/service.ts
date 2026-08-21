@@ -387,10 +387,11 @@ let productionServicePromise: Promise<ReturnType<typeof createWritingService>> |
   null;
 
 async function productionService() {
-  productionServicePromise ??= import('../db/client').then(({ getDatabase }) =>
-    createWritingService({
-      repository: createDrizzleWritingRepository(getDatabase()),
-    }),
+  productionServicePromise ??= import('../db/client').then(
+    async ({ getDatabase }) =>
+      createWritingService({
+        repository: createDrizzleWritingRepository(await getDatabase()),
+      }),
   );
   return productionServicePromise;
 }

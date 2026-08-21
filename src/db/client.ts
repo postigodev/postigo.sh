@@ -1,6 +1,6 @@
 import { neon } from '@neondatabase/serverless';
-import { DATABASE_URL } from 'astro:env/server';
 import { drizzle } from 'drizzle-orm/neon-http';
+import { getDatabaseConfig } from '../lib/server-env';
 import * as schema from './schema';
 
 function createDatabase(databaseUrl: string) {
@@ -11,15 +11,12 @@ export type Database = ReturnType<typeof createDatabase>;
 
 let database: Database | undefined;
 
-export function getDatabase(): Database {
+export async function getDatabase(): Promise<Database> {
   if (database) {
     return database;
   }
 
-  if (!DATABASE_URL) {
-    throw new Error('DATABASE_URL is required to access the database.');
-  }
-
+  const { DATABASE_URL } = await getDatabaseConfig();
   database = createDatabase(DATABASE_URL);
   return database;
 }
