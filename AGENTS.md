@@ -201,7 +201,7 @@ Before declaring implementation work complete, run the relevant checks. Baseline
 - `pnpm build`
 - focused Playwright coverage for changed critical interaction paths
 
-Critical browser flows include the static homepage, project-window open/focus,
+Critical browser flows include the on-demand homepage, project-window open/focus,
 desktop drag/resize/maximize/close, direct project routes, and fullscreen mobile
 project cases. Backend flows also include honest no-credential public fallbacks,
 public admin login, fail-closed protected admin routes, and writing/PDF method
