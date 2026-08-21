@@ -220,6 +220,8 @@ button, a { font: inherit; }
   font-weight: 700;
 }
 
+.open-writings { margin-left: 7px; }
+
 .project-list span,
 .writing-list span,
 .activity-list span {
