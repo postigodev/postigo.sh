@@ -17,7 +17,8 @@ and on-demand writing, authentication, and presence routes on Vercel.
   multiple cases, while mobile presents fullscreen cases without drag/resize.
 - Professional facts come from `docs/career/` and typed local portfolio data.
 - Published writings and the protected writing admin use Drizzle with Neon;
-  writing PDFs use Vercel Blob.
+  writing PDFs are private Vercel Blob objects delivered through their stable
+  same-origin writing route.
 
 See `docs/ARCHITECTURE.md` for the current implementation model. Historical
 plans under `docs/superpowers/` are noncanonical and may describe retired work.
@@ -62,9 +63,18 @@ secret. `ADMIN_EMAIL` authorizes one account: after trimming and lowercasing,
 the authenticated GitHub email must exactly equal the configured address.
 
 Create or connect a Vercel Blob store to the Vercel project and expose its
-read/write token as `BLOB_READ_WRITE_TOKEN`. The token is needed for admin PDF
-uploads and cleanup, not for rendering the public fallback or admin login.
-`SITE_URL` is the public origin used for canonical writing and PDF metadata.
+read/write token as `BLOB_READ_WRITE_TOKEN`. The token stays server-only and is
+needed for admin PDF uploads and cleanup as well as authenticated reads from the
+stable public `/writings/[slug]/paper.pdf` entrypoint. PDF objects are private;
+the route first verifies that the writing is published, then streams GET bytes
+or answers HEAD metadata without exposing or redirecting to the Blob URL. The
+4 MB upload cap also bounds function bandwidth per PDF response. The token is
+not needed to render the public fallback or admin login. `SITE_URL` is the
+public origin used for canonical writing metadata and the same-origin PDF
+metadata URL.
+
+Phase 2 remains responsible for the writings editorial design and any direct
+upload flow; Phase 1 keeps uploads and private PDF delivery server-owned.
 
 Use `pnpm dev:vercel` when testing the root `/api/*` presence functions locally.
 On Vercel, link this repository to the intended project and configure the

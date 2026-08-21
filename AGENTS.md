@@ -28,7 +28,7 @@ Use:
 - Drizzle ORM with Neon Postgres
 - Better Auth with GitHub OAuth
 - Astro Actions for writing mutations
-- Vercel Blob for writing PDFs
+- Vercel Blob for private writing PDF objects
 - plain CSS / scoped CSS / CSS custom properties
 - typed local portfolio content
 - Playwright for critical interaction tests
@@ -148,11 +148,16 @@ Use the async writing facade in `src/data/writings.ts` for public summaries. It
 loads published records through the writing service and returns an honest
 unavailable state when the database cannot be reached. Drizzle/Neon is the
 canonical persistence path, Better Auth protects the admin, Astro Actions own
-mutations, and Vercel Blob stores optional writing PDFs.
+mutations, and Vercel Blob stores optional writing PDFs privately. The stable
+same-origin `/writings/[slug]/paper.pdf` route must query published content first
+and use the server-only Blob token to stream GET bytes or answer HEAD metadata;
+never render or redirect to the private Blob URL. The 4 MB upload cap bounds
+function bandwidth for this delivery path.
 
 Keep the writing backend route-first and server-owned. Its addition does not
 authorize a Phase 2 visual redesign, SPA conversion, or expansion of window
-chrome beyond project cases.
+chrome beyond project cases. Phase 2 still owns writings editorial design and
+any direct upload flow.
 
 When content is uncertain, consult `docs/career/` before publishing it.
 

@@ -10,12 +10,12 @@ import ProjectWindowLayer from '../project-windows/ProjectWindowLayer';
 interface Props {
   initialProjectSlug?: string;
   writings?: readonly WritingSummary[];
-  writingsUnavailable?: boolean;
+  writingsAvailable?: boolean;
 }
 const {
   initialProjectSlug,
   writings = [],
-  writingsUnavailable = false,
+  writingsAvailable,
 } = Astro.props;
 ---
 <div class="site-page" data-home-surface>
@@ -60,7 +60,9 @@ const {
       </SiteModule>
 
       <SiteModule id="writings-box" title="writings" column="main">
-        {writingsUnavailable
+        {writingsAvailable === undefined
+          ? <p class="empty-state"><strong>Writing availability is checked live.</strong><span>Open the writings page for the current publication status.</span></p>
+          : !writingsAvailable
           ? <p class="empty-state"><strong>Writings are temporarily unavailable.</strong><span>The rest of the portfolio remains available.</span></p>
           : writings.length > 0
           ? <ol class="writing-list">{writings.map((writing) => <li><a href={`/writings/${writing.slug}`}>{writing.title}</a><span>{writing.summary}</span></li>)}</ol>

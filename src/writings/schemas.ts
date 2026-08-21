@@ -98,7 +98,6 @@ const writingFields = {
   contentMarkdown: trimmedText(WRITING_LIMITS.contentMarkdown),
   type: z.enum(WRITING_TYPES),
   language: writingLanguageSchema,
-  status: z.enum(WRITING_STATUSES).optional(),
   authors: z
     .array(writingAuthorSchema)
     .min(1, 'At least one author is required.')
@@ -111,15 +110,20 @@ const writingFields = {
   ogImageUrl: nullableUrl().optional(),
 };
 
+const createWritingFields = {
+  ...writingFields,
+  status: z.enum(WRITING_STATUSES).optional(),
+};
+
 export const createWritingSchema = z
-  .object(writingFields)
+  .object(createWritingFields)
   .transform((input) => ({
     ...input,
     slug: input.slug ?? normalizeWritingSlug(input.title),
   }))
   .pipe(
     z.object({
-      ...writingFields,
+      ...createWritingFields,
       slug: writingSlugSchema,
     }),
   ) satisfies z.ZodType<CreateWritingInput & { slug: string }>;

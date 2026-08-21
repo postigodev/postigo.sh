@@ -70,6 +70,24 @@ function repository(initialRows: WritingRecord[] = []) {
       rows[index] = { ...rows[index], ...values } as WritingRecord;
       return rows[index];
     }),
+    publish: vi.fn(async (id: string, publishedAt: Date) => {
+      await Promise.resolve();
+      const index = rows.findIndex((row) => row.id === id);
+      if (index < 0) return null;
+      const current = rows[index] as WritingRecord;
+      rows[index] = {
+        ...current,
+        status: 'published',
+        publishedAt: current.publishedAt ?? publishedAt,
+      };
+      return rows[index];
+    }),
+    unpublish: vi.fn(async (id: string) => {
+      const index = rows.findIndex((row) => row.id === id);
+      if (index < 0) return null;
+      rows[index] = { ...rows[index], status: 'draft' } as WritingRecord;
+      return rows[index];
+    }),
     delete: vi.fn(async (id) => {
       const index = rows.findIndex((row) => row.id === id);
       if (index < 0) return null;
@@ -172,7 +190,33 @@ describe('writing service publication behavior', () => {
     const republished = await service.publishWriting(draft.id);
     expect(republished?.publishedAt).toBe(firstPublish);
     expect(republished?.status).toBe('published');
-    expect(now).toHaveBeenCalledTimes(1);
+    expect(now).toHaveBeenCalledTimes(2);
+    expect(repo.getById).not.toHaveBeenCalled();
+    expect(repo.update).not.toHaveBeenCalled();
+  });
+
+  it('preserves the first timestamp across concurrent publish requests', async () => {
+    const firstPublish = new Date('2026-03-01T00:00:00.000Z');
+    const competingPublish = new Date('2026-03-01T00:00:01.000Z');
+    const draft = record();
+    const { repo } = repository([draft]);
+    const now = vi
+      .fn<() => Date>()
+      .mockReturnValueOnce(firstPublish)
+      .mockReturnValueOnce(competingPublish);
+    const service = createWritingService({ repository: repo, now });
+
+    const [first, second] = await Promise.all([
+      service.publishWriting(draft.id),
+      service.publishWriting(draft.id),
+    ]);
+
+    expect(first?.publishedAt).toBe(firstPublish);
+    expect(second?.publishedAt).toBe(firstPublish);
+    expect(repo.publish).toHaveBeenNthCalledWith(1, draft.id, firstPublish);
+    expect(repo.publish).toHaveBeenNthCalledWith(2, draft.id, competingPublish);
+    expect(repo.getById).not.toHaveBeenCalled();
+    expect(repo.update).not.toHaveBeenCalled();
   });
 
   it('returns null from dedicated publication APIs when the writing does not exist', async () => {
@@ -181,6 +225,9 @@ describe('writing service publication behavior', () => {
 
     await expect(service.publishWriting('missing')).resolves.toBeNull();
     await expect(service.unpublishWriting('missing')).resolves.toBeNull();
+    expect(repo.publish).toHaveBeenCalledOnce();
+    expect(repo.unpublish).toHaveBeenCalledOnce();
+    expect(repo.getById).not.toHaveBeenCalled();
     expect(repo.update).not.toHaveBeenCalled();
   });
 

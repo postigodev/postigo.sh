@@ -73,7 +73,7 @@ export interface CreateWritingInput {
   ogImageUrl?: string | null;
 }
 
-export type UpdateWritingInput = Partial<CreateWritingInput>;
+export type UpdateWritingInput = Partial<Omit<CreateWritingInput, 'status'>>;
 
 export type WritingServiceWarningCode =
   | 'old_pdf_cleanup_failed'

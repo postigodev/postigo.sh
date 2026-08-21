@@ -17,7 +17,7 @@ src/data/portfolio.ts + async writings facade ── typed production content
         ├── Astro ── static/on-demand routes, Actions, metadata, no-JS content
         ├── Drizzle/Neon ── auth and writing records
         ├── Better Auth ── GitHub OAuth and admin sessions
-        ├── Vercel Blob ── optional writing PDFs
+        ├── Vercel Blob ── private optional writing PDFs
         └── Preact ── project windows + presence + tiny admin auth controls
 
 DESIGN.md ── canonical production visual system
@@ -43,7 +43,7 @@ and may describe retired desktop-shell work.
 - Drizzle ORM with Neon Postgres for auth and writing records
 - Better Auth with GitHub OAuth for administrator sessions
 - Astro Actions for authorized writing mutations
-- Vercel Blob for optional writing PDFs
+- Vercel Blob for private optional writing PDFs
 - pnpm, Vitest, and Playwright
 
 No global state library, component library, animation framework, SPA shell, or
@@ -80,17 +80,23 @@ Stable routes are:
 /api/auth/*
 ```
 
-The writing index and detail routes are public. A stable PDF route resolves
-stored PDF metadata and redirects only to valid HTTPS Blob URLs. `/admin/login`
-is public; middleware protects every other `/admin` route and fails closed with
-503 when database or authentication configuration is absent. Better Auth owns
-the `/api/auth/*` request handlers. Astro Actions create, update, publish,
-unpublish, delete, upload, and detach writing data after the same authorization
-check.
+The writing index and detail routes are public. The stable
+`/writings/[slug]/paper.pdf` route resolves only published writing records, uses
+the server-only Blob token to read the private object, and streams GET bytes or
+returns HEAD metadata from the same origin. It never renders or redirects to the
+private Blob URL. Responses are non-cacheable so unpublishing revokes resolution
+at the stable route; the 4 MB upload limit bounds function bandwidth per PDF
+response. `/admin/login` is public; middleware protects every other `/admin`
+route and fails closed with 503 when database or authentication configuration is
+absent. Better Auth owns the `/api/auth/*` request handlers. Astro Actions
+create, update, publish, unpublish, delete, upload, and detach writing data after
+the same authorization check.
 
 The homepage and a direct project route share the same Astro `HomeSurface`.
-Without JavaScript, project anchors navigate normally and the route remains
-readable.
+The on-demand homepage passes an explicit writing-availability result. Static
+project routes cannot know that live state, so they point visitors to the live
+writings document without claiming that no writing has been published. Without
+JavaScript, project anchors navigate normally and the route remains readable.
 
 ### Preact
 
@@ -142,14 +148,20 @@ not fabricate an empty publishing history when the backend cannot be reached.
 repository and service own persistence and domain behavior; public routes only
 select published records. Better Auth establishes GitHub sessions, and
 authorization grants admin access only when the normalized session email exactly
-matches `ADMIN_EMAIL`. Vercel Blob stores optional PDF objects while Postgres
-stores their public URL and cleanup metadata.
+matches `ADMIN_EMAIL`. Vercel Blob stores optional PDF objects privately while
+Postgres stores their internal object locator and cleanup metadata. Publication
+and unpublication use dedicated atomic repository updates; first publication
+time is preserved with database-level `COALESCE`.
 
 Public routes distinguish missing content from unavailable infrastructure: a
 valid absent record is 404, while an unconfigured or unreachable backend is 503.
 The homepage and writing index remain readable with an honest unavailable
 message. The public admin login also renders without credentials, while protected
 admin routes fail closed.
+
+Phase 2 remains responsible for writings-specific editorial design and any
+direct upload flow. The Phase 1 backend keeps the current admin upload and
+private PDF delivery paths server-owned.
 
 ## Styling and assets
 

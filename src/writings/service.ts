@@ -9,7 +9,7 @@ import type {
 } from './domain';
 import {
   vercelBlobWritingPdfStorage,
-  type WritingPdfStorage,
+  type WritingPdfMutationStorage,
 } from './pdf-storage';
 import {
   createDrizzleWritingRepository,
@@ -32,7 +32,7 @@ export interface WritingServiceLogger {
 
 export interface WritingServiceDependencies {
   repository: WritingRepository;
-  pdfStorage?: WritingPdfStorage;
+  pdfStorage?: WritingPdfMutationStorage;
   logger?: WritingServiceLogger;
   now?: () => Date;
 }
@@ -255,9 +255,6 @@ export function createWritingService({
       if (!existing) return null;
 
       const values: WritingRecordUpdate = { ...parsed };
-      if (parsed.status === 'published' && !existing.publishedAt) {
-        values.publishedAt = now();
-      }
 
       try {
         const updated = await repository.update(id, values);
@@ -268,19 +265,12 @@ export function createWritingService({
     },
 
     async publishWriting(id: string): Promise<Writing | null> {
-      const existing = await repository.getById(id);
-      if (!existing) return null;
-      const updated = await repository.update(id, {
-        status: 'published',
-        ...(existing.publishedAt ? {} : { publishedAt: now() }),
-      });
+      const updated = await repository.publish(id, now());
       return updated ? mapWritingRecord(updated) : null;
     },
 
     async unpublishWriting(id: string): Promise<Writing | null> {
-      const existing = await repository.getById(id);
-      if (!existing) return null;
-      const updated = await repository.update(id, { status: 'draft' });
+      const updated = await repository.unpublish(id);
       return updated ? mapWritingRecord(updated) : null;
     },
 

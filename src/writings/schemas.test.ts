@@ -47,6 +47,12 @@ describe('writing schemas', () => {
     expect(() => updateWritingSchema.parse({})).toThrow(
       'At least one field must be updated',
     );
+    expect(() =>
+      updateWritingSchema.parse({ status: 'published' }),
+    ).toThrow('At least one field must be updated');
+    expect(
+      updateWritingSchema.parse({ title: 'Edited', status: 'published' }),
+    ).toEqual({ title: 'Edited' });
   });
 
   it('trims bounded arrays and removes exact duplicates', () => {

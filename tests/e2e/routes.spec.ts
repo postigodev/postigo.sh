@@ -40,6 +40,14 @@ test('Sendo public route hides provenance and uses an archive source action', as
   await expect(page.getByRole('link', { name: /Source repository/ })).toHaveClass(/archive-action/);
 });
 
+test('prerendered project routes do not invent a live writing publication state', async ({ page }) => {
+  await page.goto('/work/preppie');
+
+  const writings = page.locator('#writings-box');
+  await expect(writings).toContainText('Writing availability is checked live.');
+  await expect(writings).not.toContainText('No published writing yet.');
+});
+
 test('direct writings route reports its unavailable-backend fallback honestly', async ({ page }) => {
   await page.goto('/writings');
   await expect(page.getByRole('heading', { level: 1, name: 'Writings' })).toBeVisible();

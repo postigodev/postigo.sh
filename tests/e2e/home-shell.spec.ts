@@ -64,7 +64,8 @@ test('exposes one semantic ticker message to assistive technology', async ({ pag
 
 test('shows an honest writings availability state and unpublished album state', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#writings-box')).toContainText(/No published writing yet|Writings are temporarily unavailable/);
+  await expect(page.locator('#writings-box')).toContainText('Writings are temporarily unavailable.');
+  await expect(page.locator('#writings-box')).not.toContainText('No published writing yet.');
   await expect(page.locator('#album')).toContainText('Photo album under construction');
 });
 

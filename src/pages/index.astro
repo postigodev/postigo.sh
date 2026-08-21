@@ -10,6 +10,6 @@ const writingsLoad = await getPublishedWritingsOrFallback();
 <BaseLayout title="Piero Postigo Rocchetti | Software Engineer" description="Backend and product software engineering portfolio.">
   <HomeSurface
     writings={writingsLoad.writings}
-    writingsUnavailable={!writingsLoad.available}
+    writingsAvailable={writingsLoad.available}
   />
 </BaseLayout>

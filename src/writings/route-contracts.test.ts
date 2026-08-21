@@ -13,9 +13,13 @@ describe('writing route boundaries', () => {
     expect(homeSurface).not.toContain("../writings/service");
     expect(homeSurface).not.toContain('getPublishedWritings(');
     expect(homeSurface).toContain('writings = []');
+    expect(homeSurface).toContain('writingsAvailable === undefined');
+    expect(homeSurface).toContain('Writing availability is checked live.');
     expect(homepage).toContain('await getPublishedWritingsOrFallback()');
+    expect(homepage).toContain('writingsAvailable={writingsLoad.available}');
     expect(homepage).toContain('export const prerender = false');
     expect(projectRoute).toContain('export const prerender = true');
+    expect(projectRoute).not.toContain('writingsAvailable=');
   });
 
   it('uses only the publication-safe service query on public detail routes', () => {
@@ -31,15 +35,21 @@ describe('writing route boundaries', () => {
     expect(detail).toContain('status = 503');
   });
 
-  it('keeps the PDF route a GET/HEAD redirect rather than a byte proxy', () => {
+  it('streams private PDFs through the stable same-origin GET/HEAD route', () => {
     const pdf = read('../pages/writings/[slug]/paper.pdf.ts');
 
-    expect(pdf).toContain('status: 307');
-    expect(pdf).toContain('location: blobUrl.toString()');
+    expect(pdf).toContain('dependencies.storage.get(input)');
+    expect(pdf).toContain('dependencies.storage.head(input)');
+    expect(pdf).toContain('getBlobConfig()');
+    expect(pdf).toContain("'content-type': 'application/pdf'");
     expect(pdf).toContain("'cache-control': 'no-store'");
     expect(pdf).toContain('export const HEAD: APIRoute');
     expect(pdf).toContain('export const ALL: APIRoute');
     expect(pdf).toContain("allow: 'GET, HEAD'");
+    expect(pdf).not.toContain("from '@vercel/blob'");
+    expect(pdf).not.toContain('writing.pdf.url');
+    expect(pdf).not.toContain('status: 307');
+    expect(pdf).not.toContain('location:');
     expect(pdf).not.toContain('arrayBuffer(');
   });
 });

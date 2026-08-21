@@ -1,11 +1,11 @@
-import { and, asc, desc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq, sql } from 'drizzle-orm';
 import type { Database } from '../db/client';
 import { writings } from '../db/schema';
 
 export type WritingRecord = typeof writings.$inferSelect;
 export type NewWritingRecord = typeof writings.$inferInsert;
 export type WritingRecordUpdate = Partial<
-  Omit<NewWritingRecord, 'id' | 'createdAt'>
+  Omit<NewWritingRecord, 'id' | 'createdAt' | 'status' | 'publishedAt'>
 >;
 
 export interface WritingRepository {
@@ -15,6 +15,8 @@ export interface WritingRepository {
   getById(id: string): Promise<WritingRecord | null>;
   create(values: NewWritingRecord): Promise<WritingRecord>;
   update(id: string, values: WritingRecordUpdate): Promise<WritingRecord | null>;
+  publish(id: string, publishedAt: Date): Promise<WritingRecord | null>;
+  unpublish(id: string): Promise<WritingRecord | null>;
   delete(id: string): Promise<WritingRecord | null>;
 }
 
@@ -78,6 +80,29 @@ export function createDrizzleWritingRepository(
         await database
           .update(writings)
           .set(values)
+          .where(eq(writings.id, id))
+          .returning(),
+      );
+    },
+
+    async publish(id, publishedAt) {
+      return firstOrNull(
+        await database
+          .update(writings)
+          .set({
+            status: 'published',
+            publishedAt: sql<Date>`coalesce(${writings.publishedAt}, ${publishedAt})`,
+          })
+          .where(eq(writings.id, id))
+          .returning(),
+      );
+    },
+
+    async unpublish(id) {
+      return firstOrNull(
+        await database
+          .update(writings)
+          .set({ status: 'draft' })
           .where(eq(writings.id, id))
           .returning(),
       );
