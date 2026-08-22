@@ -1,6 +1,7 @@
 ---
 import GitHubWidget from "./GitHubWidget";
 import NowPlayingWidget from "./NowPlayingWidget";
+import MediaLogWidget from "./MediaLogWidget";
 import SiteModule from "./SiteModule.astro";
 import { identity, projectCases, selectedWork } from "../data/portfolio";
 import { resumeContent } from "../data/siteContent";
@@ -233,6 +234,10 @@ const { initialProjectSlug, writings = [], writingsAvailable } = Astro.props;
             ))
           }
         </ol>
+      </SiteModule>
+
+      <SiteModule id="media-box" title="media log" column="right">
+        <MediaLogWidget client:load />
       </SiteModule>
     </aside>
   </div>

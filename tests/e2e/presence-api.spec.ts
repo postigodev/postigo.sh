@@ -10,7 +10,9 @@ test('privacy page describes the owner-only playback display', async ({ page }) 
 test('local functions reject account selectors', async ({ request }) => {
   expect((await request.get('/api/now-playing?user=visitor')).status()).toBe(400);
   expect((await request.get('/api/github-snapshot?user=visitor')).status()).toBe(400);
+  expect((await request.get('/api/media-log?user=visitor')).status()).toBe(400);
   expect((await request.post('/api/now-playing', { data: { refreshToken: 'visitor' } })).status()).toBe(405);
+  expect((await request.post('/api/media-log')).status()).toBe(405);
 });
 
 test('local functions expose only normalized public fields', async ({ request }) => {

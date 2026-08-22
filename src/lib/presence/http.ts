@@ -13,6 +13,11 @@ export const githubCache = {
   cdn: 'public, s-maxage=21600, stale-while-revalidate=64800',
 } as const satisfies CachePolicy;
 
+export const mediaLogCache = {
+  browser: 'public, max-age=0, must-revalidate',
+  cdn: 'public, s-maxage=300, stale-while-revalidate=1800',
+} as const satisfies CachePolicy;
+
 const noStoreCache = {
   browser: 'no-store',
   cdn: 'no-store',
@@ -85,4 +90,31 @@ export async function readJsonBounded<T>(response: Response, limitBytes = 262_14
     offset += chunk.byteLength;
   }
   return JSON.parse(new TextDecoder().decode(bytes)) as T;
+}
+
+export async function readTextBounded(response: Response, limitBytes = 262_144): Promise<string> {
+  const declaredLength = Number(response.headers.get('content-length'));
+  if (Number.isFinite(declaredLength) && declaredLength > limitBytes) throw new Error(`upstream payload exceeds ${limitBytes} bytes`);
+  if (!response.body) return '';
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      received += value.byteLength;
+      if (received > limitBytes) {
+        await reader.cancel();
+        throw new Error(`upstream payload exceeds ${limitBytes} bytes`);
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(received);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+  return new TextDecoder().decode(bytes);
 }
