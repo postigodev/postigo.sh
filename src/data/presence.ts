@@ -12,17 +12,35 @@ export type NowPlayingView =
       observedAt: string;
     };
 
-export type GitHubSnapshotView =
-  | { state: 'unavailable'; profileUrl: string; login: 'postigodev'; avatarUrl: string }
+export type GitHubActivityKind =
+  | 'push'
+  | 'pull-request'
+  | 'issue'
+  | 'comment'
+  | 'review'
+  | 'release'
+  | 'repository-created'
+  | 'repository-public'
+  | 'fork'
+  | 'star';
+
+export interface GitHubActivityEntry {
+  id: string;
+  kind: GitHubActivityKind;
+  phrase: string;
+  target: string;
+  detail?: string;
+  url: string;
+  createdAt: string;
+}
+
+export type GitHubActivityView =
+  | { state: 'unavailable'; profileUrl: string; login: 'postigodev' }
   | {
       state: 'ready';
       profileUrl: string;
       login: 'postigodev';
-      avatarUrl: string;
-      publicRepos: number;
-      followers: number;
-      stars: number;
-      languages: readonly string[];
+      entries: readonly GitHubActivityEntry[];
       observedAt: string;
     };
 
@@ -31,9 +49,8 @@ export const unavailableNowPlaying: NowPlayingView = {
   observedAt: 'static-fallback',
 };
 
-export const staticGitHubFallback: GitHubSnapshotView = {
+export const staticGitHubFallback: GitHubActivityView = {
   state: 'unavailable',
   profileUrl: 'https://github.com/postigodev',
   login: 'postigodev',
-  avatarUrl: 'https://avatars.githubusercontent.com/u/247466788?v=4',
 };

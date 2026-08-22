@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
-import type { GitHubSnapshotView, NowPlayingView } from '../data/presence';
+import type { GitHubActivityView, NowPlayingView } from '../data/presence';
 
 type Validator<T> = (value: unknown) => value is T;
 const objectValue = (value: unknown): Record<string, unknown> | undefined => value !== null && typeof value === 'object' ? value as Record<string, unknown> : undefined;
@@ -22,13 +22,25 @@ export function isNowPlayingView(value: unknown): value is NowPlayingView {
     && (view.progressMs === undefined || nonNegativeNumber(view.progressMs));
 }
 
-export function isGitHubSnapshotView(value: unknown): value is GitHubSnapshotView {
+export function isGitHubActivityView(value: unknown): value is GitHubActivityView {
   const view = objectValue(value);
-  if (!view || view.login !== 'postigodev' || view.profileUrl !== 'https://github.com/postigodev' || !webUrl(view.avatarUrl)) return false;
+  if (!view || view.login !== 'postigodev' || view.profileUrl !== 'https://github.com/postigodev') return false;
   if (view.state === 'unavailable') return true;
   if (view.state !== 'ready' || !nonEmpty(view.observedAt)) return false;
-  return nonNegativeNumber(view.publicRepos) && nonNegativeNumber(view.followers) && nonNegativeNumber(view.stars)
-    && Array.isArray(view.languages) && view.languages.every(nonEmpty);
+  if (!Array.isArray(view.entries) || view.entries.length > 20) return false;
+  return view.entries.every((candidate) => {
+    const activity = objectValue(candidate);
+    return activity !== undefined
+      && nonEmpty(activity.id)
+      && ['push', 'pull-request', 'issue', 'comment', 'review', 'release', 'repository-created', 'repository-public', 'fork', 'star'].includes(String(activity.kind))
+      && nonEmpty(activity.phrase)
+      && nonEmpty(activity.target)
+      && (activity.detail === undefined || nonEmpty(activity.detail))
+      && webUrl(activity.url)
+      && new URL(activity.url).hostname === 'github.com'
+      && nonEmpty(activity.createdAt)
+      && !Number.isNaN(Date.parse(activity.createdAt));
+  });
 }
 
 export function usePresenceEndpoint<T>(url: string, fallback: T, validate: Validator<T>, enabled = true): T {

@@ -325,7 +325,7 @@ Presence labels are tiny uppercase badges with a metallic blue fill, cold ink, o
 
 ### GitHub Activity
 
-The profile line pairs a presence label with the public handle. Ready-state metrics form a two-column grid with one-pixel separators and near-black cells; the unavailable state is a single honest sentence, never fake activity.
+GitHub is a compact public activity log, not a profile-statistics panel. Roughly five border-separated events remain visible before an internal, narrow steel scrollbar takes over. Each complete row is a specific external link with a naked pixel icon, a short human action, one optional ellipsized detail, and a muted relative timestamp. The fixed footer links `@postigodev` and the full GitHub overview. An unavailable feed uses the pixel warning triangle and an honest recovery link; it never falls back to fabricated activity or the retired repositories/followers/stars/languages grid.
 
 ### Now Playing
 

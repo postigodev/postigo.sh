@@ -10,7 +10,7 @@ export const spotifyCache = {
 
 export const githubCache = {
   browser: 'public, max-age=0, must-revalidate',
-  cdn: 'public, s-maxage=21600, stale-while-revalidate=64800',
+  cdn: 'public, s-maxage=3600, stale-while-revalidate=21600',
 } as const satisfies CachePolicy;
 
 export const mediaLogCache = {

@@ -6,7 +6,7 @@ test('deployed preview serves documents and normalized presence APIs', async ({ 
   await page.goto('/privacy');
   await expect(page.getByRole('heading', { name: 'Privacy' })).toBeVisible();
 
-  for (const path of ['/api/now-playing', '/api/github-snapshot']) {
+  for (const path of ['/api/now-playing', '/api/github-activity']) {
     const response = await request.get(path);
     expect(response.status()).toBe(200);
     const body = await response.json();

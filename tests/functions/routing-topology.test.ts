@@ -12,7 +12,7 @@ describe('server route topology', () => {
 
     expect(rootApiFiles).toEqual([]);
     expect(existsSync(resolve(process.cwd(), 'src/pages/api/auth/[...all].ts'))).toBe(true);
-    expect(existsSync(resolve(process.cwd(), 'src/pages/api/github-snapshot.ts'))).toBe(true);
+    expect(existsSync(resolve(process.cwd(), 'src/pages/api/github-activity.ts'))).toBe(true);
     expect(existsSync(resolve(process.cwd(), 'src/pages/api/now-playing.ts'))).toBe(true);
   });
 });
