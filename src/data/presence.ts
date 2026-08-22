@@ -13,7 +13,7 @@ export type NowPlayingView =
     };
 
 export type GitHubActivityKind =
-  | 'push'
+  | 'commit'
   | 'pull-request'
   | 'issue'
   | 'comment'
@@ -32,7 +32,6 @@ export interface GitHubActivityEntry {
   detail?: string;
   url: string;
   createdAt: string;
-  oldestCreatedAt?: string;
 }
 
 export type GitHubActivityView =

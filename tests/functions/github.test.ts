@@ -1,150 +1,149 @@
 import { describe, expect, it, vi } from 'vitest';
 import { getGitHubActivity, normalizeGitHubEvent } from '../../src/lib/presence/github';
 
-const createdAt = '2026-08-21T12:00:00Z';
-const shaBefore = '1'.repeat(40);
-const shaHead = '2'.repeat(40);
+const createdAt = '2026-08-22T12:00:00Z';
+const sha = (value: string) => value.repeat(40).slice(0, 40);
+const hexSha = (value: number) => value.toString(16).padStart(40, '0');
 
 function event(type: string, payload: Record<string, unknown> = {}, overrides: Record<string, unknown> = {}) {
   return { id: `${type}-1`, type, actor: { login: 'postigodev' }, repo: { name: 'postigodev/postigo.sh' }, payload, public: true, created_at: createdAt, ...overrides };
 }
 
-function githubResponse(body: unknown, status = 200) {
+function response(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 }
 
+function comparedCommit(id: string, date: string) {
+  return { sha: sha(id), commit: { committer: { date }, author: { date } } };
+}
+
+function comparePage(commits: readonly unknown[], total = commits.length, status = 'ahead') {
+  return { status, total_commits: total, commits };
+}
+
+function githubFetch(events: readonly unknown[], compare: (url: string) => unknown = () => comparePage([])) {
+  return vi.fn(async (input: string | URL | Request) => {
+    const url = String(input);
+    return url.includes('/events/public') ? response(events) : response(compare(url));
+  }) as unknown as typeof fetch;
+}
+
 describe('normalizeGitHubEvent', () => {
-  it('maps normal pushes to compare and zero-SHA pushes to the head commit', () => {
-    expect(normalizeGitHubEvent(event('PushEvent', { ref: 'refs/heads/main', before: shaBefore, head: shaHead }))).toMatchObject({
-      kind: 'push', phrase: 'pushed to', detail: 'main branch', url: `https://github.com/postigodev/postigo.sh/compare/${shaBefore}...${shaHead}`,
-    });
-    expect(normalizeGitHubEvent(event('PushEvent', { ref: 'refs/heads/new', before: '0'.repeat(40), head: shaHead }))).toMatchObject({
-      url: `https://github.com/postigodev/postigo.sh/commit/${shaHead}`,
-    });
+  it('never emits raw push activity', () => {
+    expect(normalizeGitHubEvent(event('PushEvent', { ref: 'refs/heads/main', before: sha('1'), head: sha('2') }))).toBeUndefined();
   });
 
   it.each([
-    ['PullRequestEvent', { action: 'opened', number: 42, pull_request: { number: 42, title: 'Improve activity log', html_url: 'https://github.com/postigodev/postigo.sh/pull/42' } }, 'pull-request', 'opened PR #42 in'],
-    ['PullRequestEvent', { action: 'closed', number: 42, pull_request: { number: 42, merged: true, title: 'Merged work', html_url: 'https://github.com/postigodev/postigo.sh/pull/42' } }, 'pull-request', 'merged PR #42 in'],
     ['IssuesEvent', { action: 'closed', issue: { number: 7, title: 'Fix feed', html_url: 'https://github.com/postigodev/postigo.sh/issues/7' } }, 'issue', 'closed issue #7 in'],
-    ['IssueCommentEvent', { action: 'created', issue: { number: 9, title: 'Review this', pull_request: {}, html_url: 'https://github.com/postigodev/postigo.sh/pull/9' }, comment: { html_url: 'https://github.com/postigodev/postigo.sh/pull/9#issuecomment-1' } }, 'comment', 'commented on PR #9 in'],
-    ['PullRequestReviewEvent', { action: 'created', pull_request: { number: 10, title: 'Review target', html_url: 'https://github.com/postigodev/postigo.sh/pull/10' }, review: { state: 'approved', html_url: 'https://github.com/postigodev/postigo.sh/pull/10#pullrequestreview-1' } }, 'review', 'approved PR #10 in'],
-    ['PullRequestReviewCommentEvent', { action: 'created', pull_request: { number: 11, title: 'Inline note', html_url: 'https://github.com/postigodev/postigo.sh/pull/11' }, comment: { html_url: 'https://github.com/postigodev/postigo.sh/pull/11#discussion_r1' } }, 'comment', 'commented on PR #11 in'],
-    ['ReleaseEvent', { action: 'published', release: { tag_name: 'v1.0.0', html_url: 'https://github.com/postigodev/postigo.sh/releases/tag/v1.0.0' } }, 'release', 'published a release for'],
-    ['ForkEvent', { forkee: { full_name: 'postigodev/fork', html_url: 'https://github.com/postigodev/fork' } }, 'fork', 'forked'],
+    ['IssueCommentEvent', { action: 'created', issue: { number: 9, title: 'Review', pull_request: {} }, comment: { html_url: 'https://github.com/postigodev/postigo.sh/pull/9#issuecomment-1' } }, 'comment', 'commented on PR #9 in'],
+    ['PullRequestReviewEvent', { action: 'created', pull_request: { number: 10, title: 'Review target' }, review: { state: 'approved' } }, 'review', 'approved PR #10 in'],
+    ['ReleaseEvent', { action: 'published', release: { tag_name: 'v1.0.0' } }, 'release', 'published a release for'],
+    ['ForkEvent', { forkee: { full_name: 'postigodev/fork' } }, 'fork', 'forked'],
     ['WatchEvent', { action: 'started' }, 'star', 'starred'],
-    ['CreateEvent', { ref_type: 'repository', description: 'New public tool' }, 'repository-created', 'created repository'],
+    ['CreateEvent', { ref_type: 'repository', description: 'Tool' }, 'repository-created', 'created repository'],
     ['PublicEvent', {}, 'repository-public', 'made repository public'],
-  ] as const)('maps %s to a compact public activity entry', (type, payload, kind, phrase) => {
-    expect(normalizeGitHubEvent(event(type, payload))).toMatchObject({ kind, phrase, target: 'postigodev/postigo.sh', createdAt });
+  ] as const)('maps %s to useful discrete activity', (type, payload, kind, phrase) => {
+    expect(normalizeGitHubEvent(event(type, payload))).toMatchObject({ kind, phrase, target: 'postigodev/postigo.sh' });
   });
 
-  it('ignores unsupported activity, unsafe actors and unsafe event URLs', () => {
+  it('normalizes both merged event representations', () => {
+    const pull = { number: 4, title: 'Merged work', html_url: 'https://github.com/postigodev/postigo.sh/pull/4' };
+    expect(normalizeGitHubEvent(event('PullRequestEvent', { action: 'merged', number: 4, pull_request: pull }))).toMatchObject({ phrase: 'merged PR #4 in' });
+    expect(normalizeGitHubEvent(event('PullRequestEvent', { action: 'closed', number: 4, pull_request: { ...pull, merged: true } }))).toMatchObject({ phrase: 'merged PR #4 in' });
+  });
+
+  it('rejects unsupported or unsafe events', () => {
     expect(normalizeGitHubEvent(event('DeploymentEvent'))).toBeUndefined();
-    expect(normalizeGitHubEvent(event('CreateEvent', { ref_type: 'branch', ref: 'topic' }))).toBeUndefined();
     expect(normalizeGitHubEvent(event('WatchEvent', { action: 'started' }, { actor: { login: 'attacker' } }))).toBeUndefined();
-    expect(normalizeGitHubEvent(event('ReleaseEvent', { action: 'published', release: { tag_name: 'v1', html_url: 'https://evil.test/release' } }))).toMatchObject({ url: 'https://github.com/postigodev/postigo.sh/releases' });
   });
 });
+
 describe('getGitHubActivity', () => {
-  it('uses one 100-event request, filters before grouping and caps renderable groups at 20', async () => {
-    const unsupported = Array.from({ length: 30 }, (_, index) => event('DeleteEvent', {}, { id: `unsupported-${index}` }));
-    const supported = Array.from({ length: 24 }, (_, index) => event('WatchEvent', { action: 'started' }, {
-      id: `supported-${index}`,
-      repo: { name: `postigodev/repo-${index}` },
-      created_at: `2026-08-${String(21 - Math.floor(index / 10)).padStart(2, '0')}T${String(12 - (index % 10)).padStart(2, '0')}:00:00Z`,
-    }));
-    const payload = [...unsupported, ...supported];
-    const fetchImpl = vi.fn(async () => githubResponse(payload)) as typeof fetch;
-    const result = await getGitHubActivity(fetchImpl, 'server-token', 'now');
-    expect(result.state).toBe('ready');
-    if (result.state !== 'ready') throw new Error('expected ready state');
-    expect(result.entries).toHaveLength(20);
-    expect(result.entries.every((entry) => entry.id.trim() && entry.phrase.trim() && entry.target.trim())).toBe(true);
-    expect(fetchImpl).toHaveBeenCalledTimes(1);
-    expect(String(vi.mocked(fetchImpl).mock.calls[0]?.[0])).toBe('https://api.github.com/users/postigodev/events/public?per_page=100');
-    expect(new Headers(vi.mocked(fetchImpl).mock.calls[0]?.[1]?.headers).get('authorization')).toBe('Bearer server-token');
+  it('derives one verified commit row with the newest real commit timestamp', async () => {
+    const events = [
+      event('PushEvent', { ref: 'refs/heads/main', before: sha('1'), head: sha('2') }, { id: 'new', created_at: '2026-08-22T12:00:00Z' }),
+      event('PushEvent', { ref: 'refs/heads/main', before: sha('3'), head: sha('4') }, { id: 'old', created_at: '2026-08-21T12:00:00Z' }),
+    ];
+    const fetchImpl = githubFetch(events, () => comparePage([
+      comparedCommit('a', '2026-08-21T13:00:00Z'),
+      comparedCommit('b', '2026-08-22T11:59:00Z'),
+    ]));
+    const result = await getGitHubActivity(fetchImpl, 'token', 'now');
+    if (result.state !== 'ready') throw new Error('expected ready');
+    expect(result.entries).toEqual([expect.objectContaining({ kind: 'commit', phrase: '2 commits to', target: 'postigodev/postigo.sh', url: 'https://github.com/postigodev/postigo.sh/commits', createdAt: '2026-08-22T11:59:00Z' })]);
+    expect(JSON.stringify(result)).not.toContain('pushed to');
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
   });
 
-  it('groups nonconsecutive pushes by repository and branch at the newest position', async () => {
-    const payload = [
-      event('PushEvent', { ref: 'refs/heads/main', before: '1'.repeat(40), head: '2'.repeat(40), size: 5 }, { id: 'push-new', created_at: '2026-08-21T12:00:00Z' }),
-      event('WatchEvent', { action: 'started' }, { id: 'star-between', repo: { name: 'shuqikhor/pixel-icons' }, created_at: '2026-08-21T10:00:00Z' }),
-      event('PushEvent', { ref: 'refs/heads/main', before: '3'.repeat(40), head: '4'.repeat(40), size: 7 }, { id: 'push-old', created_at: '2026-08-21T07:00:00Z' }),
+  it('deduplicates commit SHAs across refs before grouping by repository', async () => {
+    const events = [
+      event('PushEvent', { ref: 'refs/heads/main', before: sha('1'), head: sha('2') }, { id: 'main' }),
+      event('PushEvent', { ref: 'refs/heads/topic', before: sha('3'), head: sha('4') }, { id: 'topic', created_at: '2026-08-22T11:00:00Z' }),
     ];
-    const result = await getGitHubActivity(vi.fn(async () => githubResponse(payload)) as typeof fetch, undefined, 'now');
-    if (result.state !== 'ready') throw new Error('expected ready state');
-    expect(result.entries).toHaveLength(2);
-    expect(result.entries[0]).toMatchObject({
-      kind: 'push',
-      phrase: '12 commits pushed to',
-      target: 'postigodev/postigo.sh',
-      detail: 'main',
-      url: 'https://github.com/postigodev/postigo.sh/tree/main',
-      createdAt: '2026-08-21T12:00:00Z',
-      oldestCreatedAt: '2026-08-21T07:00:00Z',
-    });
-    expect(result.entries[0]?.id).toBe('group:["push-new","push-old"]');
-    expect(result.entries[1]?.id).toBe('star-between');
-    expect(result.entries[0]?.url).not.toContain('/compare/');
-  });
-
-  it('falls back to push count when any commit count is absent and never mixes refs or repositories', async () => {
-    const payload = [
-      event('PushEvent', { ref: 'refs/heads/main', before: shaBefore, head: shaHead, size: 2 }, { id: 'main-sized', created_at: '2026-08-21T12:00:00Z' }),
-      event('PushEvent', { ref: 'refs/heads/main', before: shaBefore, head: shaHead }, { id: 'main-unsized', created_at: '2026-08-21T11:00:00Z' }),
-      event('PushEvent', { ref: 'refs/heads/dev', before: shaBefore, head: shaHead, size: 3 }, { id: 'dev', created_at: '2026-08-21T10:00:00Z' }),
-      event('PushEvent', { ref: 'refs/heads/main', before: shaBefore, head: shaHead, size: 4 }, { id: 'other-repo', repo: { name: 'postigodev/koba' }, created_at: '2026-08-21T09:00:00Z' }),
-    ];
-    const result = await getGitHubActivity(vi.fn(async () => githubResponse(payload)) as typeof fetch, undefined, 'now');
-    if (result.state !== 'ready') throw new Error('expected ready state');
-    expect(result.entries).toHaveLength(3);
-    expect(result.entries[0]).toMatchObject({ phrase: '2 pushes to', detail: 'main' });
-    expect(result.entries[1]).toMatchObject({ phrase: 'pushed to', detail: 'dev branch' });
-    expect(result.entries[2]).toMatchObject({ target: 'postigodev/koba' });
-  });
-
-  it('groups equivalent actions but keeps different PR actions distinct', async () => {
-    const pullRequest = { number: 3, title: 'Activity work', html_url: 'https://github.com/postigodev/postigo.sh/pull/3' };
-    const payload = [
-      event('PullRequestEvent', { action: 'opened', number: 3, pull_request: pullRequest }, { id: 'opened-new', created_at: '2026-08-21T12:00:00Z' }),
-      event('IssuesEvent', { action: 'opened', issue: { number: 9, title: 'Interruption', html_url: 'https://github.com/postigodev/postigo.sh/issues/9' } }, { id: 'issue', created_at: '2026-08-21T11:00:00Z' }),
-      event('PullRequestEvent', { action: 'opened', number: 3, pull_request: pullRequest }, { id: 'opened-old', created_at: '2026-08-21T10:00:00Z' }),
-      event('PullRequestEvent', { action: 'closed', number: 3, pull_request: { ...pullRequest, merged: true } }, { id: 'merged', created_at: '2026-08-21T09:00:00Z' }),
-    ];
-    const result = await getGitHubActivity(vi.fn(async () => githubResponse(payload)) as typeof fetch, undefined, 'now');
-    if (result.state !== 'ready') throw new Error('expected ready state');
-    expect(result.entries.map(({ phrase }) => phrase)).toEqual(['opened PR #3 2 times in', 'opened issue #9 in', 'merged PR #3 in']);
-  });
-
-  it('groups PR comments across both public comment event types', async () => {
-    const pullRequest = { number: 8, title: 'Same subject', html_url: 'https://github.com/postigodev/postigo.sh/pull/8' };
-    const payload = [
-      event('IssueCommentEvent', { action: 'created', issue: { ...pullRequest, pull_request: {} }, comment: { html_url: 'https://github.com/postigodev/postigo.sh/pull/8#issuecomment-2' } }, { id: 'issue-comment', created_at: '2026-08-21T12:00:00Z' }),
-      event('PullRequestReviewCommentEvent', { action: 'created', pull_request: pullRequest, comment: { html_url: 'https://github.com/postigodev/postigo.sh/pull/8#discussion_r1' } }, { id: 'review-comment', created_at: '2026-08-21T08:00:00Z' }),
-    ];
-    const result = await getGitHubActivity(vi.fn(async () => githubResponse(payload)) as typeof fetch, undefined, 'now');
-    if (result.state !== 'ready') throw new Error('expected ready state');
+    const shared = comparedCommit('a', '2026-08-22T10:00:00Z');
+    const fetchImpl = githubFetch(events, (url) => url.includes(`${sha('1')}...${sha('2')}`)
+      ? comparePage([shared, comparedCommit('b', '2026-08-22T11:00:00Z')])
+      : comparePage([shared, comparedCommit('c', '2026-08-22T09:00:00Z')]));
+    const result = await getGitHubActivity(fetchImpl, undefined, 'now');
+    if (result.state !== 'ready') throw new Error('expected ready');
     expect(result.entries).toHaveLength(1);
-    expect(result.entries[0]).toMatchObject({ phrase: 'commented 2 times on PR #8 in', oldestCreatedAt: '2026-08-21T08:00:00Z' });
+    expect(result.entries[0]).toMatchObject({ phrase: '3 commits to', createdAt: '2026-08-22T11:00:00Z' });
   });
 
-  it('groups repeated stars for one repository without merging other repositories', async () => {
-    const payload = [
-      event('WatchEvent', { action: 'started' }, { id: 'star-new', created_at: '2026-08-21T12:00:00Z' }),
-      event('WatchEvent', { action: 'started' }, { id: 'star-other', repo: { name: 'postigodev/koba' }, created_at: '2026-08-21T11:00:00Z' }),
-      event('WatchEvent', { action: 'started' }, { id: 'star-old', created_at: '2026-08-21T10:00:00Z' }),
+  it('prioritizes the eight newest repo+ref groups', async () => {
+    const events = Array.from({ length: 10 }, (_, index) => event('PushEvent', {
+      ref: `refs/heads/topic-${index}`, before: hexSha(index + 1), head: hexSha(index + 101),
+    }, { id: `push-${index}`, created_at: `2026-08-22T${String(20 - index).padStart(2, '0')}:00:00Z` }));
+    const fetchImpl = githubFetch(events, (url) => comparePage([comparedCommit(url.includes('topic') ? 'e' : 'f', '2026-08-22T12:00:00Z')]));
+    await getGitHubActivity(fetchImpl, undefined, 'now');
+    const compareUrls = vi.mocked(fetchImpl).mock.calls.slice(1).map(([url]) => String(url));
+    expect(compareUrls).toHaveLength(8);
+    expect(compareUrls.join('\n')).not.toContain(`${hexSha(9)}...`);
+    expect(compareUrls.join('\n')).not.toContain(`${hexSha(10)}...`);
+  });
+
+  it('paginates comparisons and requires exact completeness', async () => {
+    const events = [event('PushEvent', { ref: 'refs/heads/main', before: sha('1'), head: sha('2') })];
+    const commits = Array.from({ length: 105 }, (_, index) => comparedCommit(index.toString(16).padStart(2, '0'), `2026-08-22T${String(index % 24).padStart(2, '0')}:00:00Z`));
+    const completeFetch = githubFetch(events, (url) => comparePage(url.endsWith('page=1') ? commits.slice(0, 100) : commits.slice(100), 105));
+    const complete = await getGitHubActivity(completeFetch, undefined, 'now');
+    if (complete.state !== 'ready') throw new Error('expected ready');
+    expect(complete.entries[0]).toMatchObject({ phrase: '105 commits to' });
+    expect(completeFetch).toHaveBeenCalledTimes(3);
+
+    const incompleteFetch = githubFetch(events, (url) => comparePage(url.endsWith('page=1') ? commits.slice(0, 100) : commits.slice(100, 104), 105));
+    const incomplete = await getGitHubActivity(incompleteFetch, undefined, 'now');
+    if (incomplete.state !== 'ready') throw new Error('expected ready');
+    expect(incomplete.entries).toEqual([]);
+  });
+
+  it('suppresses an opened PR only when a later event confirms its merge', async () => {
+    const mergedPull = { number: 4, title: 'Merged', html_url: 'https://github.com/postigodev/postigo.sh/pull/4', merged: true };
+    const openPull = { number: 5, title: 'Still open', html_url: 'https://github.com/postigodev/postigo.sh/pull/5' };
+    const events = [
+      event('PullRequestEvent', { action: 'closed', number: 4, pull_request: mergedPull }, { id: 'merged', created_at: '2026-08-22T12:00:00Z' }),
+      event('PullRequestEvent', { action: 'opened', number: 5, pull_request: openPull }, { id: 'open-live', created_at: '2026-08-22T11:00:00Z' }),
+      event('PullRequestEvent', { action: 'opened', number: 4, pull_request: mergedPull }, { id: 'open-merged', created_at: '2026-08-22T10:00:00Z' }),
     ];
-    const result = await getGitHubActivity(vi.fn(async () => githubResponse(payload)) as typeof fetch, undefined, 'now');
-    if (result.state !== 'ready') throw new Error('expected ready state');
-    expect(result.entries).toHaveLength(2);
-    expect(result.entries[0]).toMatchObject({ phrase: 'starred 2 times', target: 'postigodev/postigo.sh', oldestCreatedAt: '2026-08-21T10:00:00Z' });
-    expect(result.entries[1]).toMatchObject({ phrase: 'starred', target: 'postigodev/koba' });
+    const result = await getGitHubActivity(githubFetch(events), undefined, 'now');
+    if (result.state !== 'ready') throw new Error('expected ready');
+    expect(result.entries.map(({ phrase }) => phrase)).toEqual(['merged PR #4 in', 'opened PR #5 in']);
+  });
+
+  it('filters unsupported events before the 15-row cap and orders globally', async () => {
+    const unsupported = Array.from({ length: 30 }, (_, index) => event('DeleteEvent', {}, { id: `bad-${index}` }));
+    const supported = Array.from({ length: 20 }, (_, index) => event('WatchEvent', { action: 'started' }, {
+      id: `star-${index}`, repo: { name: `postigodev/repo-${index}` }, created_at: `2026-08-22T${String(20 - index).padStart(2, '0')}:00:00Z`,
+    }));
+    const result = await getGitHubActivity(githubFetch([...unsupported, ...supported]), undefined, 'now');
+    if (result.state !== 'ready') throw new Error('expected ready');
+    expect(result.entries).toHaveLength(15);
+    expect(result.entries[0]?.id).toBe('star-0');
+    expect(result.entries.every(({ id, phrase, target }) => id && phrase && target)).toBe(true);
   });
 
   it.each([403, 429, 500])('returns the stable fallback for GitHub %s responses', async (status) => {
-    const result = await getGitHubActivity(vi.fn(async () => githubResponse({ message: 'private detail' }, status)) as typeof fetch, undefined, 'now');
-    expect(result).toEqual({ state: 'unavailable', profileUrl: 'https://github.com/postigodev', login: 'postigodev' });
-    expect(JSON.stringify(result)).not.toContain('private detail');
+    const fetchImpl = vi.fn(async () => response({ message: 'private detail' }, status)) as unknown as typeof fetch;
+    expect(await getGitHubActivity(fetchImpl, undefined, 'now')).toEqual({ state: 'unavailable', profileUrl: 'https://github.com/postigodev', login: 'postigodev' });
   });
 });

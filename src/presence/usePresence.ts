@@ -32,18 +32,14 @@ export function isGitHubActivityView(value: unknown): value is GitHubActivityVie
     const activity = objectValue(candidate);
     return activity !== undefined
       && nonEmpty(activity.id)
-      && ['push', 'pull-request', 'issue', 'comment', 'review', 'release', 'repository-created', 'repository-public', 'fork', 'star'].includes(String(activity.kind))
+      && ['commit', 'pull-request', 'issue', 'comment', 'review', 'release', 'repository-created', 'repository-public', 'fork', 'star'].includes(String(activity.kind))
       && nonEmpty(activity.phrase)
       && nonEmpty(activity.target)
       && (activity.detail === undefined || nonEmpty(activity.detail))
       && webUrl(activity.url)
       && new URL(activity.url).hostname === 'github.com'
       && nonEmpty(activity.createdAt)
-      && !Number.isNaN(Date.parse(activity.createdAt))
-      && (activity.oldestCreatedAt === undefined
-        || (nonEmpty(activity.oldestCreatedAt)
-          && !Number.isNaN(Date.parse(activity.oldestCreatedAt))
-          && Date.parse(activity.oldestCreatedAt) <= Date.parse(activity.createdAt)));
+      && !Number.isNaN(Date.parse(activity.createdAt));
   });
 }
 

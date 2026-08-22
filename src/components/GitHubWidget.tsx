@@ -2,7 +2,7 @@ import { staticGitHubFallback, type GitHubActivityKind } from '../data/presence'
 import { isGitHubActivityView, usePresenceEndpoint } from '../presence/usePresence';
 
 const icons: Record<GitHubActivityKind, string> = {
-  push: '/images/icons/push.svg',
+  commit: '/images/icons/push.svg',
   'pull-request': '/images/icons/pr_comment.svg',
   issue: '/images/icons/issue.svg',
   comment: '/images/icons/comment.svg',
@@ -11,7 +11,7 @@ const icons: Record<GitHubActivityKind, string> = {
   'repository-created': '/images/icons/folder.svg',
   'repository-public': '/images/icons/public_repo.svg',
   fork: '/images/icons/fork.svg',
-  star: '/images/icons/heart.svg',
+  star: '/images/icons/star.svg',
 };
 
 export function relativeGitHubTime(createdAt: string, now = Date.now()): string {
@@ -20,13 +20,6 @@ export function relativeGitHubTime(createdAt: string, now = Date.now()): string 
   if (elapsedSeconds < 3_600) return `${Math.floor(elapsedSeconds / 60)}m`;
   if (elapsedSeconds < 86_400) return `${Math.floor(elapsedSeconds / 3_600)}h`;
   return `${Math.floor(elapsedSeconds / 86_400)}d`;
-}
-
-export function relativeGitHubRange(createdAt: string, oldestCreatedAt: string | undefined, now = Date.now()): string {
-  const newest = relativeGitHubTime(createdAt, now);
-  if (!oldestCreatedAt || oldestCreatedAt === createdAt) return newest;
-  const oldest = relativeGitHubTime(oldestCreatedAt, now);
-  return `${newest}–${oldest}`;
 }
 
 export default function GitHubWidget() {
@@ -42,9 +35,7 @@ export default function GitHubWidget() {
                 <span class="github-event__line"><strong>{activity.phrase}</strong>{' '}<span class="github-event__target">{activity.target}</span></span>
                 {activity.detail && <span class="github-event__detail">{activity.detail}</span>}
               </span>
-              <time class="github-event__time" dateTime={activity.createdAt} title={activity.oldestCreatedAt
-                ? `${new Date(activity.createdAt).toLocaleString()} – ${new Date(activity.oldestCreatedAt).toLocaleString()}`
-                : new Date(activity.createdAt).toLocaleString()}>{relativeGitHubRange(activity.createdAt, activity.oldestCreatedAt)}</time>
+              <time class="github-event__time" dateTime={activity.createdAt} title={new Date(activity.createdAt).toLocaleString()}>{relativeGitHubTime(activity.createdAt)}</time>
             </a>
           </li>)}
         </ol>
