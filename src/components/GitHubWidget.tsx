@@ -22,6 +22,13 @@ export function relativeGitHubTime(createdAt: string, now = Date.now()): string 
   return `${Math.floor(elapsedSeconds / 86_400)}d`;
 }
 
+export function relativeGitHubRange(createdAt: string, oldestCreatedAt: string | undefined, now = Date.now()): string {
+  const newest = relativeGitHubTime(createdAt, now);
+  if (!oldestCreatedAt || oldestCreatedAt === createdAt) return newest;
+  const oldest = relativeGitHubTime(oldestCreatedAt, now);
+  return `${newest}–${oldest}`;
+}
+
 export default function GitHubWidget() {
   const view = usePresenceEndpoint('/api/github-activity', staticGitHubFallback, isGitHubActivityView);
 
@@ -35,7 +42,9 @@ export default function GitHubWidget() {
                 <span class="github-event__line"><strong>{activity.phrase}</strong>{' '}<span class="github-event__target">{activity.target}</span></span>
                 {activity.detail && <span class="github-event__detail">{activity.detail}</span>}
               </span>
-              <time class="github-event__time" dateTime={activity.createdAt} title={new Date(activity.createdAt).toLocaleString()}>{relativeGitHubTime(activity.createdAt)}</time>
+              <time class="github-event__time" dateTime={activity.createdAt} title={activity.oldestCreatedAt
+                ? `${new Date(activity.createdAt).toLocaleString()} – ${new Date(activity.oldestCreatedAt).toLocaleString()}`
+                : new Date(activity.createdAt).toLocaleString()}>{relativeGitHubRange(activity.createdAt, activity.oldestCreatedAt)}</time>
             </a>
           </li>)}
         </ol>

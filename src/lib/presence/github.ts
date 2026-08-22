@@ -16,6 +16,19 @@ const REPOSITORY = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
 
 type JsonObject = Record<string, unknown>;
 
+type AggregateData =
+  | { type: 'push'; ref: string; refName: string; refType: 'branch' | 'tag'; refUrl: string; size?: number }
+  | { type: 'star' }
+  | { type: 'pull-request'; action: string; number: number }
+  | { type: 'issue'; action: string; number: number }
+  | { type: 'comment'; subject: 'PR' | 'issue'; number: number }
+  | { type: 'review'; action: 'approved' | 'changes-requested' | 'reviewed'; number: number };
+
+type NormalizedGitHubEvent = GitHubActivityEntry & {
+  groupKey?: string;
+  aggregate?: AggregateData;
+};
+
 function objectValue(value: unknown): JsonObject | undefined {
   return value !== null && typeof value === 'object' && !Array.isArray(value) ? value as JsonObject : undefined;
 }
@@ -28,6 +41,10 @@ function text(value: unknown): string | undefined {
 
 function integer(value: unknown): number | undefined {
   return typeof value === 'number' && Number.isInteger(value) && value > 0 ? value : undefined;
+}
+
+function nonNegativeInteger(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : undefined;
 }
 
 function detail(value: unknown): string | undefined {
@@ -50,6 +67,25 @@ function repositoryUrl(repository: string): string {
   return `https://github.com/${repository}`;
 }
 
+function semanticKey(...parts: readonly (string | number)[]): string {
+  return JSON.stringify(parts);
+}
+
+function refInfo(baseUrl: string, ref: string | undefined): Pick<Extract<AggregateData, { type: 'push' }>, 'ref' | 'refName' | 'refType' | 'refUrl'> | undefined {
+  const prefixes = [
+    ['refs/heads/', 'branch', 'tree'] as const,
+    ['refs/tags/', 'tag', 'releases/tag'] as const,
+  ];
+  for (const [prefix, refType, path] of prefixes) {
+    if (!ref?.startsWith(prefix)) continue;
+    const refName = ref.slice(prefix.length);
+    if (!refName) return undefined;
+    const encodedRef = refName.split('/').map(encodeURIComponent).join('/');
+    return { ref, refName, refType, refUrl: `${baseUrl}/${path}/${encodedRef}` };
+  }
+  return undefined;
+}
+
 function entry(
   id: string,
   kind: GitHubActivityKind,
@@ -58,11 +94,11 @@ function entry(
   url: string,
   createdAt: string,
   extraDetail?: string,
-): GitHubActivityEntry {
+): NormalizedGitHubEvent {
   return { id, kind, phrase, target, ...(extraDetail ? { detail: extraDetail } : {}), url, createdAt };
 }
 
-function pushEntry(id: string, repository: string, payload: JsonObject, createdAt: string): GitHubActivityEntry {
+function pushEntry(id: string, repository: string, payload: JsonObject, createdAt: string): NormalizedGitHubEvent {
   const before = text(payload.before);
   const head = text(payload.head);
   const ref = text(payload.ref);
@@ -80,29 +116,45 @@ function pushEntry(id: string, repository: string, payload: JsonObject, createdA
   const refDetail = ref?.startsWith('refs/heads/')
     ? `${ref.slice('refs/heads/'.length)} branch`
     : ref?.startsWith('refs/tags/') ? `${ref.slice('refs/tags/'.length)} tag` : undefined;
-  return entry(id, 'push', 'pushed to', repository, url, createdAt, refDetail);
+  const normalized = entry(id, 'push', 'pushed to', repository, url, createdAt, refDetail);
+  const aggregateRef = refInfo(baseUrl, ref);
+  if (!aggregateRef) return normalized;
+  const size = nonNegativeInteger(payload.size);
+  return {
+    ...normalized,
+    groupKey: semanticKey('push', repository, aggregateRef.ref),
+    aggregate: { type: 'push', ...aggregateRef, ...(size !== undefined ? { size } : {}) },
+  };
 }
 
-function pullRequestEntry(id: string, repository: string, payload: JsonObject, createdAt: string): GitHubActivityEntry | undefined {
+function pullRequestEntry(id: string, repository: string, payload: JsonObject, createdAt: string): NormalizedGitHubEvent | undefined {
   const pullRequest = objectValue(payload.pull_request);
   const number = integer(payload.number) ?? integer(pullRequest?.number);
   const action = text(payload.action);
   if (!pullRequest || !number || !action || !['opened', 'closed', 'merged', 'reopened'].includes(action)) return undefined;
   const verb = action === 'closed' && pullRequest.merged === true ? 'merged' : action;
   const url = githubUrl(pullRequest.html_url) ?? `${repositoryUrl(repository)}/pull/${number}`;
-  return entry(id, 'pull-request', `${verb} PR #${number} in`, repository, url, createdAt, detail(pullRequest.title));
+  return {
+    ...entry(id, 'pull-request', `${verb} PR #${number} in`, repository, url, createdAt, detail(pullRequest.title)),
+    groupKey: semanticKey('pull-request', repository, verb, number),
+    aggregate: { type: 'pull-request', action: verb, number },
+  };
 }
 
-function issueEntry(id: string, repository: string, payload: JsonObject, createdAt: string): GitHubActivityEntry | undefined {
+function issueEntry(id: string, repository: string, payload: JsonObject, createdAt: string): NormalizedGitHubEvent | undefined {
   const issue = objectValue(payload.issue);
   const number = integer(issue?.number);
   const action = text(payload.action);
   if (!issue || !number || !action || !['opened', 'closed', 'reopened'].includes(action)) return undefined;
   const url = githubUrl(issue.html_url) ?? `${repositoryUrl(repository)}/issues/${number}`;
-  return entry(id, 'issue', `${action} issue #${number} in`, repository, url, createdAt, detail(issue.title));
+  return {
+    ...entry(id, 'issue', `${action} issue #${number} in`, repository, url, createdAt, detail(issue.title)),
+    groupKey: semanticKey('issue', repository, action, number),
+    aggregate: { type: 'issue', action, number },
+  };
 }
 
-function issueCommentEntry(id: string, repository: string, payload: JsonObject, createdAt: string): GitHubActivityEntry | undefined {
+function issueCommentEntry(id: string, repository: string, payload: JsonObject, createdAt: string): NormalizedGitHubEvent | undefined {
   if (payload.action !== 'created') return undefined;
   const issue = objectValue(payload.issue);
   const comment = objectValue(payload.comment);
@@ -110,10 +162,15 @@ function issueCommentEntry(id: string, repository: string, payload: JsonObject, 
   if (!issue || !comment || !number) return undefined;
   const isPullRequest = objectValue(issue.pull_request) !== undefined;
   const url = githubUrl(comment.html_url) ?? githubUrl(issue.html_url) ?? repositoryUrl(repository);
-  return entry(id, 'comment', `commented on ${isPullRequest ? 'PR' : 'issue'} #${number} in`, repository, url, createdAt, detail(issue.title));
+  const subject = isPullRequest ? 'PR' : 'issue';
+  return {
+    ...entry(id, 'comment', `commented on ${subject} #${number} in`, repository, url, createdAt, detail(issue.title)),
+    groupKey: semanticKey('comment', repository, subject, number),
+    aggregate: { type: 'comment', subject, number },
+  };
 }
 
-function reviewEntry(id: string, repository: string, payload: JsonObject, createdAt: string): GitHubActivityEntry | undefined {
+function reviewEntry(id: string, repository: string, payload: JsonObject, createdAt: string): NormalizedGitHubEvent | undefined {
   if (!['created', 'updated'].includes(String(payload.action))) return undefined;
   const pullRequest = objectValue(payload.pull_request);
   const review = objectValue(payload.review);
@@ -123,21 +180,30 @@ function reviewEntry(id: string, repository: string, payload: JsonObject, create
   const phrase = state === 'approved' ? `approved PR #${number} in`
     : state === 'changes_requested' ? `requested changes on PR #${number} in`
       : `reviewed PR #${number} in`;
+  const aggregateAction = state === 'approved' ? 'approved' : state === 'changes_requested' ? 'changes-requested' : 'reviewed';
   const url = githubUrl(review.html_url) ?? githubUrl(pullRequest.html_url) ?? `${repositoryUrl(repository)}/pull/${number}`;
-  return entry(id, 'review', phrase, repository, url, createdAt, detail(pullRequest.title));
+  return {
+    ...entry(id, 'review', phrase, repository, url, createdAt, detail(pullRequest.title)),
+    groupKey: semanticKey('review', repository, aggregateAction, number),
+    aggregate: { type: 'review', action: aggregateAction, number },
+  };
 }
 
-function reviewCommentEntry(id: string, repository: string, payload: JsonObject, createdAt: string): GitHubActivityEntry | undefined {
+function reviewCommentEntry(id: string, repository: string, payload: JsonObject, createdAt: string): NormalizedGitHubEvent | undefined {
   if (payload.action !== 'created') return undefined;
   const pullRequest = objectValue(payload.pull_request);
   const comment = objectValue(payload.comment);
   const number = integer(pullRequest?.number);
   if (!pullRequest || !comment || !number) return undefined;
   const url = githubUrl(comment.html_url) ?? githubUrl(pullRequest.html_url) ?? `${repositoryUrl(repository)}/pull/${number}`;
-  return entry(id, 'comment', `commented on PR #${number} in`, repository, url, createdAt, detail(pullRequest.title));
+  return {
+    ...entry(id, 'comment', `commented on PR #${number} in`, repository, url, createdAt, detail(pullRequest.title)),
+    groupKey: semanticKey('comment', repository, 'PR', number),
+    aggregate: { type: 'comment', subject: 'PR', number },
+  };
 }
 
-export function normalizeGitHubEvent(value: unknown): GitHubActivityEntry | undefined {
+export function normalizeGitHubEvent(value: unknown): NormalizedGitHubEvent | undefined {
   const event = objectValue(value);
   const actor = objectValue(event?.actor);
   const repo = objectValue(event?.repo);
@@ -171,7 +237,11 @@ export function normalizeGitHubEvent(value: unknown): GitHubActivityEntry | unde
       return entry(id, 'fork', 'forked', repository, githubUrl(forkee.html_url) ?? `${repoUrl}/forks`, createdAt, detail(forkee.full_name));
     }
     case 'WatchEvent':
-      return payload.action === 'started' ? entry(id, 'star', 'starred', repository, repoUrl, createdAt) : undefined;
+      return payload.action === 'started' ? {
+        ...entry(id, 'star', 'starred', repository, repoUrl, createdAt),
+        groupKey: semanticKey('star', repository),
+        aggregate: { type: 'star' },
+      } : undefined;
     case 'CreateEvent':
       return payload.ref_type === 'repository' ? entry(id, 'repository-created', 'created repository', repository, repoUrl, createdAt, detail(payload.description)) : undefined;
     case 'PublicEvent':
@@ -179,6 +249,82 @@ export function normalizeGitHubEvent(value: unknown): GitHubActivityEntry | unde
     default:
       return undefined;
   }
+}
+
+function publicEntry(value: NormalizedGitHubEvent): GitHubActivityEntry {
+  const { groupKey: _groupKey, aggregate: _aggregate, ...activity } = value;
+  return activity;
+}
+
+function groupedPhrase(aggregate: AggregateData, count: number): string {
+  switch (aggregate.type) {
+    case 'star': return `starred ${count} times`;
+    case 'pull-request': return `${aggregate.action} PR #${aggregate.number} ${count} times in`;
+    case 'issue': return `${aggregate.action} issue #${aggregate.number} ${count} times in`;
+    case 'comment': return `commented ${count} times on ${aggregate.subject} #${aggregate.number} in`;
+    case 'review':
+      if (aggregate.action === 'changes-requested') return `requested changes ${count} times on PR #${aggregate.number} in`;
+      return `${aggregate.action === 'approved' ? 'approved' : 'reviewed'} PR #${aggregate.number} ${count} times in`;
+    case 'push': return `${count} pushes to`;
+  }
+}
+
+function finalizeGroup(members: readonly NormalizedGitHubEvent[]): GitHubActivityEntry {
+  const newest = members[0];
+  if (!newest) throw new Error('cannot finalize an empty GitHub activity group');
+  if (members.length === 1 || !newest.aggregate) return publicEntry(newest);
+
+  const oldestCreatedAt = members.reduce((oldest, member) => Date.parse(member.createdAt) < Date.parse(oldest) ? member.createdAt : oldest, newest.createdAt);
+  const memberIds = members.map(({ id }) => id).sort();
+  const grouped: GitHubActivityEntry = {
+    ...publicEntry(newest),
+    id: `group:${JSON.stringify(memberIds)}`,
+    phrase: groupedPhrase(newest.aggregate, members.length),
+    oldestCreatedAt,
+  };
+
+  if (newest.aggregate.type !== 'push') return grouped;
+  const pushData = members.map(({ aggregate }) => aggregate?.type === 'push' ? aggregate : undefined);
+  const sizes = pushData.map((push) => push?.size);
+  const hasCompleteCommitCount = sizes.every((size): size is number => size !== undefined);
+  return {
+    ...grouped,
+    phrase: hasCompleteCommitCount ? `${sizes.reduce((total, size) => total + size, 0)} commits pushed to` : `${members.length} pushes to`,
+    detail: newest.aggregate.refName,
+    url: newest.aggregate.refUrl,
+  };
+}
+
+function isRenderableActivity(value: GitHubActivityEntry): boolean {
+  return value.id.trim() !== ''
+    && value.phrase.trim() !== ''
+    && value.target.trim() !== ''
+    && githubUrl(value.url) !== undefined
+    && !Number.isNaN(Date.parse(value.createdAt))
+    && (value.oldestCreatedAt === undefined || !Number.isNaN(Date.parse(value.oldestCreatedAt)));
+}
+
+function groupGitHubActivity(events: readonly NormalizedGitHubEvent[]): GitHubActivityEntry[] {
+  const sorted = [...events].sort((left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt));
+  const buckets: NormalizedGitHubEvent[][] = [];
+  const bySemanticKey = new Map<string, NormalizedGitHubEvent[]>();
+
+  for (const activity of sorted) {
+    if (!activity.groupKey || !activity.aggregate) {
+      buckets.push([activity]);
+      continue;
+    }
+    const existing = bySemanticKey.get(activity.groupKey);
+    if (existing) {
+      existing.push(activity);
+      continue;
+    }
+    const members = [activity];
+    bySemanticKey.set(activity.groupKey, members);
+    buckets.push(members);
+  }
+
+  return buckets.map(finalizeGroup).filter(isRenderableActivity);
 }
 
 function githubHeaders(token?: string): Headers {
@@ -193,9 +339,10 @@ export async function getGitHubActivity(fetchImpl: typeof fetch, token: string |
     if (!response.ok) throw new Error('github upstream request failed');
     const payload = await readJsonBounded<unknown>(response);
     if (!Array.isArray(payload)) throw new Error('github upstream payload was not an array');
+    const normalized = payload.map(normalizeGitHubEvent).filter((value): value is NormalizedGitHubEvent => Boolean(value));
     return {
       state: 'ready', profileUrl: PROFILE_URL, login: 'postigodev',
-      entries: payload.map(normalizeGitHubEvent).filter((value): value is GitHubActivityEntry => Boolean(value)).slice(0, MAX_ENTRIES),
+      entries: groupGitHubActivity(normalized).slice(0, MAX_ENTRIES),
       observedAt,
     };
   } catch {
