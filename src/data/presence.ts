@@ -32,6 +32,7 @@ export interface GitHubActivityEntry {
   detail?: string;
   url: string;
   createdAt: string;
+  oldestCreatedAt?: string;
 }
 
 export type GitHubActivityView =

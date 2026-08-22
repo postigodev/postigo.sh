@@ -39,7 +39,11 @@ export function isGitHubActivityView(value: unknown): value is GitHubActivityVie
       && webUrl(activity.url)
       && new URL(activity.url).hostname === 'github.com'
       && nonEmpty(activity.createdAt)
-      && !Number.isNaN(Date.parse(activity.createdAt));
+      && !Number.isNaN(Date.parse(activity.createdAt))
+      && (activity.oldestCreatedAt === undefined
+        || (nonEmpty(activity.oldestCreatedAt)
+          && !Number.isNaN(Date.parse(activity.oldestCreatedAt))
+          && Date.parse(activity.oldestCreatedAt) <= Date.parse(activity.createdAt)));
   });
 }
 
