@@ -1,7 +1,14 @@
 import { getTableName, is } from 'drizzle-orm';
 import { getTableConfig, IndexedColumn } from 'drizzle-orm/pg-core';
 import { describe, expect, it } from 'vitest';
-import { account, session, user, verification, writings } from './schema';
+import {
+  account,
+  portfolioLocation,
+  session,
+  user,
+  verification,
+  writings,
+} from './schema';
 
 describe('auth schema', () => {
   it('keeps Better Auth models singular and issuer-scoped', () => {
@@ -101,5 +108,16 @@ describe('writings schema', () => {
     ]) {
       expect(columnNames).not.toContain(forbiddenColumnName);
     }
+  });
+});
+
+describe('portfolio location schema', () => {
+  it('stores one coarse current location without IP or history fields', () => {
+    expect(getTableName(portfolioLocation)).toBe('portfolio_location');
+    expect(
+      getTableConfig(portfolioLocation).columns.map((column) => column.name),
+    ).toEqual(['id', 'city', 'region', 'country', 'timezone', 'updated_at']);
+    expect(portfolioLocation.id.primary).toBe(true);
+    expect(portfolioLocation.region.notNull).toBe(false);
   });
 });

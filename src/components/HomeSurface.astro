@@ -1,5 +1,6 @@
 ---
 import GitHubWidget from "./GitHubWidget";
+import LocationBox from "./LocationBox.astro";
 import NowPlayingWidget from "./NowPlayingWidget";
 import MediaLogWidget from "./MediaLogWidget";
 import SiteModule from "./SiteModule.astro";
@@ -7,13 +8,20 @@ import { identity, projectCases, selectedWork } from "../data/portfolio";
 import { resumeContent } from "../data/siteContent";
 import type { WritingSummary } from "../data/writings";
 import ProjectWindowLayer from "../project-windows/ProjectWindowLayer";
+import type { StoredLocation } from "../location/service";
 
 interface Props {
   initialProjectSlug?: string;
   writings?: readonly WritingSummary[];
   writingsAvailable?: boolean;
+  latestLocation?: StoredLocation | null;
 }
-const { initialProjectSlug, writings = [], writingsAvailable } = Astro.props;
+const {
+  initialProjectSlug,
+  writings = [],
+  writingsAvailable,
+  latestLocation = null,
+} = Astro.props;
 ---
 
 <div class="site-page" data-home-surface>
@@ -207,6 +215,8 @@ const { initialProjectSlug, writings = [], writingsAvailable } = Astro.props;
       class="site-column site-column--right"
       aria-label="Presence and utilities"
     >
+      {latestLocation && <LocationBox location={latestLocation} />}
+
       <SiteModule id="latest" title="now playing" column="right"
         ><NowPlayingWidget client:load /></SiteModule
       >

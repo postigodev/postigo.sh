@@ -2,14 +2,19 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import HomeSurface from '../components/HomeSurface.astro';
 import { getPublishedWritingsOrFallback } from '../data/writings';
+import { getLatestLocationOrFallback } from '../location/service';
 
 export const prerender = false;
 
-const writingsLoad = await getPublishedWritingsOrFallback();
+const [writingsLoad, latestLocation] = await Promise.all([
+  getPublishedWritingsOrFallback(),
+  getLatestLocationOrFallback(),
+]);
 ---
 <BaseLayout title="Piero Postigo Rocchetti | Software Engineer" description="Backend and product software engineering portfolio.">
   <HomeSurface
     writings={writingsLoad.writings}
     writingsAvailable={writingsLoad.available}
+    latestLocation={latestLocation}
   />
 </BaseLayout>

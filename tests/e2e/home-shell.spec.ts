@@ -27,6 +27,15 @@ test('renders the preview-native twelve-module homepage without the desktop shel
   await expect(page.locator('html')).toHaveCSS('font-family', /Tahoma/);
 });
 
+test('omits the location box when no stored location is available', async ({
+  page,
+}) => {
+  await page.goto('/');
+
+  await expect(page.locator('[data-home-surface]')).toBeVisible();
+  await expect(page.locator('[data-location-box]')).toHaveCount(0);
+});
+
 test('keeps selected work in the approved order with semantic case links', async ({ page }) => {
   await page.goto('/');
 

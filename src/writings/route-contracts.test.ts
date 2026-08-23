@@ -15,7 +15,7 @@ describe('writing route boundaries', () => {
     expect(homeSurface).toContain('writings = []');
     expect(homeSurface).toContain('writingsAvailable === undefined');
     expect(homeSurface).toContain('Writing availability is checked live.');
-    expect(homepage).toContain('await getPublishedWritingsOrFallback()');
+    expect(homepage).toContain('getPublishedWritingsOrFallback()');
     expect(homepage).toContain('writingsAvailable={writingsLoad.available}');
     expect(homepage).toContain('export const prerender = false');
     expect(projectRoute).toContain('export const prerender = true');

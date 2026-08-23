@@ -35,6 +35,21 @@ test('mobile follows the approved content priority and remains within the viewpo
   expect(mascotBounds.mascotBottom).toBeLessThanOrEqual(mascotBounds.headerBottom + 2);
 });
 
+test('keeps the no-location fallback within the mobile viewport', async ({
+  page,
+}) => {
+  await page.goto('/');
+
+  await expect(page.locator('[data-location-box]')).toHaveCount(0);
+  expect(
+    await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth <=
+        document.documentElement.clientWidth,
+    ),
+  ).toBe(true);
+});
+
 test('mobile keeps project links usable without JavaScript', async ({ page }) => {
   await page.goto('/');
   await page.locator('#projects').getByRole('link', { name: 'Preppie' }).click();

@@ -1,0 +1,188 @@
+---
+import type { StoredLocation } from '../location/service';
+
+interface Props {
+  location: StoredLocation;
+}
+
+const { location } = Astro.props;
+const place = `${location.city}, ${location.region ?? location.country}`;
+const clockFormatter = new Intl.DateTimeFormat('en-US', {
+  timeZone: location.timezone,
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: false,
+});
+
+const moonPhases = [
+  'new moon',
+  'waxing crescent',
+  'first quarter',
+  'waxing gibbous',
+  'full moon',
+  'waning gibbous',
+  'last quarter',
+  'waning crescent',
+] as const;
+const knownNewMoon = Date.UTC(2000, 0, 6, 18, 14);
+const synodicMonthMs = 29.53058867 * 86_400_000;
+const phaseProgress =
+  (((Date.now() - knownNewMoon) % synodicMonthMs) + synodicMonthMs) %
+  synodicMonthMs;
+const moonPhase =
+  moonPhases[
+    Math.floor((phaseProgress / synodicMonthMs) * 8 + 0.5) % moonPhases.length
+  ];
+---
+
+<aside
+  class="location-box"
+  aria-label="Current location"
+  data-location-box
+  data-mobile-order
+  data-timezone={location.timezone}
+>
+  <p class="location-kicker">currently posting from</p>
+  <p class="location-place">{place}</p>
+
+  <div class="location-status">
+    <span class="status-item">
+      <span class="moon-icon" aria-hidden="true">☾</span>
+      <time id="location-clock" datetime={new Date().toISOString()}
+        >{clockFormatter.format(new Date())}</time
+      >
+    </span>
+  </div>
+
+  <p class="location-moon">
+    <span aria-hidden="true">◐</span>
+    <span id="moon-phase">{moonPhase}</span>
+  </p>
+</aside>
+
+<style>
+  .location-box {
+    --location-bg: rgba(49, 38, 42, 0.92);
+    --location-border: rgba(235, 238, 244, 0.9);
+    --location-text: #ebe7e9;
+    --location-muted: #c9c2c7;
+    --location-accent: #9be8df;
+
+    width: min(260px, 100%);
+    box-sizing: border-box;
+    padding: 10px 14px 11px;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.035),
+        rgba(0, 0, 0, 0.08)
+      ),
+      var(--location-bg);
+    border: 1px dashed var(--location-border);
+    border-radius: 7px;
+    color: var(--location-text);
+    text-align: center;
+    box-shadow:
+      0 2px 0 rgba(0, 0, 0, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(4px);
+    font-family: "Times New Roman", Georgia, serif;
+    text-shadow:
+      1px 1px 0 #111,
+      -1px -1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  .location-box p {
+    margin: 0;
+  }
+
+  .location-kicker {
+    margin-bottom: 1px !important;
+    color: var(--location-text);
+    font-size: 12px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.9px;
+  }
+
+  .location-place {
+    margin-bottom: 7px !important;
+    color: var(--location-accent);
+    font-size: 16px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 1.8px;
+    line-height: 1.05;
+    text-transform: lowercase;
+    text-shadow:
+      1px 1px 0 #111,
+      0 0 5px rgba(155, 232, 223, 0.18);
+  }
+
+  .location-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .status-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+  }
+
+  .moon-icon {
+    color: #b8ffff;
+    font-size: 18px;
+    line-height: 1;
+    text-shadow:
+      0 0 4px rgba(140, 255, 255, 0.7),
+      1px 1px 0 #000;
+  }
+
+  .location-moon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    color: var(--location-muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+  }
+
+  @media (max-width: 420px) {
+    .location-box {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  const locationBox = document.querySelector<HTMLElement>('[data-location-box]');
+  const clock = locationBox?.querySelector<HTMLTimeElement>('#location-clock');
+  const timezone = locationBox?.dataset.timezone;
+
+  function updateClock() {
+    if (!clock || !timezone) return;
+
+    clock.textContent = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    }).format(new Date());
+    clock.dateTime = new Date().toISOString();
+  }
+
+  updateClock();
+  window.setInterval(updateClock, 1000);
+</script>

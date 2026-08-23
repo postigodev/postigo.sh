@@ -148,6 +148,17 @@ export const writings = pgTable(
   ],
 );
 
+export const portfolioLocation = pgTable('portfolio_location', {
+  id: text('id').primaryKey(),
+  city: text('city').notNull(),
+  region: text('region'),
+  country: text('country').notNull(),
+  timezone: text('timezone').notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),

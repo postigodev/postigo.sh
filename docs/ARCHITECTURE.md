@@ -144,14 +144,20 @@ published database records into homepage/index summaries and converts backend
 configuration or database failures into an explicit unavailable state. It does
 not fabricate an empty publishing history when the backend cannot be reached.
 
-`src/db/schema.ts` defines the Better Auth and writing tables. The writing
-repository and service own persistence and domain behavior; public routes only
-select published records. Better Auth establishes GitHub sessions, and
-authorization grants admin access only when the normalized session email exactly
-matches `ADMIN_EMAIL`. Vercel Blob stores optional PDF objects privately while
+`src/db/schema.ts` defines the Better Auth, writing, and singleton portfolio
+location tables. The writing repository and service own persistence and domain
+behavior; public routes only select published records. Better Auth establishes
+GitHub sessions, and authorization grants admin access only when the normalized
+session email exactly matches `ADMIN_EMAIL`. Vercel Blob stores optional PDF objects privately while
 Postgres stores their internal object locator and cleanup metadata. Publication
 and unpublication use dedicated atomic repository updates; first publication
 time is preserved with database-level `COALESCE`.
+
+After that same administrator authorization succeeds, protected admin requests
+may replace the singleton coarse location from Vercel's city, region, country,
+and timezone headers. Missing or invalid geo headers are ignored. No IP address
+or location history is stored, and the homepage omits the location box when the
+record or database is unavailable.
 
 Public routes distinguish missing content from unavailable infrastructure: a
 valid absent record is 404, while an unconfigured or unreachable backend is 503.
