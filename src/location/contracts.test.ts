@@ -13,6 +13,13 @@ describe('homepage location boundaries', () => {
     expect(homepage).toContain('latestLocation={latestLocation}');
     expect(surface).toContain('latestLocation = null');
     expect(surface).toContain('{latestLocation && <LocationBox');
+    expect(surface).not.toContain('id="updates-mini"');
+    expect(surface.indexOf('{latestLocation && <LocationBox')).toBeGreaterThan(
+      surface.indexOf('id="album"'),
+    );
+    expect(surface.indexOf('{latestLocation && <LocationBox')).toBeLessThan(
+      surface.indexOf('id="media-box"'),
+    );
   });
 
   it('uses the approved copy and omits temperature and geolocation APIs', () => {

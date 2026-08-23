@@ -19,7 +19,7 @@ test('mobile follows the approved content priority and remains within the viewpo
     'resume-box',
     'latest',
     'album',
-    'updates-mini',
+    'media-box',
   ]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 

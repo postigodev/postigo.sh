@@ -12,7 +12,7 @@ const expectedModules = [
   'resume',
   'now playing',
   'photo album',
-  'selected work status',
+  'media log',
 ] as const;
 
 test('renders the preview-native twelve-module homepage without the desktop shell', async ({ page }) => {
@@ -53,13 +53,10 @@ test('keeps selected work in the approved order with semantic case links', async
   ]);
 });
 
-test('describes selected work without implying unsupported recency', async ({ page }) => {
+test('removes the selected work status module', async ({ page }) => {
   await page.goto('/');
 
-  const status = page.locator('#updates-mini');
-  await expect(status.getByRole('heading', { name: 'Selected work status' })).toBeVisible();
-  await expect(status).not.toContainText('latest activity');
-  await expect(status.locator('a')).toHaveText(['Preppie', 'Cimax Modernization', 'Koba']);
+  await expect(page.locator('#updates-mini')).toHaveCount(0);
 });
 
 test('exposes one semantic ticker message to assistive technology', async ({ page }) => {

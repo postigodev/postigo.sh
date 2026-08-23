@@ -215,8 +215,6 @@ const {
       class="site-column site-column--right"
       aria-label="Presence and utilities"
     >
-      {latestLocation && <LocationBox location={latestLocation} />}
-
       <SiteModule id="latest" title="now playing" column="right"
         ><NowPlayingWidget client:load /></SiteModule
       >
@@ -229,22 +227,7 @@ const {
         </div>
       </SiteModule>
 
-      <SiteModule id="updates-mini" title="selected work status" column="right">
-        <ol class="activity-list">
-          {
-            selectedWork.slice(0, 3).map((project) => (
-              <li>
-                <>
-                  <a data-project-launcher href={`/work/${project.slug}`}>
-                    {project.name}
-                  </a>
-                  <span>{project.status}</span>
-                </>
-              </li>
-            ))
-          }
-        </ol>
-      </SiteModule>
+      {latestLocation && <LocationBox location={latestLocation} />}
 
       <SiteModule id="media-box" title="media log" column="right">
         <MediaLogWidget client:load />
