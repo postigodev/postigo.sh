@@ -18,6 +18,8 @@ function locationHeaders(overrides: Record<string, string> = {}) {
     'x-vercel-ip-country-region': 'IL',
     'x-vercel-ip-country': 'US',
     'x-vercel-ip-timezone': 'America/Chicago',
+    'x-vercel-ip-latitude': '40.9478',
+    'x-vercel-ip-longitude': '-90.3712',
     ...overrides,
   });
 }
@@ -44,6 +46,8 @@ describe('Vercel location headers', () => {
       region: 'IL',
       country: 'CR',
       timezone: 'America/Chicago',
+      latitude: 40.9,
+      longitude: -90.4,
     });
   });
 
@@ -56,6 +60,13 @@ describe('Vercel location headers', () => {
   ])('rejects %s without fabricating a replacement', (_, overrides) => {
     expect(parseVercelLocation(locationHeaders(overrides))).toBeNull();
   });
+
+  it('keeps location usable when coordinates are missing or invalid', () => {
+    expect(parseVercelLocation(locationHeaders({
+      'x-vercel-ip-latitude': 'outside',
+      'x-vercel-ip-longitude': '',
+    }))).toMatchObject({ latitude: null, longitude: null });
+  });
 });
 
 describe('location persistence', () => {
@@ -63,6 +74,7 @@ describe('location persistence', () => {
     const repository: LocationRepository = {
       getLatest: vi.fn(),
       upsert: vi.fn(),
+      updateWeather: vi.fn(),
     };
     const deps = dependencies(repository);
 
@@ -75,6 +87,7 @@ describe('location persistence', () => {
     const repository: LocationRepository = {
       getLatest: vi.fn(),
       upsert: vi.fn(async () => undefined),
+      updateWeather: vi.fn(),
     };
     const deps = dependencies(repository);
 
@@ -85,15 +98,38 @@ describe('location persistence', () => {
         region: 'IL',
         country: 'US',
         timezone: 'America/Chicago',
+        latitude: 40.9,
+        longitude: -90.4,
       },
       new Date('2026-08-22T12:00:00.000Z'),
+      true,
+    );
+  });
+
+  it('preserves cached weather when rounded coordinates are unchanged', async () => {
+    const current: StoredLocation = {
+      city: 'Galesburg', region: 'IL', country: 'US', timezone: 'America/Chicago',
+      latitude: 40.9, longitude: -90.4, updatedAt: new Date(), weather: null,
+    };
+    const repository: LocationRepository = {
+      getLatest: vi.fn(async () => current),
+      upsert: vi.fn(async () => undefined),
+      updateWeather: vi.fn(),
+    };
+
+    await captureAdminLocation(locationHeaders(), dependencies(repository));
+
+    expect(repository.upsert).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Date),
+      false,
     );
   });
 
   it('returns null when public location storage is unavailable', async () => {
     const logger = { error: vi.fn() };
     const deps: LocationDependencies = {
-      ...dependencies({ getLatest: vi.fn(), upsert: vi.fn() }),
+      ...dependencies({ getLatest: vi.fn(), upsert: vi.fn(), updateWeather: vi.fn() }),
       getRepository: vi.fn(async () => {
         throw new Error('database unavailable');
       }),
@@ -119,8 +155,11 @@ describe('location persistence', () => {
         region: 'IL',
         country: 'US',
         timezone: 'America/Chicago',
+        latitude: 40.9,
+        longitude: -90.4,
       },
       new Date('2026-08-22T12:00:00.000Z'),
+      true,
     );
 
     expect(queries).toHaveLength(1);
@@ -134,13 +173,56 @@ describe('location persistence', () => {
       region: 'IL',
       country: 'US',
       timezone: 'America/Chicago',
+      latitude: null,
+      longitude: null,
       updatedAt: new Date('2026-08-22T12:00:00.000Z'),
+      weather: null,
     };
     const deps = dependencies({
       getLatest: vi.fn(async () => stored),
       upsert: vi.fn(),
+      updateWeather: vi.fn(),
     });
 
     await expect(getLatestLocationOrFallback(deps)).resolves.toBe(stored);
+  });
+
+  it('uses a fresh cached weather snapshot without a provider request', async () => {
+    const now = new Date('2026-08-22T12:00:00.000Z');
+    const stored: StoredLocation = {
+      city: 'Galesburg', region: 'IL', country: 'US', timezone: 'America/Chicago',
+      latitude: 40.9, longitude: -90.4, updatedAt: now,
+      weather: {
+        symbolCode: 'cloudy', temperatureC: 20, observedAt: now, fetchedAt: now,
+        expiresAt: new Date('2026-08-22T12:30:00.000Z'), lastModified: null,
+      },
+    };
+    const fetcher = vi.fn();
+    const deps = {
+      ...dependencies({ getLatest: vi.fn(async () => stored), upsert: vi.fn(), updateWeather: vi.fn() }),
+      fetcher: fetcher as typeof fetch,
+    };
+
+    await expect(getLatestLocationOrFallback(deps)).resolves.toBe(stored);
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+
+  it('drops weather older than two hours when refresh fails', async () => {
+    const now = new Date('2026-08-22T12:00:00.000Z');
+    const stored: StoredLocation = {
+      city: 'Galesburg', region: 'IL', country: 'US', timezone: 'America/Chicago',
+      latitude: 40.9, longitude: -90.4, updatedAt: now,
+      weather: {
+        symbolCode: 'cloudy', temperatureC: 20, observedAt: now,
+        fetchedAt: new Date('2026-08-22T09:00:00.000Z'),
+        expiresAt: new Date('2026-08-22T09:30:00.000Z'), lastModified: null,
+      },
+    };
+    const deps = {
+      ...dependencies({ getLatest: vi.fn(async () => stored), upsert: vi.fn(), updateWeather: vi.fn() }),
+      fetcher: vi.fn(async () => { throw new Error('offline'); }) as typeof fetch,
+    };
+
+    await expect(getLatestLocationOrFallback(deps)).resolves.toMatchObject({ weather: null });
   });
 });

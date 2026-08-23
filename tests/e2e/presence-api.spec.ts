@@ -5,6 +5,15 @@ test('privacy page describes the owner-only playback display', async ({ page }) 
   await expect(page.getByRole('heading', { name: 'Privacy' })).toBeVisible();
   await expect(page.getByText(/owner's current or recently played Spotify content/i)).toBeVisible();
   await expect(page.getByText(/visitors do not connect a Spotify account/i)).toBeVisible();
+  await expect(page.getByText(/rounded to one decimal/i)).toBeVisible();
+  await expect(page.getByText(/never geolocates portfolio visitors/i)).toBeVisible();
+});
+
+test('credits page attributes weather assets and data', async ({ page }) => {
+  await page.goto('/credits');
+  await expect(page.getByRole('heading', { name: 'Credits' })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Weather icons by Pxlkit/i })).toHaveAttribute('href', 'https://pxlkit.xyz');
+  await expect(page.getByRole('link', { name: /Weather data from MET Norway/i })).toHaveAttribute('href', 'https://api.met.no');
 });
 
 test('local functions reject account selectors', async ({ request }) => {

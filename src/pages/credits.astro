@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DocumentNav from '../components/DocumentNav.astro';
+import { creditsContent } from '../data/siteContent';
+---
+
+<BaseLayout title="Credits | Piero Postigo Rocchetti" description="Attributions for portfolio data and visual assets.">
+  <main class="document-shell">
+    <DocumentNav />
+    <p>{creditsContent.eyebrow}</p>
+    <h1>{creditsContent.title}</h1>
+    <p><a href="https://pxlkit.xyz">{creditsContent.paragraphs[0]}</a></p>
+    <p><a href="https://api.met.no">{creditsContent.paragraphs[1]}</a></p>
+  </main>
+</BaseLayout>

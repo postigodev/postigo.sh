@@ -22,14 +22,26 @@ describe('homepage location boundaries', () => {
     );
   });
 
-  it('uses the approved copy and omits temperature and geolocation APIs', () => {
+  it('renders server-owned weather without browser geolocation or fetch', () => {
     const component = read('../components/LocationBox.astro');
+    const weather = read('./weather.ts');
 
     expect(component).toContain('currently posting from');
     expect(component).toContain('data-timezone={location.timezone}');
     expect(component).toContain("Intl.DateTimeFormat('en-US'");
-    expect(component).not.toContain('location-temp');
+    expect(weather).toContain("const WEATHER_ROOT = '/images/weather'");
+    expect(component).toContain('prefers-reduced-motion');
+    expect(component).toContain('location-weather');
     expect(component).not.toContain('navigator.geolocation');
     expect(component).not.toContain('fetch(');
+  });
+
+  it('links the visible credits route from the homepage footer', () => {
+    const surface = read('../components/HomeSurface.astro');
+    const credits = read('../pages/credits.astro');
+
+    expect(surface).toContain('href="/credits"');
+    expect(credits).toContain('https://pxlkit.xyz');
+    expect(credits).toContain('https://api.met.no');
   });
 });

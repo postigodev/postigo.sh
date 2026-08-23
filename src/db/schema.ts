@@ -1,6 +1,7 @@
 import { relations } from 'drizzle-orm';
 import {
   boolean,
+  doublePrecision,
   index,
   integer,
   jsonb,
@@ -154,6 +155,14 @@ export const portfolioLocation = pgTable('portfolio_location', {
   region: text('region'),
   country: text('country').notNull(),
   timezone: text('timezone').notNull(),
+  latitude: doublePrecision('latitude'),
+  longitude: doublePrecision('longitude'),
+  weatherSymbolCode: text('weather_symbol_code'),
+  weatherTemperatureC: doublePrecision('weather_temperature_c'),
+  weatherObservedAt: timestamp('weather_observed_at', { withTimezone: true }),
+  weatherFetchedAt: timestamp('weather_fetched_at', { withTimezone: true }),
+  weatherExpiresAt: timestamp('weather_expires_at', { withTimezone: true }),
+  weatherLastModified: text('weather_last_modified'),
   updatedAt: timestamp('updated_at', { withTimezone: true })
     .defaultNow()
     .notNull(),

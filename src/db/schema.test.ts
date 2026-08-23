@@ -116,7 +116,22 @@ describe('portfolio location schema', () => {
     expect(getTableName(portfolioLocation)).toBe('portfolio_location');
     expect(
       getTableConfig(portfolioLocation).columns.map((column) => column.name),
-    ).toEqual(['id', 'city', 'region', 'country', 'timezone', 'updated_at']);
+    ).toEqual([
+      'id',
+      'city',
+      'region',
+      'country',
+      'timezone',
+      'latitude',
+      'longitude',
+      'weather_symbol_code',
+      'weather_temperature_c',
+      'weather_observed_at',
+      'weather_fetched_at',
+      'weather_expires_at',
+      'weather_last_modified',
+      'updated_at',
+    ]);
     expect(portfolioLocation.id.primary).toBe(true);
     expect(portfolioLocation.region.notNull).toBe(false);
   });

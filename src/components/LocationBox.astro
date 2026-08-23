@@ -1,5 +1,6 @@
 ---
 import type { StoredLocation } from '../location/service';
+import { getWeatherPresentation } from '../location/weather';
 
 interface Props {
   location: StoredLocation;
@@ -7,6 +8,9 @@ interface Props {
 
 const { location } = Astro.props;
 const place = `${location.city}, ${location.region ?? location.country}`;
+const weather = location.weather
+  ? getWeatherPresentation(location.weather.symbolCode)
+  : null;
 const clockFormatter = new Intl.DateTimeFormat('en-US', {
   timeZone: location.timezone,
   hour: '2-digit',
@@ -38,13 +42,32 @@ const moonPhase =
 
 <aside
   class="location-box"
-  aria-label="Current location"
+  aria-label="Current location and weather"
   data-location-box
   data-mobile-order
   data-timezone={location.timezone}
 >
   <p class="location-kicker">currently posting from</p>
   <p class="location-place">{place}</p>
+
+  {weather && location.weather && (
+    <div class="location-weather" data-weather-condition={weather.condition}>
+      <picture>
+        <source
+          media="(prefers-reduced-motion: reduce)"
+          srcset={weather.reducedMotionIconPath}
+        />
+        <img
+          class={`weather-icon weather-icon--${weather.motion}`}
+          src={weather.iconPath}
+          alt=""
+          width="24"
+          height="24"
+        />
+      </picture>
+      <span>{weather.condition} · {Math.round(location.weather.temperatureC)}°C</span>
+    </div>
+  )}
 
   <div class="location-status">
     <span class="status-item">
@@ -129,6 +152,44 @@ const moonPhase =
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.5px;
+  }
+
+  .location-weather {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: -1px 0 6px;
+    color: var(--location-text);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.45px;
+  }
+
+  .location-weather picture,
+  .weather-icon {
+    display: block;
+    width: 24px;
+    height: 24px;
+  }
+
+  .weather-icon {
+    image-rendering: pixelated;
+    transform-origin: center;
+  }
+
+  .weather-icon--twinkle { animation: weather-twinkle 1.6s steps(2, end) infinite; }
+  .weather-icon--drift { animation: weather-drift 2.4s steps(3, end) infinite; }
+  .weather-icon--fall { animation: weather-fall 1.2s steps(2, end) infinite; }
+  .weather-icon--bounce { animation: weather-bounce 1s steps(2, end) infinite; }
+
+  @keyframes weather-twinkle { 50% { opacity: 0.72; } }
+  @keyframes weather-drift { 50% { transform: translateX(1px); } }
+  @keyframes weather-fall { 50% { transform: translateY(1px); } }
+  @keyframes weather-bounce { 50% { transform: translateY(-1px); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .weather-icon { animation: none; }
   }
 
   .status-item {

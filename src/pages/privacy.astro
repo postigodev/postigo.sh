@@ -6,5 +6,5 @@ import { privacyContent } from '../data/siteContent';
 export const prerender = true;
 ---
 <BaseLayout title="Privacy | Piero Postigo Rocchetti" description="Privacy details for public portfolio presence data.">
-  <main class="document-shell"><DocumentNav /><p>{privacyContent.eyebrow}</p><h1>{privacyContent.title}</h1>{privacyContent.paragraphs.map((paragraph, index) => <p>{paragraph}{index === 2 && <> Questions can be sent through the <a href="/contact">Contact page</a>.</>}</p>)}</main>
+  <main class="document-shell"><DocumentNav /><p>{privacyContent.eyebrow}</p><h1>{privacyContent.title}</h1>{privacyContent.paragraphs.map((paragraph) => <p>{paragraph}</p>)}<p>Questions can be sent through the <a href="/contact">Contact page</a>.</p></main>
 </BaseLayout>

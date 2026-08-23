@@ -155,9 +155,12 @@ time is preserved with database-level `COALESCE`.
 
 After that same administrator authorization succeeds, protected admin requests
 may replace the singleton coarse location from Vercel's city, region, country,
-and timezone headers. Missing or invalid geo headers are ignored. No IP address
-or location history is stored, and the homepage omits the location box when the
-record or database is unavailable.
+timezone, latitude, and longitude headers. Coordinates are validated and rounded
+to one decimal. The on-demand homepage uses only those stored administrator
+coordinates to load MET Norway weather server-side, respecting provider cache
+headers and retaining a bounded last-good snapshot. No visitor is geolocated, no
+IP address or location history is stored, and missing location or weather data is
+omitted rather than fabricated.
 
 Public routes distinguish missing content from unavailable infrastructure: a
 valid absent record is 404, while an unconfigured or unreachable backend is 503.
