@@ -95,7 +95,7 @@ Astro owns:
 Preact owns progressive enhancement only:
 
 - project-case windows in `src/project-windows/`
-- live GitHub and Spotify presence widgets
+- live GitHub, Spotify, and other explicitly approved presence/activity widgets
 - tiny admin sign-in and sign-out controls
 
 Do not turn the site into an SPA or hydrate static documents unnecessarily.
@@ -211,6 +211,27 @@ desktop drag/resize/maximize/close, direct project routes, and fullscreen mobile
 project cases. Backend flows also include honest no-credential public fallbacks,
 public admin login, fail-closed protected admin routes, and writing/PDF method
 contracts.
+
+## Token efficiency
+
+Optimize for total useful work per token.
+
+* Use subagents only when they materially reduce total token usage or prevent
+  substantial irrelevant context from entering the main thread. Do not delegate
+  small edits, routine searches, or work that can be completed cheaply inline.
+* Prefer executing concrete plans directly. If the task is still being planned,
+  implementation has not started, and Plan mode is not active, remind the user
+  once to switch to Plan mode.
+* Use `rg` and `rg --files` for repository search. Search narrowly before
+  opening files, and avoid reading large files or generated output unnecessarily.
+* Reuse established context. Do not repeatedly inspect unchanged files or
+  reconfirm facts already known.
+* Prefer focused checks during implementation; run broader required test suites
+  once the change is coherent. Do not rerun expensive successful checks unless
+  later changes could invalidate them.
+* Keep tool output and communication concise. Avoid unnecessary planning layers,
+  narration, speculative refactors, and context gathered "just in case."
+
 
 ## Definition of done
 
