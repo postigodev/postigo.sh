@@ -1,7 +1,7 @@
 ---
-import type { StoredLocation } from '../location/service';
-import { getDayPeriod, getMoonPresentation } from '../location/celestial';
-import { getWeatherPresentation } from '../location/weather';
+import type { StoredLocation } from "../location/service";
+import { getDayPeriod, getMoonPresentation } from "../location/celestial";
+import { getWeatherPresentation } from "../location/weather";
 
 interface Props {
   location: StoredLocation;
@@ -15,14 +15,13 @@ const weather = location.weather
 const now = new Date();
 const dayPeriod = getDayPeriod(now, location.timezone);
 const moon = getMoonPresentation(now);
-const clockFormatter = new Intl.DateTimeFormat('en-US', {
+const clockFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: location.timezone,
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit',
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
   hour12: false,
 });
-
 ---
 
 <aside
@@ -34,43 +33,84 @@ const clockFormatter = new Intl.DateTimeFormat('en-US', {
 >
   <p class="location-kicker">currently posting from</p>
   <p class="location-place">{place}</p>
-
-  <div class="location-status">
-    <span class="status-item">
-      <span class="time-effect" data-time-effect="day" hidden={dayPeriod !== 'day'} aria-hidden="true">
-        <picture><source media="(prefers-reduced-motion: reduce)" srcset="/images/weather/spark-burst-static.svg" /><img src="/images/weather/spark-burst.svg" alt="" width="18" height="18" /></picture>
-      </span>
-      <span class="time-effect" data-time-effect="night" hidden={dayPeriod !== 'night'} aria-hidden="true">
-        <picture><source media="(prefers-reduced-motion: reduce)" srcset="/images/weather/pixel-rain-static.svg" /><img src="/images/weather/pixel-rain.svg" alt="" width="18" height="18" /></picture>
-      </span>
-      <time id="location-clock" datetime={now.toISOString()}>{clockFormatter.format(now)}</time>
-    </span>
-  </div>
-
-  {weather && location.weather && (
-    <div class="location-weather" data-weather-condition={weather.condition}>
-      <picture>
-        <source
-          media="(prefers-reduced-motion: reduce)"
-          srcset={weather.reducedMotionIconPath}
-        />
-        <img
-          class={`weather-icon weather-icon--${weather.motion}`}
-          src={weather.iconPath}
-          alt=""
-          width="24"
-          height="24"
-        />
-      </picture>
-      <span class="weather-copy">
-        <span>{weather.condition}</span>
-        <span>{Math.round(location.weather.temperatureC)}°C</span>
+  <div class="location-box-flex">
+    <div class="location-status">
+      <span class="status-item">
+        <span
+          class="time-effect"
+          data-time-effect="day"
+          hidden={dayPeriod !== "day"}
+          aria-hidden="true"
+        >
+          <picture
+            ><source
+              media="(prefers-reduced-motion: reduce)"
+              srcset="/images/weather/spark-burst-static.svg"
+            /><img
+              src="/images/weather/spark-burst.svg"
+              alt=""
+              width="18"
+              height="18"
+            /></picture
+          >
+        </span>
+        <span
+          class="time-effect"
+          data-time-effect="night"
+          hidden={dayPeriod !== "night"}
+          aria-hidden="true"
+        >
+          <picture
+            ><source
+              media="(prefers-reduced-motion: reduce)"
+              srcset="/images/weather/pixel-rain-static.svg"
+            /><img
+              src="/images/weather/pixel-rain.svg"
+              alt=""
+              width="18"
+              height="18"
+            /></picture
+          >
+        </span>
+        <time id="location-clock" datetime={now.toISOString()}
+          >{clockFormatter.format(now)}</time
+        >
       </span>
     </div>
-  )}
-
+    <span>★</span>
+    {
+      weather && location.weather && (
+        <div
+          class="location-weather"
+          data-weather-condition={weather.condition}
+        >
+          <span class="weather-copy">
+            <span>{weather.condition}</span>
+            <span>{Math.round(location.weather.temperatureC)}°C</span>
+          </span>
+          <picture>
+            <source
+              media="(prefers-reduced-motion: reduce)"
+              srcset={weather.reducedMotionIconPath}
+            />
+            <img
+              class={`weather-icon weather-icon--${weather.motion}`}
+              src={weather.iconPath}
+              alt=""
+              width="24"
+              height="24"
+            />
+          </picture>
+          
+        </div>
+      )
+    }
+  </div>
   <p class="location-moon">
-    <span class={`moon-phase-icon moon-phase-icon--${moon.variant}`} aria-hidden="true">
+    <span
+      class={`moon-phase-icon moon-phase-icon--${moon.variant}`}
+      aria-hidden="true"
+    >
       <img src={moon.iconPath} alt="" width="16" height="16" />
     </span>
     <span id="moon-phase">{moon.label}</span>
@@ -89,11 +129,7 @@ const clockFormatter = new Intl.DateTimeFormat('en-US', {
     box-sizing: border-box;
     padding: 10px 14px 11px;
     background:
-      linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.035),
-        rgba(0, 0, 0, 0.08)
-      ),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(0, 0, 0, 0.08)),
       var(--location-bg);
     border: 1px dashed var(--location-border);
     border-radius: 7px;
@@ -145,8 +181,17 @@ const clockFormatter = new Intl.DateTimeFormat('en-US', {
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.5px;
+    justify-self: start;
   }
-
+  .location-box-flex {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: start;
+    width: 100%;
+  }
+  .location-box-flex > span {
+    justify-self: center;
+  }
   .location-weather {
     display: flex;
     align-items: center;
@@ -157,6 +202,7 @@ const clockFormatter = new Intl.DateTimeFormat('en-US', {
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.45px;
+    justify-self: end;
   }
 
   .location-weather picture,
@@ -170,7 +216,7 @@ const clockFormatter = new Intl.DateTimeFormat('en-US', {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    line-height: 1.05;
+    line-height: 1;
   }
 
   .weather-icon {
@@ -178,18 +224,44 @@ const clockFormatter = new Intl.DateTimeFormat('en-US', {
     transform-origin: center;
   }
 
-  .weather-icon--twinkle { animation: weather-twinkle 1.6s steps(2, end) infinite; }
-  .weather-icon--drift { animation: weather-drift 2.4s steps(3, end) infinite; }
-  .weather-icon--fall { animation: weather-fall 1.2s steps(2, end) infinite; }
-  .weather-icon--bounce { animation: weather-bounce 1s steps(2, end) infinite; }
+  .weather-icon--twinkle {
+    animation: weather-twinkle 1.6s steps(2, end) infinite;
+  }
+  .weather-icon--drift {
+    animation: weather-drift 2.4s steps(3, end) infinite;
+  }
+  .weather-icon--fall {
+    animation: weather-fall 1.2s steps(2, end) infinite;
+  }
+  .weather-icon--bounce {
+    animation: weather-bounce 1s steps(2, end) infinite;
+  }
 
-  @keyframes weather-twinkle { 50% { opacity: 0.72; } }
-  @keyframes weather-drift { 50% { transform: translateX(1px); } }
-  @keyframes weather-fall { 50% { transform: translateY(1px); } }
-  @keyframes weather-bounce { 50% { transform: translateY(-1px); } }
+  @keyframes weather-twinkle {
+    50% {
+      opacity: 0.72;
+    }
+  }
+  @keyframes weather-drift {
+    50% {
+      transform: translateX(1px);
+    }
+  }
+  @keyframes weather-fall {
+    50% {
+      transform: translateY(1px);
+    }
+  }
+  @keyframes weather-bounce {
+    50% {
+      transform: translateY(-1px);
+    }
+  }
 
   @media (prefers-reduced-motion: reduce) {
-    .weather-icon { animation: none; }
+    .weather-icon {
+      animation: none;
+    }
   }
 
   .status-item {
@@ -231,12 +303,23 @@ const clockFormatter = new Intl.DateTimeFormat('en-US', {
     image-rendering: pixelated;
   }
 
-  .moon-phase-icon { overflow: hidden; }
-  .moon-phase-icon--new img { filter: brightness(0.2) saturate(0.6); opacity: 0.8; }
+  .moon-phase-icon {
+    overflow: hidden;
+  }
+  .moon-phase-icon--new img {
+    filter: brightness(0.2) saturate(0.6);
+    opacity: 0.8;
+  }
   .moon-phase-icon--waxing-crescent img,
-  .moon-phase-icon--waxing-gibbous img { transform: scaleX(-1); }
-  .moon-phase-icon--first-quarter img { clip-path: inset(0 0 0 50%); }
-  .moon-phase-icon--last-quarter img { clip-path: inset(0 50% 0 0); }
+  .moon-phase-icon--waxing-gibbous img {
+    transform: scaleX(-1);
+  }
+  .moon-phase-icon--first-quarter img {
+    clip-path: inset(0 0 0 50%);
+  }
+  .moon-phase-icon--last-quarter img {
+    clip-path: inset(0 50% 0 0);
+  }
 
   @media (max-width: 420px) {
     .location-box {
@@ -246,30 +329,37 @@ const clockFormatter = new Intl.DateTimeFormat('en-US', {
 </style>
 
 <script>
-  const locationBox = document.querySelector<HTMLElement>('[data-location-box]');
-  const clock = locationBox?.querySelector<HTMLTimeElement>('#location-clock');
+  const locationBox = document.querySelector<HTMLElement>(
+    "[data-location-box]",
+  );
+  const clock = locationBox?.querySelector<HTMLTimeElement>("#location-clock");
   const timezone = locationBox?.dataset.timezone;
-  const effects = locationBox?.querySelectorAll<HTMLElement>('[data-time-effect]');
+  const effects =
+    locationBox?.querySelectorAll<HTMLElement>("[data-time-effect]");
 
   function updateClock() {
     if (!clock || !timezone) return;
 
-    clock.textContent = new Intl.DateTimeFormat('en-US', {
+    clock.textContent = new Intl.DateTimeFormat("en-US", {
       timeZone: timezone,
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
       hour12: false,
     }).format(new Date());
     clock.dateTime = new Date().toISOString();
 
-    const hour = Number(new Intl.DateTimeFormat('en-US', {
-      timeZone: timezone,
-      hour: 'numeric',
-      hourCycle: 'h23',
-    }).format(new Date()));
-    const period = hour >= 6 && hour < 18 ? 'day' : 'night';
-    effects?.forEach((effect) => { effect.hidden = effect.dataset.timeEffect !== period; });
+    const hour = Number(
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: timezone,
+        hour: "numeric",
+        hourCycle: "h23",
+      }).format(new Date()),
+    );
+    const period = hour >= 6 && hour < 18 ? "day" : "night";
+    effects?.forEach((effect) => {
+      effect.hidden = effect.dataset.timeEffect !== period;
+    });
   }
 
   updateClock();
