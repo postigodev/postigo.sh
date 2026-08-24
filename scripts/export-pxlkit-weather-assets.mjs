@@ -1,11 +1,11 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
-const [modulePath, outputDir] = process.argv.slice(2);
-if (!modulePath || !outputDir) throw new Error('Usage: node export-pxlkit-weather-assets.mjs <weather-module> <output-dir>');
+const [modulePath, outputDir, selection = 'weather'] = process.argv.slice(2);
+if (!modulePath || !outputDir) throw new Error('Usage: node export-pxlkit-weather-assets.mjs <module> <output-dir> [weather|effects]');
 
 const icons = await import(pathToFileURL(modulePath).href);
-const selected = {
+const weather = {
   Sun: 'sun.svg', PulsingSun: 'pulsing-sun.svg', ClearNight: 'clear-night.svg',
   CloudSun: 'cloud-sun.svg', CloudyNight: 'cloudy-night.svg', Cloud: 'cloud.svg',
   Fog: 'fog.svg', DriftingFog: 'drifting-fog.svg', Drizzle: 'drizzle.svg',
@@ -13,6 +13,8 @@ const selected = {
   FallingSnow: 'falling-snow.svg', SnowNight: 'snow-night.svg', Thunder: 'thunder.svg',
   LightningStrike: 'lightning-strike.svg',
 };
+const effects = { PixelRain: 'pixel-rain.svg', SparkBurst: 'spark-burst.svg' };
+const selected = selection === 'effects' ? effects : weather;
 
 function pixels(icon, grid = icon.grid, palette = icon.palette) {
   const result = [];
@@ -51,4 +53,9 @@ for (const [exportName, filename] of Object.entries(selected)) {
   const icon = icons[exportName];
   if (!icon) throw new Error(`Missing Pxlkit export: ${exportName}`);
   await writeFile(`${outputDir}/${filename}`, 'frames' in icon ? animatedSvg(icon) : staticSvg(icon));
+  if (selection === 'effects') {
+    const staticFilename = filename.replace('.svg', '-static.svg');
+    const firstFrame = 'frames' in icon ? { ...icon, grid: icon.frames[0].grid, palette: { ...icon.palette, ...icon.frames[0].palette } } : icon;
+    await writeFile(`${outputDir}/${staticFilename}`, staticSvg(firstFrame));
+  }
 }

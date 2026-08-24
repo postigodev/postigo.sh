@@ -3,7 +3,8 @@ Pxlkit Asset License Notice
 
 Copyright (c) 2026 Joangel De La Rosa and Pxlkit Contributors
 
-These weather icons are derived from @pxlkit/weather 1.2.4.
+These weather icons are derived from @pxlkit/weather 1.2.4 and
+@pxlkit/effects 1.2.3.
 Free community use requires visible attribution. Standalone redistribution,
 repackaging, and resale are not allowed.
 

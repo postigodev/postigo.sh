@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 35" width="504" height="490" shape-rendering="crispEdges">
+  <title>Pixel Spotify logo</title>
+  <path fill="#191313" d="M7 0h21v1h-21zM4 1h27v1h-27zM3 2h29v1h-29zM2 3h31v1h-31zM1 4h13v1h-13zM21 4h13v1h-13zM1 5h10v1h-10zM24 5h10v1h-10zM1 6h9v1h-9zM25 6h11v1h-11zM1 7h8v1h-8zM27 7h9v1h-9zM0 8h8v1h-8zM28 8h8v1h-8zM0 9h7v1h-7zM28 9h8v1h-8zM0 10h6v1h-6zM29 10h7v1h-7zM0 11h5v1h-5zM12 11h7v1h-7zM30 11h6v1h-6zM0 12h5v1h-5zM9 12h15v1h-15zM30 12h6v1h-6zM0 13h5v1h-5zM8 13h18v1h-18zM30 13h6v1h-6zM0 14h4v1h-4zM9 14h1v1h-1zM21 14h6v1h-6zM31 14h5v1h-5zM0 15h4v1h-4zM24 15h3v1h-3zM31 15h5v1h-5zM0 16h4v1h-4zM11 16h9v1h-9zM31 16h5v1h-5zM0 17h4v1h-4zM9 17h14v1h-14zM31 17h5v1h-5zM0 18h4v1h-4zM9 18h3v1h-3zM19 18h6v1h-6zM31 18h5v1h-5zM0 19h4v1h-4zM22 19h4v1h-4zM31 19h5v1h-5zM0 20h4v1h-4zM14 20h3v1h-3zM24 20h1v1h-1zM31 20h5v1h-5zM0 21h5v1h-5zM10 21h11v1h-11zM31 21h5v1h-5zM0 22h5v1h-5zM10 22h2v1h-2zM19 22h4v1h-4zM30 22h6v1h-6zM0 23h5v1h-5zM22 23h2v1h-2zM30 23h6v1h-6zM0 24h6v1h-6zM29 24h7v1h-7zM0 25h6v1h-6zM29 25h7v1h-7zM0 26h7v1h-7zM28 26h8v1h-8zM0 27h8v1h-8zM27 27h9v1h-9zM1 28h8v1h-8zM26 28h10v1h-10zM1 29h10v1h-10zM24 29h10v1h-10zM1 30h12v1h-12zM22 30h12v1h-12zM2 31h31v1h-31zM2 32h31v1h-31zM4 33h28v1h-28zM5 34h25v1h-25z"/>
+  <path fill="#25D661" d="M14 4h7v1h-7zM11 5h13v1h-13zM10 6h15v1h-15zM9 7h18v1h-18zM8 8h20v1h-20zM7 9h21v1h-21zM6 10h23v1h-23zM5 11h7v1h-7zM19 11h11v1h-11zM5 12h4v1h-4zM24 12h6v1h-6zM5 13h3v1h-3zM26 13h4v1h-4zM4 14h5v1h-5zM10 14h11v1h-11zM27 14h4v1h-4zM4 15h20v1h-20zM27 15h4v1h-4zM4 16h7v1h-7zM20 16h11v1h-11zM4 17h5v1h-5zM23 17h8v1h-8zM4 18h5v1h-5zM12 18h7v1h-7zM25 18h6v1h-6zM4 19h18v1h-18zM26 19h5v1h-5zM4 20h10v1h-10zM17 20h7v1h-7zM25 20h6v1h-6zM5 21h5v1h-5zM21 21h10v1h-10zM5 22h5v1h-5zM12 22h7v1h-7zM23 22h7v1h-7zM5 23h17v1h-17zM24 23h6v1h-6zM6 24h23v1h-23zM6 25h23v1h-23zM7 26h21v1h-21zM8 27h19v1h-19zM9 28h17v1h-17zM11 29h13v1h-13zM13 30h9v1h-9z"/>
+<!-- Code injected by live-server -->
+<script type="text/javascript">
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function() {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					head.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					head.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function(msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			console.log('Live reload enabled.');
+		})();
+	}
+	// ]]>
+</script>
+</svg>

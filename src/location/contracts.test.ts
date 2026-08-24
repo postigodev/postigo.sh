@@ -36,6 +36,30 @@ describe('homepage location boundaries', () => {
     expect(component).not.toContain('fetch(');
   });
 
+  it('orders location, time, vertical weather, and SVG moon phase', () => {
+    const component = read('../components/LocationBox.astro');
+    expect(component.indexOf('class="location-place"')).toBeLessThan(component.indexOf('class="location-status"'));
+    expect(component.indexOf('class="location-status"')).toBeLessThan(component.indexOf('class="location-weather"'));
+    expect(component.indexOf('class="location-weather"')).toBeLessThan(component.indexOf('class="location-moon"'));
+    expect(component).toContain('class="weather-copy"');
+    expect(component).toContain('flex-direction: column');
+    expect(component).toContain('moon-phase-icon--${moon.variant}');
+    expect(component).not.toContain('◐');
+    expect(component).not.toContain('☾');
+    expect(component).toContain('/images/weather/spark-burst-static.svg');
+    expect(component).toContain('/images/weather/pixel-rain-static.svg');
+  });
+
+  it('ships local animated effects, static fallbacks, and moon assets', () => {
+    for (const asset of ['pixel-rain', 'spark-burst']) {
+      expect(read(`../../public/images/weather/${asset}.svg`)).toContain('@keyframes');
+      expect(read(`../../public/images/weather/${asset}-static.svg`)).not.toContain('@keyframes');
+    }
+    for (const asset of ['moon-thin', 'moon-thick', 'moon-full']) {
+      expect(read(`../../public/images/weather/${asset}.svg`)).toContain('<svg');
+    }
+  });
+
   it('links the visible credits route from the homepage footer', () => {
     const surface = read('../components/HomeSurface.astro');
     const credits = read('../pages/credits.astro');
