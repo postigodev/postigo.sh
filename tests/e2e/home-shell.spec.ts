@@ -10,7 +10,7 @@ const expectedModules = [
   'note',
   'links',
   'resume',
-  'now playing',
+  'Spotify',
   'photo album',
   'media log',
 ] as const;

@@ -1,4 +1,6 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 
 const playingFixture = {
   state: 'playing',
@@ -11,6 +13,16 @@ const playingFixture = {
   progressMs: 84_000,
   observedAt: '2026-08-13T18:00:00.000Z',
 };
+
+const artworkFixture = resolve(process.cwd(), 'public/images/icons/Now Playing_files/ab67616d0000b273c5246f80d22d902d0be31cbf');
+
+async function routeArtwork(page: Page) {
+  await page.route(playingFixture.artworkUrl, async (route) => route.fulfill({
+    body: await readFile(artworkFixture),
+    contentType: 'image/jpeg',
+    headers: { 'access-control-allow-origin': '*' },
+  }));
+}
 
 const githubFixture = {
   state: 'ready',
@@ -25,12 +37,18 @@ const githubFixture = {
 };
 
 test('progressively enhances Spotify and GitHub without blocking static identity', async ({ page }) => {
+  await routeArtwork(page);
   await page.route('**/api/now-playing', (route) => route.fulfill({ json: playingFixture }));
   await page.route('**/api/github-activity', (route) => route.fulfill({ json: githubFixture }));
-  await page.goto('/');
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
 
   await expect(page.getByRole('heading', { name: 'Software Engineer' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Spotify' })).toBeVisible();
   await expect(page.getByRole('link', { name: /Test Track on Spotify/i })).toHaveAttribute('href', playingFixture.spotifyUrl);
+  await expect(page.getByAltText('Test Album — Test Artist')).toBeVisible();
+  await expect(page.locator('#latest')).toHaveAttribute('data-spotify-palette', 'artwork');
+  await expect.poll(async () => Number.parseFloat(await page.locator('.spotify-player__progress > span').evaluate((element) => (element as HTMLElement).style.width))).toBeGreaterThanOrEqual(40);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await expect(page.locator('[data-github-widget]')).toContainText('20 commits to');
   await expect(page.locator('[data-github-widget]')).toContainText('postigodev/postigo.sh');
   await expect(page.locator('[data-github-widget] .github-event__time').first()).not.toContainText('–');
@@ -43,9 +61,31 @@ test('progressively enhances Spotify and GitHub without blocking static identity
 test('preserves explicit unavailable states for malformed responses', async ({ page }) => {
   await page.route('**/api/now-playing', (route) => route.fulfill({ json: { state: 'playing', token: 'bad' } }));
   await page.route('**/api/github-activity', (route) => route.abort());
-  await page.goto('/');
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-  await expect(page.locator('[data-now-playing]')).toContainText('Spotify presence is unavailable');
+  await expect(page.locator('[data-now-playing]')).toContainText('Spotify unavailable');
+  await expect(page.locator('#latest')).toHaveAttribute('data-spotify-palette', 'fallback');
   await expect(page.locator('[data-github-widget]')).toContainText('GitHub activity temporarily unavailable');
   await expect(page.getByRole('link', { name: '@postigodev' })).toBeVisible();
+});
+
+test('renders recent playback without playing motion', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await routeArtwork(page);
+  await page.route('**/api/now-playing', (route) => route.fulfill({ json: { ...playingFixture, state: 'recent', progressMs: undefined } }));
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+  await expect(page.locator('[data-now-playing]')).toContainText('LAST PLAYED');
+  await expect(page.locator('[data-now-playing]')).not.toHaveClass(/is-playing/);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
+test('reduces Spotify artwork motion when requested', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await routeArtwork(page);
+  await page.route('**/api/now-playing', (route) => route.fulfill({ json: playingFixture }));
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+  await expect(page.locator('.spotify-player__album img')).toBeVisible();
+  expect(await page.locator('.spotify-player__album img').evaluate((element) => getComputedStyle(element).animationIterationCount)).toBe('1');
 });
