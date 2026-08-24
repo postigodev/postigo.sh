@@ -32,6 +32,11 @@ const githubFixture = {
     { id: 'commits-1', kind: 'commit', phrase: '20 commits to', target: 'postigodev/postigo.sh', url: 'https://github.com/postigodev/postigo.sh/commits', createdAt: '2026-08-13T17:52:00.000Z' },
     { id: 'issue-1', kind: 'issue', phrase: 'opened issue #42 in', target: 'postigodev/koba', detail: 'Improve repository scan diagnostics', url: 'https://github.com/postigodev/koba/issues/42', createdAt: '2026-08-13T15:00:00.000Z' },
     { id: 'star-1', kind: 'star', phrase: 'starred', target: 'shuqikhor/pixel-icons', url: 'https://github.com/shuqikhor/pixel-icons', createdAt: '2026-08-13T13:00:00.000Z' },
+    { id: 'pr-1', kind: 'pull-request', phrase: 'merged PR #9 in', target: 'postigodev/brumaire', url: 'https://github.com/postigodev/brumaire/pull/9', createdAt: '2026-08-12T18:00:00.000Z' },
+    { id: 'release-1', kind: 'release', phrase: 'published a release for', target: 'postigodev/koba', url: 'https://github.com/postigodev/koba/releases/tag/v1', createdAt: '2026-08-11T18:00:00.000Z' },
+    { id: 'fork-1', kind: 'fork', phrase: 'forked', target: 'postigodev/example', url: 'https://github.com/postigodev/example/forks', createdAt: '2026-08-10T18:00:00.000Z' },
+    { id: 'public-1', kind: 'repository-public', phrase: 'made repository public', target: 'postigodev/archive', url: 'https://github.com/postigodev/archive', createdAt: '2026-08-09T18:00:00.000Z' },
+    { id: 'created-1', kind: 'repository-created', phrase: 'created repository', target: 'postigodev/new-repo', url: 'https://github.com/postigodev/new-repo', createdAt: '2026-08-08T18:00:00.000Z' },
   ],
   observedAt: '2026-08-13T18:00:00.000Z',
 };
@@ -49,13 +54,32 @@ test('progressively enhances Spotify and GitHub without blocking static identity
   await expect(page.locator('#latest')).toHaveAttribute('data-spotify-palette', 'artwork');
   await expect.poll(async () => Number.parseFloat(await page.locator('.spotify-player__progress > span').evaluate((element) => (element as HTMLElement).style.width))).toBeGreaterThanOrEqual(40);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  await expect(page.locator('[data-github-widget]')).toContainText('20 commits to');
+  await expect(page.locator('[data-github-widget]')).toContainText('20 commits');
   await expect(page.locator('[data-github-widget]')).toContainText('postigodev/postigo.sh');
-  await expect(page.locator('[data-github-widget] .github-event__time').first()).not.toContainText('–');
-  await expect(page.locator('[data-github-widget] img[src="/images/icons/star.svg"]')).toHaveCount(1);
-  await expect(page.locator('[data-github-widget] .github-event-row')).toHaveCount(githubFixture.entries.length);
-  await expect(page.locator('[data-github-widget] .github-event-row:empty')).toHaveCount(0);
-  await expect(page.locator('[data-github-widget] a').first()).toHaveAttribute('href', githubFixture.entries[0].url);
+  await expect(page.locator('[data-github-widget] time').first()).not.toContainText('–');
+  await expect(page.locator('[data-github-widget] [role="option"]')).toHaveCount(6);
+  await expect(page.locator('[data-github-widget] [role="option"]').first()).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('[data-github-widget] .github-overview__detail')).toHaveAttribute('href', githubFixture.entries[0].url);
+  await expect(page.getByRole('button', { name: 'Next GitHub activity' })).toBeVisible();
+});
+
+test('navigates and opens the complete GitHub activity menu', async ({ page }) => {
+  await page.route('**/api/github-activity', (route) => route.fulfill({ json: githubFixture }));
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.evaluate(() => { window.open = (url) => { document.documentElement.dataset.githubOpened = String(url); return null; }; });
+
+  const first = page.locator('[data-github-index="0"]');
+  await first.focus();
+  await first.press('End');
+  await expect(page.locator('[data-github-index="7"]')).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('.github-overview__detail')).toHaveAttribute('href', githubFixture.entries[7].url);
+  await page.locator('[data-github-index="7"]').press('Enter');
+  await expect(page.locator('html')).toHaveAttribute('data-github-opened', githubFixture.entries[7].url);
+
+  await page.locator('[data-github-index="7"]').press('Home');
+  await expect(page.locator('[data-github-index="0"]')).toHaveAttribute('aria-selected', 'true');
+  await page.locator('[data-github-index="1"]').dblclick();
+  await expect(page.locator('html')).toHaveAttribute('data-github-opened', githubFixture.entries[1].url);
 });
 
 test('preserves explicit unavailable states for malformed responses', async ({ page }) => {
@@ -65,8 +89,8 @@ test('preserves explicit unavailable states for malformed responses', async ({ p
 
   await expect(page.locator('[data-now-playing]')).toContainText('Spotify unavailable');
   await expect(page.locator('#latest')).toHaveAttribute('data-spotify-palette', 'fallback');
-  await expect(page.locator('[data-github-widget]')).toContainText('GitHub activity temporarily unavailable');
-  await expect(page.getByRole('link', { name: '@postigodev' })).toBeVisible();
+  await expect(page.locator('[data-github-widget]')).toContainText('GITHUB ACTIVITY UNAVAILABLE');
+  await expect(page.getByRole('link', { name: 'postigodev', exact: true })).toBeVisible();
 });
 
 test('renders recent playback without playing motion', async ({ page }) => {

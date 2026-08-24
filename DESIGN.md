@@ -325,7 +325,7 @@ Presence labels are tiny uppercase badges with a metallic blue fill, cold ink, o
 
 ### GitHub Activity
 
-GitHub is a compact public activity log, not a profile-statistics panel. Roughly five border-separated events remain visible before an internal, narrow steel scrollbar takes over. Each complete row is a specific external link with a naked pixel icon, a short human action, one optional ellipsized detail, and a muted relative timestamp. The fixed footer links `@postigodev` and the full GitHub overview. An unavailable feed uses the pixel warning triangle and an honest recovery link; it never falls back to fabricated activity or the retired repositories/followers/stars/languages grid.
+GitHub is a compact public activity log styled as a low-resolution PS1-era menu, not a profile-statistics panel. Its fluid 320:144 shell replaces the standard module titlebar with a sparse `postigodev / ACTIVITY` header, one embedded six-row frame, an ugly-green active selection, a date gutter, and a selected-event detail frame. The implementation remains semantic HTML rather than canvas: pointer, keyboard, wheel, touch, and explicit detail-link access all reach the same normalized public events. Additional entries move through the six-row viewport with restrained gutter controls instead of a modern scrollbar. Empty and unavailable states occupy the same shell and link honestly to the public profile; they never fabricate activity or revive the retired repositories/followers/stars/languages grid.
 
 ### Now Playing
 
