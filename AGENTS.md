@@ -219,6 +219,7 @@ Optimize for total useful work per token.
 * Use subagents only when they materially reduce total token usage or prevent
   substantial irrelevant context from entering the main thread. Do not delegate
   small edits, routine searches, or work that can be completed cheaply inline.
+* Excute plans inline, only use subagents when absolutely necessary. Inline must be your first option.
 * Prefer executing concrete plans directly. If the task is still being planned,
   implementation has not started, and Plan mode is not active, remind the user
   once to switch to Plan mode.
