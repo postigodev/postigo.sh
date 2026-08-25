@@ -86,6 +86,25 @@ test('navigates and opens the complete GitHub activity menu', async ({ page }) =
   await expect(page.locator('html')).toHaveAttribute('data-github-opened', githubFixture.entries[1].url);
 });
 
+test('keeps wheel scrolling inside the GitHub activity menu', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 420 });
+  await page.route('**/api/github-activity', (route) => route.fulfill({ json: githubFixture }));
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+  const canvas = page.locator('[data-github-widget] canvas');
+  await canvas.scrollIntoViewIfNeeded();
+  const box = await canvas.boundingBox();
+  expect(box).not.toBeNull();
+  await page.mouse.move((box?.x ?? 0) + (box?.width ?? 0) / 2, (box?.y ?? 0) + (box?.height ?? 0) / 2);
+  const before = await page.evaluate(() => window.scrollY);
+  expect(before).toBeGreaterThan(0);
+
+  await page.mouse.wheel(0, -300);
+  await page.waitForTimeout(100);
+
+  expect(await page.evaluate(() => window.scrollY)).toBe(before);
+});
+
 test('preserves explicit unavailable states for malformed responses', async ({ page }) => {
   await page.route('**/api/now-playing', (route) => route.fulfill({ json: { state: 'playing', token: 'bad' } }));
   await page.route('**/api/github-activity', (route) => route.abort());

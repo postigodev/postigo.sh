@@ -121,10 +121,11 @@ export default function GitHubWidget() {
   }
 
   function handleWheel(event: WheelEvent) {
-    if (Math.abs(event.deltaY) < 4 || Date.now() < wheelLock.current) return;
+    if (Math.abs(event.deltaY) < 4 || total === 0) return;
+    event.preventDefault();
+    if (Date.now() < wheelLock.current) return;
     const next = safeSelected + (event.deltaY > 0 ? 1 : -1);
     if (next < 0 || next >= total) return;
-    event.preventDefault();
     wheelLock.current = Date.now() + 90;
     selectIndex(next);
   }

@@ -120,18 +120,18 @@ function frame(ctx: CanvasRenderingContext2D, x: number, y: number, width: numbe
 }
 
 function raisedBox(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number) {
-  ctx.fillStyle = '#c0c0c0';
+  ctx.fillStyle = '#18251c';
   ctx.fillRect(x, y, width, height);
-  line(ctx, x, y, x + width - 1, y, '#ffffff');
-  line(ctx, x, y, x, y + height - 1, '#ffffff');
-  line(ctx, x, y + height - 1, x + width - 1, y + height - 1, '#404040');
-  line(ctx, x + width - 1, y, x + width - 1, y + height - 1, '#404040');
-  line(ctx, x + 1, y + height - 2, x + width - 2, y + height - 2, '#808080');
-  line(ctx, x + width - 2, y + 1, x + width - 2, y + height - 2, '#808080');
+  line(ctx, x, y, x + width - 1, y, '#73806f');
+  line(ctx, x, y, x, y + height - 1, '#73806f');
+  line(ctx, x, y + height - 1, x + width - 1, y + height - 1, '#030705');
+  line(ctx, x + width - 1, y, x + width - 1, y + height - 1, '#030705');
+  line(ctx, x + 1, y + height - 2, x + width - 2, y + height - 2, '#0a100c');
+  line(ctx, x + width - 2, y + 1, x + width - 2, y + height - 2, '#0a100c');
 }
 
 function triangle(ctx: CanvasRenderingContext2D, x: number, y: number, direction: 'up' | 'down') {
-  ctx.fillStyle = '#111';
+  ctx.fillStyle = '#d6c675';
   for (let row = 0; row < 4; row += 1) {
     const width = direction === 'up' ? row * 2 + 1 : (4 - row) * 2 - 1;
     const offset = direction === 'up' ? 3 - row : row;
@@ -140,11 +140,11 @@ function triangle(ctx: CanvasRenderingContext2D, x: number, y: number, direction
 }
 
 function drawScrollbar(ctx: CanvasRenderingContext2D, geometry: GitHubScrollbarGeometry) {
-  ctx.fillStyle = '#707070';
+  ctx.fillStyle = '#0a100c';
   ctx.fillRect(geometry.track.x, geometry.track.y, geometry.track.width, geometry.track.height);
   for (let y = geometry.track.y; y < geometry.track.y + geometry.track.height; y += 2) {
     for (let x = geometry.track.x; x < geometry.track.x + geometry.track.width; x += 2) {
-      ctx.fillStyle = (x + y) % 4 === 0 ? '#5d5d5d' : '#929292';
+      ctx.fillStyle = (x + y) % 4 === 0 ? '#132019' : '#263329';
       ctx.fillRect(x, y, 1, 1);
     }
   }
