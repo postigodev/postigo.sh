@@ -56,11 +56,13 @@ test('progressively enhances Spotify and GitHub without blocking static identity
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await expect(page.locator('[data-github-widget]')).toContainText('20 commits');
   await expect(page.locator('[data-github-widget]')).toContainText('postigodev/postigo.sh');
-  await expect(page.locator('[data-github-widget] time').first()).not.toContainText('–');
-  await expect(page.locator('[data-github-widget] [role="option"]')).toHaveCount(6);
-  await expect(page.locator('[data-github-widget] [role="option"]').first()).toHaveAttribute('aria-selected', 'true');
-  await expect(page.locator('[data-github-widget] .github-overview__detail')).toHaveAttribute('href', githubFixture.entries[0].url);
-  await expect(page.getByRole('button', { name: 'Next GitHub activity' })).toBeVisible();
+  const canvas = page.locator('[data-github-widget] canvas');
+  await expect(canvas).toHaveAttribute('width', '320');
+  await expect(canvas).toHaveAttribute('height', '144');
+  await expect(page.locator('[data-github-widget] ol li')).toHaveCount(githubFixture.entries.length);
+  await expect(page.locator('[data-github-widget] ol li').first()).toContainText('13 AUG');
+  await expect(page.locator('[data-github-widget] ol li').nth(1)).toContainText('13 AUG');
+  await expect(page.locator('[data-github-widget] .github-overview__overlay--detail')).toHaveAttribute('href', githubFixture.entries[0].url);
 });
 
 test('navigates and opens the complete GitHub activity menu', async ({ page }) => {
@@ -68,17 +70,19 @@ test('navigates and opens the complete GitHub activity menu', async ({ page }) =
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.evaluate(() => { window.open = (url) => { document.documentElement.dataset.githubOpened = String(url); return null; }; });
 
-  const first = page.locator('[data-github-index="0"]');
-  await first.focus();
-  await first.press('End');
-  await expect(page.locator('[data-github-index="7"]')).toHaveAttribute('aria-selected', 'true');
-  await expect(page.locator('.github-overview__detail')).toHaveAttribute('href', githubFixture.entries[7].url);
-  await page.locator('[data-github-index="7"]').press('Enter');
+  const canvas = page.locator('[data-github-widget] canvas');
+  await canvas.focus();
+  await canvas.press('End');
+  await expect(page.locator('.github-overview__overlay--detail')).toHaveAttribute('href', githubFixture.entries[7].url);
+  await expect(page.locator('[aria-live="polite"]')).toContainText('created repository postigodev/new-repo');
+  await canvas.press('Enter');
   await expect(page.locator('html')).toHaveAttribute('data-github-opened', githubFixture.entries[7].url);
 
-  await page.locator('[data-github-index="7"]').press('Home');
-  await expect(page.locator('[data-github-index="0"]')).toHaveAttribute('aria-selected', 'true');
-  await page.locator('[data-github-index="1"]').dblclick();
+  await canvas.press('Home');
+  await expect(page.locator('.github-overview__overlay--detail')).toHaveAttribute('href', githubFixture.entries[0].url);
+  const box = await canvas.boundingBox();
+  expect(box).not.toBeNull();
+  await canvas.dblclick({ position: { x: (box?.width ?? 320) * 150 / 320, y: (box?.height ?? 144) * 48 / 144 } });
   await expect(page.locator('html')).toHaveAttribute('data-github-opened', githubFixture.entries[1].url);
 });
 
@@ -89,8 +93,8 @@ test('preserves explicit unavailable states for malformed responses', async ({ p
 
   await expect(page.locator('[data-now-playing]')).toContainText('Spotify unavailable');
   await expect(page.locator('#latest')).toHaveAttribute('data-spotify-palette', 'fallback');
-  await expect(page.locator('[data-github-widget]')).toContainText('GITHUB ACTIVITY UNAVAILABLE');
-  await expect(page.getByRole('link', { name: 'postigodev', exact: true })).toBeVisible();
+  await expect(page.locator('[data-github-widget]')).toContainText('GitHub activity unavailable');
+  await expect(page.getByRole('link', { name: 'Open postigodev on GitHub' }).first()).toBeVisible();
 });
 
 test('renders recent playback without playing motion', async ({ page }) => {

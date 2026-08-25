@@ -301,43 +301,14 @@ button, a { font: inherit; }
 .empty-state strong { color: #f1f4fc; }
 .empty-state span { font-size: 8px; }
 
-.github-overview { position: relative; width: 100%; height: 100%; overflow: hidden; color: #d6d3c8; background: #05070a; cursor: default; user-select: none; -webkit-font-smoothing: none; }
-.github-overview__noise { position: absolute; z-index: 0; inset: 0; pointer-events: none; opacity: .27; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='2' seed='22491' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='64' height='64' fill='%23080b0d'/%3E%3Crect width='64' height='64' filter='url(%23n)' opacity='.24'/%3E%3C/svg%3E"); image-rendering: pixelated; }
-.github-overview::before, .github-overview::after { content: ""; position: absolute; z-index: 1; right: 0; left: 0; height: max(1px, .3125cqi); pointer-events: none; background: rgba(255,255,255,.025); }
-.github-overview::before { top: 30.5556%; }
-.github-overview::after { top: 70.1389%; }
-.github-overview__header { position: absolute; z-index: 2; top: 0; right: 3.125%; left: 3.125%; height: 14.5833%; border-bottom: max(1px, .3125cqi) solid #3c3e3b; }
-.github-overview__header::after { content: ""; position: absolute; bottom: max(-2px, -.625cqi); left: 0; width: 31%; height: max(1px, .3125cqi); background: #77776d; }
-.github-overview__header a, .github-overview__header span { position: absolute; bottom: 18%; text-shadow: max(1px, .3125cqi) max(1px, .3125cqi) #020303; }
-.github-overview__header a { left: 0; color: #ece9dc; background: transparent; font: 700 4.0625cqi/1 "Times New Roman", Times, serif; text-decoration: none; }
-.github-overview__header a:hover { color: #fff4c4; background: transparent; }
-.github-overview__header span { right: 0; color: #99988f; font: 700 2.5cqi/1 "Times New Roman", Times, serif; }
-.github-overview__list-frame, .github-overview__detail { position: absolute; z-index: 2; right: 2.5%; left: 2.5%; background: #0b0d0f; box-shadow: inset 0 0 0 max(1px, .3125cqi) #74756e, inset max(1px, .3125cqi) max(1px, .3125cqi) 0 max(1px, .3125cqi) #9a998d, inset max(-2px, -.625cqi) max(-2px, -.625cqi) 0 max(1px, .3125cqi) #121412; }
-.github-overview__list-frame { top: 15.9722%; height: 65.2778%; }
-.github-overview__date-gutter { position: absolute; top: 2.1277%; bottom: 2.1277%; left: .9375cqi; width: 15cqi; border-right: max(1px, .3125cqi) solid #30322f; background: #080a0c; }
-.github-overview__list { position: absolute; top: 3.1915%; right: 1.5625cqi; left: 16.5625cqi; height: 95.7447%; margin: 0; padding: 0; list-style: none; touch-action: pan-y; }
-.github-overview__row { position: relative; display: grid; grid-template-columns: 34% minmax(0, 1fr) 10%; align-items: center; width: 100%; height: 16.6667%; padding: 0 2.5cqi; color: #858780; outline: 0; font: 400 1.875cqi/1 Arial, Helvetica, sans-serif; white-space: nowrap; }
-.github-overview__row::before { content: ""; position: absolute; z-index: -1; inset: 0; }
-.github-overview__row:hover::before { background: #111416; }
-.github-overview__row[aria-selected="true"]::before { border: max(1px, .3125cqi) solid #2cb84b; border-top-color: #37d05a; border-right-color: #126d29; border-bottom-color: #198733; background: #0b2414; }
-.github-overview__row:focus-visible::before { outline: max(1px, .3125cqi) solid var(--lime); outline-offset: max(1px, .3125cqi); }
-.github-overview__row strong { overflow: hidden; color: #d8d4c7; font: 700 3.125cqi/1 "Times New Roman", Times, serif; text-overflow: ellipsis; text-shadow: max(1px, .3125cqi) max(1px, .3125cqi) #020303; }
-.github-overview__row[aria-selected="true"] strong { color: #e8c86d; }
-.github-overview__row time { color: #71736e; font: 400 2.1875cqi/1 "Times New Roman", Times, serif; text-align: right; }
-.github-overview__row[aria-selected="true"] .github-overview__action, .github-overview__row[aria-selected="true"] time { color: #d6d1bd; }
-.github-overview__date { position: absolute; right: calc(100% + 2.5cqi); width: 13.125cqi; overflow: hidden; color: #a6a399; font: 700 2.5cqi/1 "Times New Roman", Times, serif; text-align: right; text-shadow: max(1px, .3125cqi) max(1px, .3125cqi) #020303; }
-.github-overview__action { overflow: hidden; padding-left: 1.25cqi; text-overflow: ellipsis; }
-.github-overview__row--blank { pointer-events: none; }
-.github-overview__step { position: absolute; z-index: 4; left: 3.75cqi; display: grid; width: 4.375cqi; height: 3.4375cqi; place-items: center; padding: 0; color: #8e9188; border: max(1px, .3125cqi) solid #52544e; border-radius: 0; background: #101310; font: 700 1.875cqi/1 Arial, sans-serif; cursor: pointer; }
-.github-overview__step:hover { color: #e8c86d; background: #0b2414; }
-.github-overview__step--up { top: 1.5625cqi; }
-.github-overview__step--down { bottom: 1.5625cqi; }
-.github-overview__status { display: grid; height: 100%; place-items: center; padding: 0 8%; color: #858780; font: 700 2.5cqi/1.2 "Times New Roman", Times, serif; letter-spacing: .08em; text-align: center; text-shadow: max(1px, .3125cqi) max(1px, .3125cqi) #020303; }
-.github-overview__detail { top: 83.3333%; display: grid; height: 11.8056%; grid-template-columns: 28% minmax(0, 1fr); align-items: center; padding: 0 1.875cqi; color: #8b8c84; text-decoration: none; }
-.github-overview__detail:hover { color: #d6d1bd; background: #111416; }
-.github-overview__detail strong, .github-overview__detail span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: max(1px, .3125cqi) max(1px, .3125cqi) #020303; }
-.github-overview__detail strong { color: #ece8da; font: 700 2.5cqi/1 "Times New Roman", Times, serif; }
-.github-overview__detail span { font: 400 1.875cqi/1 Arial, Helvetica, sans-serif; }
+.github-overview { position: relative; width: 100%; height: 100%; overflow: hidden; background: #05070a; }
+.github-overview__canvas { display: block; width: 100%; height: 100%; aspect-ratio: 320 / 144; image-rendering: pixelated; image-rendering: crisp-edges; cursor: default; touch-action: pan-y; }
+.github-overview__canvas:focus-visible { outline: 2px solid var(--lime); outline-offset: -3px; box-shadow: inset 0 0 0 1px #060806; }
+.github-overview__overlay { position: absolute; z-index: 2; overflow: hidden; color: transparent; background: transparent; text-decoration: none; white-space: nowrap; opacity: 0; }
+.github-overview__overlay:hover { color: transparent; background: transparent; }
+.github-overview__overlay:focus-visible { opacity: 1; color: transparent; outline: 2px solid var(--lime); outline-offset: -2px; box-shadow: inset 0 0 0 1px #060806; }
+.github-overview__overlay--profile { top: 2%; left: 3%; width: 31%; height: 11%; }
+.github-overview__overlay--detail { top: 83.3333%; right: 2.5%; bottom: 4.8611%; left: 2.5%; }
 .presence-empty { margin: 0; color: #b9c5da; }
 
 #latest {

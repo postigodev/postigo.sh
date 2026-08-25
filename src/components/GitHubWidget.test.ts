@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { githubActivityWindow, presentGitHubActivity, relativeGitHubTime } from './githubActivityPresentation';
+import { githubCanvasRowAt, githubScrollbarGeometry } from './githubActivityCanvas';
 
 describe('relativeGitHubTime', () => {
   const now = Date.parse('2026-08-21T12:00:00Z');
@@ -48,5 +49,24 @@ describe('githubActivityWindow', () => {
     [2, 3, { start: 0, end: 3 }],
   ])('keeps selection %i visible among %i entries', (selected, total, expected) => {
     expect(githubActivityWindow(selected, total)).toEqual(expected);
+  });
+});
+
+describe('GitHub canvas geometry', () => {
+  it('keeps the Win98 scrollbar inside the right side of the list frame', () => {
+    const geometry = githubScrollbarGeometry(3, 12);
+    expect(geometry).toMatchObject({
+      topButton: { x: 297, y: 26, width: 11, height: 12 },
+      bottomButton: { x: 297, y: 102, width: 11, height: 12 },
+    });
+    expect(geometry?.thumb.y).toBeGreaterThanOrEqual(geometry?.track.y ?? 0);
+    expect((geometry?.thumb.y ?? 0) + (geometry?.thumb.height ?? 0)).toBeLessThanOrEqual(102);
+  });
+
+  it('omits overflow chrome for six entries and gives it hit precedence over rows', () => {
+    expect(githubScrollbarGeometry(0, 6)).toBeUndefined();
+    expect(githubCanvasRowAt(300, 30, 0, 12)).toBeUndefined();
+    expect(githubCanvasRowAt(100, 30, 0, 12)).toBe(0);
+    expect(githubCanvasRowAt(100, 105, 2, 12)).toBe(7);
   });
 });
