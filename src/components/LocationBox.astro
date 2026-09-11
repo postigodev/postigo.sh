@@ -15,6 +15,15 @@ const weather = location.weather
 const now = new Date();
 const dayPeriod = getDayPeriod(now, location.timezone);
 const moon = getMoonPresentation(now);
+// Static artwork coordinates: crown, wings, roses, outer ornament.
+const sparkles = [
+  [596,62,3,7.1,-2.4], [650,120,6,8.3,-5.7], [568,175,2,6.7,-1.3],
+  [704,180,3,9.1,-7.2], [167,86,6,8.7,-3.6], [99,253,2,7.6,-6.1],
+  [447,109,3,9.7,-4.4], [1099,99,6,7.9,-1.9], [1176,278,2,10.1,-8.2],
+  [815,132,3,8.9,-5.3], [242,682,3,9.3,-2.7], [1005,572,6,7.3,-4.9],
+  [391,980,6,10.7,-8.6], [851,1010,3,8.1,-6.4], [615,1090,2,9.9,-3.1],
+  [115,1041,3,7.7,-5.8], [1124,1101,6,10.3,-7.5],
+];
 const clockFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: location.timezone,
   hour: "2-digit",
@@ -32,6 +41,8 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
   data-timezone={location.timezone}
 >
   <p class="location-kicker">currently posting from</p>
+  <div class="location-frame">
+    <div class="location-content">
   <p class="location-place">{place}</p>
   <div class="location-box-flex">
     <div class="location-status">
@@ -115,34 +126,112 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
     </span>
     <span id="moon-phase">{moon.label}</span>
   </p>
+    </div>
+    <img class="location-angels" src="/images/weather/angels.png"
+      alt="" aria-hidden="true" width="1254" height="1254" />
+    <div class="location-sparkles" aria-hidden="true">
+      {sparkles.map(([x, y, size, duration, delay]) => (
+        <span class:list={["angel-sparkle", size > 3 ? "sparkle-star" : "sparkle-dot"]}
+          style={`--x:${x / 1254 * 100}%;--y:${y / 1254 * 100}%;--size:${size}px;--duration:${duration}s;--delay:${delay}s`} />
+      ))}
+    </div>
+  </div>
 </aside>
 
 <style>
   .location-box {
-    --location-bg: rgba(49, 38, 42, 0.92);
-    --location-border: rgba(235, 238, 244, 0.9);
     --location-text: #ebe7e9;
     --location-muted: #c9c2c7;
     --location-accent: #9be8df;
 
-    width: min(260px, 100%);
+    width: min(360px, 100%);
+    align-self: center;
     box-sizing: border-box;
-    padding: 10px 14px 11px;
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(0, 0, 0, 0.08)),
-      var(--location-bg);
-    border: 1px dashed var(--location-border);
-    border-radius: 7px;
     color: var(--location-text);
     text-align: center;
-    box-shadow:
-      0 2px 0 rgba(0, 0, 0, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(4px);
     font-family: "Times New Roman", Georgia, serif;
     text-shadow:
       1px 1px 0 #111,
       -1px -1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  .location-frame {
+    position: relative;
+    isolation: isolate;
+    aspect-ratio: 1254 / 1254;
+    container-type: inline-size;
+  }
+
+  .location-frame::before {
+    content: "";
+    position: absolute;
+    /* Retain the original backing only inside the measured oval. */
+    left: 23.3%;
+    top: 23.9%;
+    width: 53.6%;
+    height: 54.4%;
+    border-radius: 50%;
+    background: rgba(49, 38, 42, 0.92);
+  }
+
+  .location-content {
+    /* Measured transparent opening: x=292..964, y=300..982.
+       Center text at (628,641), inside the curved rim. */
+    position: absolute;
+    z-index: 1;
+    left: 50.08%;
+    top: 51.12%;
+    width: 49%;
+    transform: translate(-50%, -50%);
+  }
+
+  .location-angels, .location-sparkles {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .location-angels {
+    z-index: 2;
+    object-fit: contain;
+    animation: angel-float 7s ease-in-out infinite;
+  }
+  .location-sparkles { z-index: 3; }
+  .angel-sparkle {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--size);
+    height: var(--size);
+    opacity: 0;
+    animation: angel-sparkle var(--duration) ease-in-out var(--delay) infinite;
+  }
+  .sparkle-dot {
+    border-radius: 50%;
+    background: rgba(255, 244, 190, 0.95);
+    box-shadow: 0 0 3px rgba(255, 235, 150, 0.5);
+  }
+  .sparkle-star::before, .sparkle-star::after {
+    content: "";
+    position: absolute;
+    background: rgba(255, 250, 220, 0.95);
+    border-radius: 999px;
+  }
+  .sparkle-star::before { width: 1px; height: 100%; left: 50%; }
+  .sparkle-star::after { height: 1px; width: 100%; top: 50%; }
+  @keyframes angel-sparkle {
+    0%, 25%, 85%, 100% { opacity: 0; transform: scale(0.45) translateY(1px); }
+    40%, 70% { opacity: 0.2; }
+    52% { opacity: 0.85; transform: scale(1) translateY(-1px); }
+  }
+  @keyframes angel-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .location-angels, .angel-sparkle { animation: none; }
+    .angel-sparkle { opacity: 0.35; }
   }
 
   .location-box p {
@@ -321,10 +410,13 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
     clip-path: inset(0 50% 0 0);
   }
 
-  @media (max-width: 420px) {
-    .location-box {
-      width: 100%;
-    }
+  /* Fit the existing row into the narrow desktop oval without shrinking type. */
+  @container (max-width: 330px) {
+    .location-box-flex { display: flex; flex-direction: column; align-items: center; }
+    .location-box-flex > span { display: none; }
+    .location-status, .location-weather { margin: 0 0 2px; }
+    .location-place { margin-bottom: 2px !important; }
+    .location-moon { line-height: 1.1; }
   }
 </style>
 
