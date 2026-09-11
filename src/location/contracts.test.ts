@@ -28,7 +28,7 @@ describe('homepage location boundaries', () => {
 
     expect(component).toContain('currently posting from');
     expect(component).toContain('data-timezone={location.timezone}');
-    expect(component).toContain("Intl.DateTimeFormat('en-US'");
+    expect(component).toMatch(/Intl\.DateTimeFormat\(["']en-US["']/);
     expect(weather).toContain("const WEATHER_ROOT = '/images/weather'");
     expect(component).toContain('prefers-reduced-motion');
     expect(component).toContain('location-weather');
@@ -36,8 +36,10 @@ describe('homepage location boundaries', () => {
     expect(component).not.toContain('fetch(');
   });
 
-  it('orders location, time, vertical weather, and SVG moon phase', () => {
+  it('orders the oval content as kicker, location, time, inline weather, and moon', () => {
     const component = read('../components/LocationBox.astro');
+    expect(component.indexOf('class="location-content"')).toBeLessThan(component.indexOf('class="location-kicker"'));
+    expect(component.indexOf('class="location-kicker"')).toBeLessThan(component.indexOf('class="location-place"'));
     expect(component.indexOf('class="location-place"')).toBeLessThan(component.indexOf('class="location-status"'));
     expect(component.indexOf('class="location-status"')).toBeLessThan(component.indexOf('class="location-weather"'));
     expect(component.indexOf('class="location-weather"')).toBeLessThan(component.indexOf('class="location-moon"'));
@@ -46,8 +48,8 @@ describe('homepage location boundaries', () => {
     expect(component).toContain('moon-phase-icon--${moon.variant}');
     expect(component).not.toContain('◐');
     expect(component).not.toContain('☾');
-    expect(component).toContain('/images/weather/spark-burst-static.svg');
-    expect(component).toContain('/images/weather/pixel-rain-static.svg');
+    expect(component).not.toContain('data-time-effect');
+    expect(component).not.toContain('class="location-box-flex"');
   });
 
   it('ships local animated effects, static fallbacks, and moon assets', () => {

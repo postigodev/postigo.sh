@@ -1,6 +1,6 @@
 ---
 import type { StoredLocation } from "../location/service";
-import { getDayPeriod, getMoonPresentation } from "../location/celestial";
+import { getMoonPresentation } from "../location/celestial";
 import { getWeatherPresentation } from "../location/weather";
 
 interface Props {
@@ -13,7 +13,6 @@ const weather = location.weather
   ? getWeatherPresentation(location.weather.symbolCode)
   : null;
 const now = new Date();
-const dayPeriod = getDayPeriod(now, location.timezone);
 const moon = getMoonPresentation(now);
 // Static artwork coordinates: crown, wings, roses, outer ornament.
 const sparkles = [
@@ -40,92 +39,51 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
   data-mobile-order
   data-timezone={location.timezone}
 >
-  <p class="location-kicker">currently posting from</p>
   <div class="location-frame">
     <div class="location-content">
-  <p class="location-place">{place}</p>
-  <div class="location-box-flex">
-    <div class="location-status">
-      <span class="status-item">
-        <span
-          class="time-effect"
-          data-time-effect="day"
-          hidden={dayPeriod !== "day"}
-          aria-hidden="true"
-        >
-          <picture
-            ><source
-              media="(prefers-reduced-motion: reduce)"
-              srcset="/images/weather/spark-burst-static.svg"
-            /><img
-              src="/images/weather/spark-burst.svg"
-              alt=""
-              width="18"
-              height="18"
-            /></picture
-          >
-        </span>
-        <span
-          class="time-effect"
-          data-time-effect="night"
-          hidden={dayPeriod !== "night"}
-          aria-hidden="true"
-        >
-          <picture
-            ><source
-              media="(prefers-reduced-motion: reduce)"
-              srcset="/images/weather/pixel-rain-static.svg"
-            /><img
-              src="/images/weather/pixel-rain.svg"
-              alt=""
-              width="18"
-              height="18"
-            /></picture
-          >
-        </span>
+      <p class="location-kicker">currently posting from</p>
+      <p class="location-place">{place}</p>
+      <div class="location-status">
         <time id="location-clock" datetime={now.toISOString()}
           >{clockFormatter.format(now)}</time
         >
-      </span>
-    </div>
-    <span>★</span>
-    {
-      weather && location.weather && (
-        <div
-          class="location-weather"
-          data-weather-condition={weather.condition}
-        >
-          <span class="weather-copy">
-            <span>{weather.condition}</span>
-            <span>{Math.round(location.weather.temperatureC)}°C</span>
+      </div>
+      <div class="location-meta">
+        {
+          weather && location.weather && (
+            <div
+              class="location-weather"
+              data-weather-condition={weather.condition}
+            >
+              <picture>
+                <source
+                  media="(prefers-reduced-motion: reduce)"
+                  srcset={weather.reducedMotionIconPath}
+                />
+                <img
+                  class={`weather-icon weather-icon--${weather.motion}`}
+                  src={weather.iconPath}
+                  alt=""
+                  width="24"
+                  height="24"
+                />
+              </picture>
+              <span class="weather-copy">
+                {weather.condition} <span aria-hidden="true">·</span> {Math.round(location.weather.temperatureC)}°C
+              </span>
+            </div>
+          )
+        }
+        <p class="location-moon">
+          <span
+            class={`moon-phase-icon moon-phase-icon--${moon.variant}`}
+            aria-hidden="true"
+          >
+            <img src={moon.iconPath} alt="" width="16" height="16" />
           </span>
-          <picture>
-            <source
-              media="(prefers-reduced-motion: reduce)"
-              srcset={weather.reducedMotionIconPath}
-            />
-            <img
-              class={`weather-icon weather-icon--${weather.motion}`}
-              src={weather.iconPath}
-              alt=""
-              width="24"
-              height="24"
-            />
-          </picture>
-          
-        </div>
-      )
-    }
-  </div>
-  <p class="location-moon">
-    <span
-      class={`moon-phase-icon moon-phase-icon--${moon.variant}`}
-      aria-hidden="true"
-    >
-      <img src={moon.iconPath} alt="" width="16" height="16" />
-    </span>
-    <span id="moon-phase">{moon.label}</span>
-  </p>
+          <span id="moon-phase">{moon.label}</span>
+        </p>
+      </div>
     </div>
     <img class="location-angels" src="/images/weather/angels.png"
       alt="" aria-hidden="true" width="1254" height="1254" />
@@ -181,7 +139,12 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
     z-index: 1;
     left: 50.08%;
     top: 51.12%;
-    width: 49%;
+    width: 46%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(3px, 1.3cqi, 5px);
+    line-height: 1.15;
     transform: translate(-50%, -50%);
   }
 
@@ -239,22 +202,23 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
   }
 
   .location-kicker {
-    margin-bottom: 1px !important;
-    color: var(--location-text);
-    font-size: 12px;
-    font-weight: 700;
+    color: var(--location-muted);
+    font-size: clamp(8px, 3.1cqi, 11px);
     font-style: italic;
-    letter-spacing: 0.9px;
+    font-weight: 400;
+    letter-spacing: 0.1px;
+    white-space: nowrap;
   }
 
   .location-place {
-    margin-bottom: 7px !important;
+    max-width: 100%;
     color: var(--location-accent);
-    font-size: 16px;
+    font-size: clamp(16px, 7.1cqi, 26px);
     font-weight: 700;
     font-style: italic;
-    letter-spacing: 1.8px;
+    letter-spacing: 0.3px;
     line-height: 1.05;
+    overflow-wrap: anywhere;
     text-transform: lowercase;
     text-shadow:
       1px 1px 0 #111,
@@ -262,54 +226,51 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
   }
 
   .location-status {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 6px;
-    font-size: 13px;
-    font-weight: 700;
+    font-size: clamp(12px, 5cqi, 18px);
+    font-weight: 400;
     letter-spacing: 0.5px;
-    justify-self: start;
-  }
-  .location-box-flex {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: start;
-    width: 100%;
-  }
-  .location-box-flex > span {
-    justify-self: center;
-  }
-  .location-weather {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin: -1px 0 6px;
-    color: var(--location-text);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.45px;
-    justify-self: end;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
-  .location-weather picture,
-  .weather-icon {
-    display: block;
-    width: 24px;
-    height: 24px;
+  .location-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(3px, 1cqi, 4px);
+    margin-top: clamp(3px, 1.3cqi, 5px);
+    color: var(--location-muted);
+    font-size: clamp(9px, 3.6cqi, 13px);
+    font-weight: 400;
+    line-height: 1.2;
+  }
+
+  .location-weather,
+  .location-moon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(3px, 1cqi, 4px);
   }
 
   .weather-copy {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .location-weather picture,
+  .weather-icon,
+  .moon-phase-icon,
+  .moon-phase-icon img {
+    display: block;
+    width: clamp(10px, 4cqi, 14px);
+    height: clamp(10px, 4cqi, 14px);
+    flex-shrink: 0;
+    image-rendering: pixelated;
   }
 
   .weather-icon {
-    image-rendering: pixelated;
+    filter: saturate(0.5);
+    opacity: 0.8;
     transform-origin: center;
   }
 
@@ -353,45 +314,6 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
     }
   }
 
-  .status-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    white-space: nowrap;
-  }
-
-  .time-effect,
-  .time-effect picture,
-  .time-effect img {
-    display: block;
-    width: 18px;
-    height: 18px;
-    image-rendering: pixelated;
-  }
-
-  .time-effect[hidden] {
-    display: none;
-  }
-
-  .location-moon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    color: var(--location-muted);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-  }
-
-  .moon-phase-icon,
-  .moon-phase-icon img {
-    display: block;
-    width: 16px;
-    height: 16px;
-    image-rendering: pixelated;
-  }
-
   .moon-phase-icon {
     overflow: hidden;
   }
@@ -409,15 +331,6 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
   .moon-phase-icon--last-quarter img {
     clip-path: inset(0 50% 0 0);
   }
-
-  /* Fit the existing row into the narrow desktop oval without shrinking type. */
-  @container (max-width: 330px) {
-    .location-box-flex { display: flex; flex-direction: column; align-items: center; }
-    .location-box-flex > span { display: none; }
-    .location-status, .location-weather { margin: 0 0 2px; }
-    .location-place { margin-bottom: 2px !important; }
-    .location-moon { line-height: 1.1; }
-  }
 </style>
 
 <script>
@@ -426,8 +339,6 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
   );
   const clock = locationBox?.querySelector<HTMLTimeElement>("#location-clock");
   const timezone = locationBox?.dataset.timezone;
-  const effects =
-    locationBox?.querySelectorAll<HTMLElement>("[data-time-effect]");
 
   function updateClock() {
     if (!clock || !timezone) return;
@@ -440,18 +351,6 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
       hour12: false,
     }).format(new Date());
     clock.dateTime = new Date().toISOString();
-
-    const hour = Number(
-      new Intl.DateTimeFormat("en-US", {
-        timeZone: timezone,
-        hour: "numeric",
-        hourCycle: "h23",
-      }).format(new Date()),
-    );
-    const period = hour >= 6 && hour < 18 ? "day" : "night";
-    effects?.forEach((effect) => {
-      effect.hidden = effect.dataset.timeEffect !== period;
-    });
   }
 
   updateClock();
