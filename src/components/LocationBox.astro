@@ -176,7 +176,7 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
     z-index: 2;
     object-fit: contain;
     filter:
-      saturate(1.08) contrast(1.04) brightness(1.03)
+      saturate(1.12) contrast(1.04) brightness(1.04)
       drop-shadow(0 0 3px rgba(255, 230, 170, 0.18))
       drop-shadow(0 0 7px rgba(255, 210, 120, 0.09));
     animation: angel-float 7s ease-in-out infinite;
@@ -184,16 +184,26 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
   .location-frame::after {
     content: "";
     z-index: 3;
-    /* The PNG alpha confines the laminate to the artwork, leaving text clear. */
+    /* Keep the mask fixed to the floating PNG; only the pearl reflection sweeps. */
     mask: url("/images/weather/angels.png") center / contain no-repeat;
     background:
+      linear-gradient(115deg,
+        transparent 40%, rgba(242, 221, 255, 0.16) 46%,
+        rgba(255, 251, 230, 0.46) 49%, rgba(209, 245, 255, 0.22) 52%,
+        transparent 58%),
+      radial-gradient(ellipse at 50% 16%, rgba(255, 244, 226, 0.12), transparent 58%),
       linear-gradient(135deg,
         transparent 8%, rgba(255, 255, 255, 0.32) 19%, transparent 32%,
         rgba(255, 226, 247, 0.12) 47%, rgba(255, 255, 255, 0.2) 52%,
         transparent 66%, rgba(211, 244, 255, 0.15) 81%, transparent 92%);
     mix-blend-mode: screen;
     opacity: 0.7;
-    animation: angel-float 7s ease-in-out infinite;
+    background-size: 250% 100%, 100% 100%, 100% 100%;
+    background-position: 150% 0, 0 0, 0 0;
+    background-repeat: no-repeat;
+    animation:
+      angel-float 7s ease-in-out infinite,
+      angel-sheen 13s ease-in-out infinite;
   }
   .location-sparkles { z-index: 4; }
   .angel-sparkle {
@@ -222,6 +232,10 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
     0%, 25%, 85%, 100% { opacity: 0; transform: scale(0.45) translateY(1px); }
     40%, 70% { opacity: 0.2; }
     52% { opacity: 0.85; transform: scale(1) translateY(-1px); }
+  }
+  @keyframes angel-sheen {
+    0%, 20% { background-position: 150% 0, 0 0, 0 0; }
+    65%, 100% { background-position: -150% 0, 0 0, 0 0; }
   }
   @keyframes angel-float {
     0%, 100% { transform: translateY(0); }
