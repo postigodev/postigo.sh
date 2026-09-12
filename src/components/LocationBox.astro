@@ -130,13 +130,22 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
   .location-frame::before {
     content: "";
     position: absolute;
-    /* Retain the original backing only inside the measured oval. */
+    /* Marble and polish stay inside the measured oval, below the text. */
     left: 23.3%;
     top: 23.9%;
     width: 53.6%;
     height: 54.4%;
     border-radius: 50%;
-    background: rgba(49, 38, 42, 0.92);
+    background:
+      radial-gradient(ellipse at 32% 15%, rgba(255, 226, 185, 0.07), transparent 62%),
+      linear-gradient(135deg, transparent 25%, rgba(255, 240, 211, 0.035) 42%, transparent 58%),
+      linear-gradient(rgba(27, 16, 12, 0.82), rgba(27, 16, 12, 0.82)),
+      url("/images/weather/dark-marble.png") center / cover no-repeat,
+      #1b100c;
+    box-shadow:
+      inset 0 2px 8px rgba(0, 0, 0, 0.65),
+      inset 0 0 0 1px rgba(221, 185, 125, 0.12);
+    pointer-events: none;
   }
 
   .location-content {
