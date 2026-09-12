@@ -36,9 +36,9 @@ describe('homepage location boundaries', () => {
     expect(component).not.toContain('fetch(');
   });
 
-  it('orders the oval content as kicker, location, time, inline weather, and moon', () => {
+  it('keeps the heading above the frame and orders location, time, weather, and moon', () => {
     const component = read('../components/LocationBox.astro');
-    expect(component.indexOf('class="location-content"')).toBeLessThan(component.indexOf('class="location-kicker"'));
+    expect(component.indexOf('class="location-kicker"')).toBeLessThan(component.indexOf('class="location-frame"'));
     expect(component.indexOf('class="location-kicker"')).toBeLessThan(component.indexOf('class="location-place"'));
     expect(component.indexOf('class="location-place"')).toBeLessThan(component.indexOf('class="location-status"'));
     expect(component.indexOf('class="location-status"')).toBeLessThan(component.indexOf('class="location-weather"'));

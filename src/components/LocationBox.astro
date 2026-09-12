@@ -39,9 +39,9 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
   data-mobile-order
   data-timezone={location.timezone}
 >
+  <p class="location-kicker">currently posting from</p>
   <div class="location-frame">
     <div class="location-content">
-      <p class="location-kicker">currently posting from</p>
       <p class="location-place">{place}</p>
       <div class="location-status">
         <time id="location-clock" datetime={now.toISOString()}
@@ -148,7 +148,7 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
     transform: translate(-50%, -50%);
   }
 
-  .location-angels, .location-sparkles {
+  .location-angels, .location-frame::after, .location-sparkles {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -158,9 +158,27 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
   .location-angels {
     z-index: 2;
     object-fit: contain;
+    filter:
+      saturate(1.08) contrast(1.04) brightness(1.03)
+      drop-shadow(0 0 3px rgba(255, 230, 170, 0.18))
+      drop-shadow(0 0 7px rgba(255, 210, 120, 0.09));
     animation: angel-float 7s ease-in-out infinite;
   }
-  .location-sparkles { z-index: 3; }
+  .location-frame::after {
+    content: "";
+    z-index: 3;
+    /* The PNG alpha confines the laminate to the artwork, leaving text clear. */
+    mask: url("/images/weather/angels.png") center / contain no-repeat;
+    background:
+      linear-gradient(135deg,
+        transparent 8%, rgba(255, 255, 255, 0.32) 19%, transparent 32%,
+        rgba(255, 226, 247, 0.12) 47%, rgba(255, 255, 255, 0.2) 52%,
+        transparent 66%, rgba(211, 244, 255, 0.15) 81%, transparent 92%);
+    mix-blend-mode: screen;
+    opacity: 0.7;
+    animation: angel-float 7s ease-in-out infinite;
+  }
+  .location-sparkles { z-index: 4; }
   .angel-sparkle {
     position: absolute;
     left: var(--x);
@@ -193,7 +211,7 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
     50% { transform: translateY(-2px); }
   }
   @media (prefers-reduced-motion: reduce) {
-    .location-angels, .angel-sparkle { animation: none; }
+    .location-angels, .location-frame::after, .angel-sparkle { animation: none; }
     .angel-sparkle { opacity: 0.35; }
   }
 
@@ -201,9 +219,11 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
     margin: 0;
   }
 
-  .location-kicker {
-    color: var(--location-muted);
-    font-size: clamp(8px, 3.1cqi, 11px);
+  .location-box .location-kicker {
+    margin-bottom: 3px;
+    color: var(--location-text);
+    font-size: 11px;
+    text-shadow: 0 1px 0 #111, 0 0 6px rgba(255, 244, 220, 0.28);
     font-style: italic;
     font-weight: 400;
     letter-spacing: 0.1px;
@@ -231,6 +251,11 @@ const clockFormatter = new Intl.DateTimeFormat("en-US", {
     letter-spacing: 0.5px;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
+  }
+
+  #location-clock {
+    display: block;
+    width: 8ch;
   }
 
   .location-meta {
